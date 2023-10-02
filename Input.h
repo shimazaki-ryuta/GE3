@@ -6,6 +6,7 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
+#include <wrl.h>
 
 class Input
 {
@@ -24,9 +25,9 @@ private:
 	Input(const Input&) = delete;
 	Input operator=(const Input&) = delete;
 
-	IDirectInput8* directInput_ = nullptr;
+	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
 
-	IDirectInputDevice8* keyboard_ = nullptr;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 	BYTE key_[256] = {};
 	BYTE preKey_[256] = {};
 

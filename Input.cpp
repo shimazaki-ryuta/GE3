@@ -13,7 +13,7 @@ void Input::Initialize(HWND hwnd)
 	assert(SUCCEEDED(hr));
 
 	//キーボードデバイス作成
-	hr = directInput_->CreateDevice(GUID_SysKeyboard,&keyboard_,NULL);
+	hr = directInput_->CreateDevice(GUID_SysKeyboard,&keyboard_, NULL);
 	assert(SUCCEEDED(hr));
 
 	//入力データ形式セット
