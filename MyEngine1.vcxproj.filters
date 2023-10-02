@@ -184,21 +184,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Object3d.VS.hlsl" />
-    <FxCompile Include="Object3d.PS.hlsl" />
-    <FxCompile Include="SpriteVS.hlsl" />
-    <FxCompile Include="SpritePS.hlsl" />
-    <FxCompile Include="Primitive3DVS.hlsl" />
-    <FxCompile Include="Primitive3DPS.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
       <Filter>imgui</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Object3d.hlsli" />
-    <None Include="Sprite.hlsli" />
-    <None Include="Primitive3D.hlsli" />
   </ItemGroup>
 </Project>

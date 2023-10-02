@@ -30,9 +30,9 @@ void Sprite::StaticInitialize(
 	assert(SUCCEEDED(hr));
 
 	//Shaderのコンパイル
-	IDxcBlob* vertexShaderBlob = CompileShader(L"SpriteVS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* vertexShaderBlob = CompileShader(L"Resources/Shaders/SpriteVS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
-	IDxcBlob* pixelShaderBlob = CompileShader(L"SpritePS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* pixelShaderBlob = CompileShader(L"Resources/Shaders/SpritePS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};

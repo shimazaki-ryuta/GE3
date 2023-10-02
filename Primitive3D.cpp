@@ -34,9 +34,9 @@ void Primitive3D::StaticInitialize(
 	assert(SUCCEEDED(hr));
 
 	//Shaderのコンパイル
-	IDxcBlob* vertexShaderBlob = CompileShader(L"Primitive3DVS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* vertexShaderBlob = CompileShader(L"Resources/Shaders/Primitive3DVS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
-	IDxcBlob* pixelShaderBlob = CompileShader(L"Primitive3DPS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* pixelShaderBlob = CompileShader(L"Resources/Shaders/Primitive3DPS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
