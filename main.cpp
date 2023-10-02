@@ -27,6 +27,10 @@
 #include "Input.h"
 
 #include "GameScene.h"
+//ImGui
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
 
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;

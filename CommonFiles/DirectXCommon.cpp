@@ -8,6 +8,10 @@
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
 
+#include "../externals/imgui/imgui_impl_dx12.h"
+#include "../externals/imgui/imgui_impl_win32.h"
+
+
 ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
 	ID3D12DescriptorHeap* descreptorHeap = nullptr;
