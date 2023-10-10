@@ -23,7 +23,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	input_ = Input::GetInstance();
 
 
-	model_.Create("resources", "axis.obj");
+	model_.Create("resources", "fence.obj");
 
 	worldTransformObj_.Initialize();
 	worldTransformObj2_.Initialize();
@@ -58,7 +58,7 @@ void GameScene::Draw3D() {
 	Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
 	model_.Draw(worldTransformObj_, viewProjection_);
-	model_.Draw(worldTransformObj2_, viewProjection_);
+//	model_.Draw(worldTransformObj2_, viewProjection_);
 
 	Model::PostDraw();
 }
