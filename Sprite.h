@@ -10,6 +10,18 @@
 class Sprite
 {
 public:
+
+	enum class BlendMode
+	{
+		None,
+		Normal,
+		Add,
+		Subtract,
+		Multiply,
+		Screen,
+		CountofBlendMode, //PSO作成に使う値、使用出来ない
+	};
+
 	struct VertexData
 	{
 		Vector4 position;
@@ -38,8 +50,10 @@ public:
 	// ルートシグネチャ
 	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
 	// パイプラインステートオブジェクト
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
-	
+	//static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
+
+	static std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::CountofBlendMode)> sPipelineStates;
+
 	static void StaticInitialize(
 		ID3D12Device* device, int window_width, int window_height,
 		const std::wstring& directoryPath = L"Resources/");
@@ -57,10 +71,11 @@ public:
 
 	inline void SetWVP(const Matrix4x4& wvp) { wvp_ = wvp; };
 
+	inline void SetColor(const Vector4& color) { materialData_->color = color; };
 
 	inline void SetUVTransform(const Matrix4x4& uvTransform) { uvTransform_ = uvTransform; };
 
-	inline const Vector2 GetPosition() {return position_; };
+	inline void SetBlendMode(const BlendMode& blendmode) { blendMode_ = blendmode; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -81,6 +96,8 @@ private:
 	Matrix4x4 uvTransform_;
 
 	Matrix4x4 wvp_;
+
+	BlendMode blendMode_;
 
 	D3D12_RESOURCE_DESC resourceDesc_;
 };
