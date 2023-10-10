@@ -296,13 +296,13 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
 
-
+	/*
 	transformResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(TransformationMatrix));
 
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	transformationMatrixData->WVP = MakeIdentity4x4();
 	transformationMatrixData->World = MakeIdentity4x4();
-
+	*/
 }
 
 

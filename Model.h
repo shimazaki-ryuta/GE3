@@ -81,13 +81,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
+	//Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	VertexData* vertexData_ = nullptr;
 	//uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
-	TransformationMatrix* transformationMatrixData = nullptr;
+	//TransformationMatrix* transformationMatrixData = nullptr;
 	WorldTransform worldTransform;
 	Vector2 position_;
 	Vector2 size_;
