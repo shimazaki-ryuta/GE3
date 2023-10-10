@@ -1,8 +1,22 @@
 #pragma once
 #include "Vector3.h"
 #include "Matrix.h"
+#include <d3d12.h>
+#include <string>
+#include <wrl.h>
 struct WorldTransform
 {
+	struct TransformationMatrix
+	{
+		Matrix4x4 WVP;
+		Matrix4x4 World;
+	};
+	// デバイス
+	static ID3D12Device* sDevice;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
+	TransformationMatrix* transformationMatrixData = nullptr;
+	static void SetDevice(
+		ID3D12Device* device);
 
 	Vector3 scale_ = {1.0f,1.0f,1.0f};
 	Vector3 rotation_ = {0.0f,0.0f,0.0f};
@@ -14,4 +28,6 @@ struct WorldTransform
 	void Initialize();
 	void UpdateMatrix();
 	inline Matrix4x4 GetWorld() { return matWorld_; };
+
+	void TransfarMatrix(const Matrix4x4&);
 };

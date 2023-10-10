@@ -32,10 +32,18 @@
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 
+#include "WorldTransform.h"
+
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
 const std::string kTitle = "";
 
+struct DirectionalLight
+{
+	Vector4 color;
+	Vector3 direction;
+	float intensity;
+};
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
@@ -70,8 +78,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	textureManager->SetDirectXCommon(dxCommon);
 	textureManager->SetsrvDescriptorHeap(dxCommon->GetsrvDescriptorHeap());
 
+	//worldTransformの初期化
+	WorldTransform::SetDevice(dxCommon->GetDevice());
+
 	//Spriteの初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(),mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
+
+	//Modelの初期化
+	Model::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 
 	Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 
@@ -87,6 +101,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(dxCommon);
 	
+	//DirectionalLight用のリソース
+	ID3D12Resource* directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
+	DirectionalLight* directinalLightData = nullptr;
+	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
+	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
+	directinalLightData->intensity = 1.0f;
+
 	///メインループ
 	MSG msg{};
 	DeltaTime::GameLoopStart();
@@ -106,10 +128,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();			
 
+			gameScene->Update();
 
 			//描画
 			dxCommon->PreDraw();
 		
+			//Lighting用のリソースの場所を設定
+			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+
 			gameScene->Draw3D();
 		
 
