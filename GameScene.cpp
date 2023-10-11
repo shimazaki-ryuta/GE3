@@ -4,6 +4,7 @@
 #include <list>
 #include <fstream>
 #include  "Primitive3D.h"
+#include "Input.h"
 //ImGui
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
@@ -32,6 +33,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 }
 
 void GameScene::Update() {
+	XINPUT_STATE joyState;
+	Input::GetJoyStickState(0,joyState);
+
+	worldTransformObj_.translation_.x += float(joyState.Gamepad.sThumbLX) / SHRT_MAX;
+
 	ImGui::Begin("obj1");
 	ImGui::DragFloat3("Scale", &worldTransformObj_.scale_.x, 0.1f, -10.0f, 10.0f);
 	ImGui::DragFloat3("Rotate", &worldTransformObj_.rotation_.x, 0.1f, -10.0f, 10.0f);

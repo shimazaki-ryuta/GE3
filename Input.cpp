@@ -7,6 +7,7 @@ Input* Input::GetInstance()
 	return &instance;
 }
 
+
 void Input::Initialize(HWND hwnd)
 {
 	HRESULT hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
@@ -23,8 +24,27 @@ void Input::Initialize(HWND hwnd)
 	//排他制御レベルのセット
 	hr = keyboard_->SetCooperativeLevel(hwnd,DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
+	/*
+	//デバイスの列挙
+	//LPDIENUMDEVICESCALLBACK DeviceFindCallBack;
+	LPVOID parameta;
+	hr = directInput_->EnumDevices(DI8DEVTYPE_JOYSTICK,DeviceFindCallBack,&parameta,DIEDFL_ATTACHEDONLY);
+	assert(SUCCEEDED(hr));
+	*/
+
 
 }
+
+bool Input::GetJoyStickState(uint8_t stickNo, XINPUT_STATE& out)
+{
+	DWORD result = XInputGetState(stickNo, &out);
+	if (result == ERROR_SUCCESS)
+	{
+		return true;
+	}
+	return false;
+}
+
 
 void Input::KeyboardUpdate()
 {

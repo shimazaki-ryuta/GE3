@@ -2,10 +2,11 @@
 #define DIRECTINPUT_VERSION	0x0800
 #include <dinput.h>
 #include <stdint.h>
-
+#include <Windows.h>
+#include <Xinput.h>
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
-
+#pragma comment(lib,"xinput.lib")
 #include <wrl.h>
 
 class Input
@@ -19,6 +20,9 @@ public:
 	static bool GetKeyDown(uint8_t);
 	static bool GetKeyUp(uint8_t);
 
+	static bool GetJoyStickState(uint8_t stickNo, XINPUT_STATE& out);
+
+
 private:
 	Input() = default;
 	~Input() = default;
@@ -28,6 +32,10 @@ private:
 	Microsoft::WRL::ComPtr<IDirectInput8> directInput_ = nullptr;
 
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
+
+	//Microsoft::WRL::ComPtr<IDirectInputDevice8> joyStick_ = nullptr;
+
+
 	BYTE key_[256] = {};
 	BYTE preKey_[256] = {};
 
