@@ -1,4 +1,6 @@
 #pragma once
+//メモリリークチェック
+#include "D3DResourceLeakChacker.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -9,10 +11,14 @@
 #include <vector>
 #include "WorldTransform.h"
 #include "ViewProjection.h"
-
+#include <memory>
 class Model
 {
 public:
+	//static D3DResourceLeakChacker* leakchecker;
+	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
+	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
+	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	struct VertexData
 	{
 		Vector4 position;
@@ -75,7 +81,11 @@ public:
 
 	void Create(const  std::string& directoryPath, const std::string& filename);
 
+	static Model* CreateFromOBJ(const  std::string& directoryPath);
+
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
+	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
+
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;

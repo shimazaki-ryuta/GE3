@@ -1,4 +1,8 @@
 #pragma once
+//メモリリークチェック
+#include "D3DResourceLeakChacker.h"
+#include <memory>
+
 #include "Vector2.h"
 #include "Vector4.h"
 #include "Matrix.h"
@@ -10,7 +14,7 @@
 class Sprite
 {
 public:
-
+	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 	enum class BlendMode
 	{
 		None,

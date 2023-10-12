@@ -1,5 +1,11 @@
 #include "ViewProjection.h"
 #include "MatrixFunction.h"
+#include "CommonFiles/WinApp.h"
+
+void ViewProjection::Initialize()
+{
+	Initialize(1280,720);
+}
 
 void ViewProjection::Initialize(int kClientWidth,int kClientHeight)
 {

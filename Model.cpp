@@ -5,14 +5,14 @@
 
 #include <fstream>
 #include <sstream>
-
+//std::shared_ptr<D3DResourceLeakChacker>Model::leakchecker;
 ID3D12Device* Model::sDevice = nullptr;
 UINT Model::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Model::sCommandList = nullptr;
 Microsoft::WRL::ComPtr<ID3D12RootSignature> Model::sRootSignature;
 Microsoft::WRL::ComPtr<ID3D12PipelineState> Model::sPipelineState;
-
-
+//D3DResourceLeakChacker* Model::leakchecker = D3DResourceLeakChacker::GetInstance();
+//Model::leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 Model::MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
 {
 	Model::MaterialData materialData;
@@ -119,6 +119,7 @@ Model::ModelData LoadObjFile(const std::string& directoryPath, const std::string
 void Model::StaticInitialize(
 	ID3D12Device* device, int window_width, int window_height, const std::wstring& directoryPath)
 {
+	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
 	sDescriptorHandleIncrementSize =
 		sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -305,6 +306,13 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	*/
 }
 
+Model* Model::CreateFromOBJ(const  std::string& filename)
+{
+	std::string directoryPath = "Resources/" + filename;
+	Model* model = new Model();
+	model->Create(directoryPath,filename + ".obj");
+	return model;
+}
 
 void Model::PreDraw(ID3D12GraphicsCommandList* commandList) {
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
@@ -342,6 +350,31 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
+
+	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+
+}
+
+void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle) {
+
+	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
+	//transformationMatrixData->World = worldTransform.matWorld_;
+	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
+
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//wvp用のCBufferの場所を設定
+	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	//Lighting用のリソースの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+
+
+	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle);
 
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

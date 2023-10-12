@@ -2,6 +2,7 @@
 #include "ShaderCompiler.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
+//std::shared_ptr<D3DResourceLeakChacker>Sprite::leakchecker;
 ID3D12Device* Sprite::sDevice = nullptr;
 UINT Sprite::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Sprite::sCommandList = nullptr;
@@ -12,6 +13,7 @@ std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(Sprite::BlendMode
 void Sprite::StaticInitialize(
 	ID3D12Device* device, int window_width, int window_height, const std::wstring& directoryPath)
 {
+	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
 	sDescriptorHandleIncrementSize =
 		sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

@@ -1,6 +1,6 @@
 #include "TextureManager.h"
 #include "ConvertString.h"
-
+//std::shared_ptr<D3DResourceLeakChacker>TextureManager::leakchecker;
 TextureManager* TextureManager::GetInstance()
 {
 	static TextureManager instance;
@@ -10,6 +10,7 @@ TextureManager* TextureManager::GetInstance()
 
 void TextureManager::Initialize(ID3D12Device* device, std::string directoryPath)
 {
+	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	device_ = device;
 	directoryPath_ = directoryPath;
 

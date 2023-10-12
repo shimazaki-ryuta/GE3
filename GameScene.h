@@ -14,6 +14,12 @@
 
 #include "CommonFiles/DirectXCommon.h"
 
+#include "Player.h"
+#include "Enemy.h"
+#include "Skydome.h"
+#include "Ground.h"
+#include "FollowCamera.h"
+
 class GameScene
 {
 public:
@@ -41,11 +47,37 @@ private:
 
 	struct Transforms cameraTransform { {1.0f, 1.0f, 1.0f}, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f } };
 
-	Model model_;
+	//Model model_;
 
-	WorldTransform worldTransformObj_;
-	WorldTransform worldTransformObj2_;
+	//WorldTransform worldTransformObj_;
+	//WorldTransform worldTransformObj2_;
+	//ViewProjection viewProjection_;
+	// ビュープロジェクション
 	ViewProjection viewProjection_;
+
+	// 自キャラ
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<Model> modelPlayerBody_;
+	std::unique_ptr<Model> modelPlayerHead_;
+	std::unique_ptr<Model> modelPlayerL_arm_;
+	std::unique_ptr<Model> modelPlayerR_arm_;
+	std::unique_ptr<Model> modelWepon_;
+
+	//敵
+	std::unique_ptr<Enemy> enemy_;
+	std::unique_ptr<Model> modelEnemyBody_;
+	std::unique_ptr<Model> modelEnemyWheel_;
+
+	bool isDebugCameraActive_ = false;
+	//DebugCamera* debugCamera_ = nullptr;
+
+	std::unique_ptr<Skydome> skydome_;
+	Model* modelSkydome_ = nullptr;
+
+	std::unique_ptr<Ground> ground_;
+	Model* modelGround_ = nullptr;
+
+	std::unique_ptr<FollowCamera> followCamera_;
 
 };
 

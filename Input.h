@@ -20,7 +20,7 @@ public:
 	static bool GetKeyDown(uint8_t);
 	static bool GetKeyUp(uint8_t);
 
-	static bool GetJoyStickState(uint8_t stickNo, XINPUT_STATE& out);
+	static bool GetJoystickState(uint8_t stickNo, XINPUT_STATE& out);
 
 
 private:
@@ -34,6 +34,9 @@ private:
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyboard_ = nullptr;
 
 	//Microsoft::WRL::ComPtr<IDirectInputDevice8> joyStick_ = nullptr;
+
+	uint32_t deadzoneLeft = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	uint32_t deadzoneRight = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 
 
 	BYTE key_[256] = {};

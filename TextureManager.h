@@ -1,4 +1,7 @@
 #pragma once
+//メモリリークチェック
+#include "D3DResourceLeakChacker.h"
+#include <memory>
 #include <d3d12.h>
 #include "CommonFiles/DirectXCommon.h"
 #include <array>
@@ -7,7 +10,7 @@
 class TextureManager
 {
 public:
-
+	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 	struct Texture
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;

@@ -43,6 +43,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)\externals\nlohmann;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)\externals\nlohmann;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -92,11 +98,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseCharacter.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="CommonFiles\DirectXCommon.cpp" />
     <ClCompile Include="CommonFiles\WinApp.cpp" />
     <ClCompile Include="ConvertString.cpp" />
+    <ClCompile Include="Curve.cpp" />
     <ClCompile Include="D3DResourceLeakChacker.cpp" />
     <ClCompile Include="DeltaTime.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -104,13 +115,19 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GlobalVariables.cpp" />
+    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatrixFunction.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Primitive3D.cpp" />
+    <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
+    <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TimedCall.cpp" />
@@ -120,11 +137,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="WorldTransform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseCharacter.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="CollisionConfig.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="CommonFiles\DirectXCommon.h" />
     <ClInclude Include="CommonFiles\WinApp.h" />
     <ClInclude Include="ConvertString.h" />
+    <ClInclude Include="Curve.h" />
     <ClInclude Include="D3DResourceLeakChacker.h" />
     <ClInclude Include="DeltaTime.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -133,16 +156,23 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="GlobalVariables.h" />
+    <ClInclude Include="Ground.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixFunction.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive3D.h" />
+    <ClInclude Include="RailCamera.h" />
     <ClInclude Include="ShaderCompiler.h" />
+    <ClInclude Include="Skydome.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TimedCall.h" />
+    <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="VectorFunction.h" />

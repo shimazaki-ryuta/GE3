@@ -1,5 +1,6 @@
 //メモリリークチェック
 #include "D3DResourceLeakChacker.h"
+LeackChecker leackChecker;
 //static D3DResourceLeakChacker* leacCheck = D3DResourceLeakChacker::GetInstance();
 #include <Windows.h>
 #define _USE_MATH_DEFINES
@@ -9,7 +10,10 @@
 #include <string>
 #include <format>
 #include <vector>
+#include <memory>
 #include"ConvertString.h"
+
+//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 
 //window関係
 #include "CommonFiles/WinApp.h"
@@ -49,7 +53,9 @@ struct DirectionalLight
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//D3DResourceLeakChacker leacCheck;// = D3DResourceLeakChacker::GetInstance();
 	assert(SUCCEEDED(CoInitializeEx(0,COINIT_MULTITHREADED)));
-
+	//std::shared_ptr<D3DResourceLeakChacker> leakchecker;
+	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
+	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	///初期化
 	Window* mainWindow=nullptr;
 	mainWindow = new Window();
