@@ -88,6 +88,8 @@ void DirectXCommon::Initialize(Window* win)
 {
 	win_ = win;
 
+	fixFps_.Initialize();
+
 	InitializeDXGIDevice();
 	CreateCommand();
 	CreateSwapChain();
@@ -181,7 +183,10 @@ void DirectXCommon::PostDraw()
 		//イベント待つ
 		WaitForSingleObject(fenceEvent_, INFINITE);
 	}
-
+	if (isFixed_)
+	{
+		fixFps_.Update();
+	}
 	hr = commandAllocator_->Reset();
 	assert(SUCCEEDED(hr));
 	hr = commandList_->Reset(commandAllocator_, nullptr);

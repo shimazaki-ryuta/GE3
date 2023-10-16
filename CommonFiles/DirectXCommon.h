@@ -6,6 +6,7 @@
 #include <dxgidebug.h>
 
 #include "WinApp.h"
+#include "../FixFPS.h"
 
 #include "../externals/DirectXTex/DirectXTex.h"
 #include "../externals/DirectXTex/d3dx12.h"
@@ -54,7 +55,8 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-
+	//fps固定の有無
+	void FixedFPS(bool is) { isFixed_ = is; };
 
 
 	// デスクリプターの数
@@ -107,6 +109,11 @@ private:
 	uint32_t descriptorSizeSRV_;
 	uint32_t descriptorSizeRTV_;
 	uint32_t descriptorSizeDSV_;
+
+	//Fps固定用
+	FixFPS fixFps_;
+	bool isFixed_;
+
 private:
 	/// <summary>
 	/// DXGIデバイス初期化

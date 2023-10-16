@@ -74,6 +74,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	DirectXCommon* dxCommon = nullptr;
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(mainWindow);
+	dxCommon->FixedFPS(true);
 
 	//入力関数の初期化
 	Input::GetInstance()->Initialize(mainWindow->GetHwnd());
