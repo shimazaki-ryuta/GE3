@@ -1,5 +1,6 @@
 #include "TextureManager.h"
 #include "ConvertString.h"
+#include "GetDescriptorHandle.h"
 //std::shared_ptr<D3DResourceLeakChacker>TextureManager::leakchecker;
 TextureManager* TextureManager::GetInstance()
 {
@@ -16,7 +17,7 @@ void TextureManager::Initialize(ID3D12Device* device, std::string directoryPath)
 
 	descriptorHandleSize = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
-
+/*
 D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -30,7 +31,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descrip
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
 }
-
+*/
 DirectX::ScratchImage InputTexture(const std::string& filePath)
 {
 	DirectX::ScratchImage image{};
@@ -88,7 +89,8 @@ uint32_t TextureManager::Load(const std::string& fileName)
 		handle = static_cast<uint32_t>(std::distance(textures_.begin(), it));
 		return handle;
 	}
-	
+	//割当領域外だったらエラー
+	assert(handle <= kSrvTextureUseEnd);
 	//新規Texture
 	 // 書き込むテクスチャの参照
 	Texture& texture = textures_.at(handle);

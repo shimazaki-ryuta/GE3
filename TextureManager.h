@@ -34,9 +34,13 @@ public:
 
 	static uint32_t LoadTexture(const std::string&);
 
-
-
 	uint32_t Load(const std::string&);
+
+	//SRVディスクリプタヒープのテクスチャ領域の終端
+	static const size_t kSrvTextureUseEnd = 256;
+	//SRVディスクリプタヒープのテクスチャ領域の終端+1
+	//static const size_t kSrvTextureUseEnd = 257;
+
 private:
 	TextureManager() = default;
 	~TextureManager() = default;
@@ -58,7 +62,7 @@ private:
 
 	uint32_t indexNextUseDiscriptorHeap = 1u;
 	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
-	std::array<Texture, DirectXCommon::kNumSrvDescriptors> textures_;
+	std::array<Texture, kSrvTextureUseEnd> textures_;
 
 };
 
