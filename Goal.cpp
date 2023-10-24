@@ -18,10 +18,10 @@ void Goal::Initialize() {
 }
 
 void Goal::Update() {
-	ImGui::Begin("goal");
+	/*ImGui::Begin("goal");
 	ImGui::DragFloat3("position",&worldTransform_.translation_.x,0.1f);
 	ImGui::End();
-	
+	*/
 	
 	obb_.center = worldTransform_.translation_;
 	obb_.size = size_;
