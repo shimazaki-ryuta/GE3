@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseCharacter.h"
+#include "Sphere.h"
 class Enemy : public BaseCharacter
 {
 public:
@@ -16,4 +17,11 @@ public:
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション（参照渡し）</param>
 	void Draw(const ViewProjection& ) override;
+
+	Sphere& GetSphere() { return sphere_; };
+
+private:
+	Vector3 position_;
+
+	Sphere sphere_;
 };

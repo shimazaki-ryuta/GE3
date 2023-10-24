@@ -19,7 +19,11 @@
 #include "Skydome.h"
 #include "Ground.h"
 #include "FollowCamera.h"
-
+#include "flooar.h"
+#include "Goal.h"
+#include "MovingFlooar.h"
+#include <array>
+#include <memory>
 class GameScene
 {
 public:
@@ -76,6 +80,11 @@ private:
 
 	std::unique_ptr<Ground> ground_;
 	Model* modelGround_ = nullptr;
+
+	std::array<std::unique_ptr<Flooar>,size_t(5)> flooars_;
+	//std::unique_ptr<Flooar> flooar_;
+
+	std::unique_ptr<Goal> goal_;
 
 	std::unique_ptr<FollowCamera> followCamera_;
 

@@ -30,3 +30,7 @@ void WorldTransform::TransfarMatrix(const Matrix4x4& matrix)
 	transformationMatrixData->WVP = matWorld_ * matrix;
 	transformationMatrixData->World = matWorld_;
 }
+
+Vector3 WorldTransform::GetWorldPosition() {
+	return Vector3{matWorld_.m[3][0],matWorld_.m[3][1] ,matWorld_.m[3][2] };
+}

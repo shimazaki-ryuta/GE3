@@ -28,6 +28,6 @@ struct WorldTransform
 	void Initialize();
 	void UpdateMatrix();
 	inline Matrix4x4 GetWorld() { return matWorld_; };
-
+	Vector3 GetWorldPosition();
 	void TransfarMatrix(const Matrix4x4&);
 };

@@ -8,7 +8,7 @@ void CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	    !(colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask())) {
 		return;
 	}
-
+	/*
 	Vector3 posA = colliderA->GetWorldPosition(), posB = colliderB->GetWorldPosition();
 	float distance = float(
 	    std::pow(posB.x - posA.x, 2) + std::pow(posB.y - posA.y, 2) + std::pow(posB.z - posA.z, 2));
@@ -16,6 +16,7 @@ void CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 		colliderA->OnCollision();
 		colliderB->OnCollision();
 	}
+	*/
 }
 
 void CollisionManager::CheckAllCollisions()

@@ -51,12 +51,17 @@ float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2
 
 float Length(const Vector3& v) { return sqrtf(Dot(v, v)); }
 
-Vector3 Nomalize(const Vector3& v) {
+Vector3 Normalize(const Vector3& v) {
 	float length = Length(v);
 	if (length == 0) {
 		return v;
 	}
 	return Multiply((1.0f / length), v);
+}
+
+Vector3 Cross(const Vector3& v1, const Vector3& v2)
+{
+	return { v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x };
 }
 
 Vector2 Lerp(const Vector2& v1, const Vector2& v2, float t) { return v1 + Multiply(t, v2 - v1); }
@@ -69,7 +74,7 @@ Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t)
 
 Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) 
 {
-	Vector3 a = Nomalize(v1), b = Nomalize(v2);
+	Vector3 a = Normalize(v1), b = Normalize(v2);
 	float s = (1.0f - t) * Length(a) + t*Length(b);
 	Vector3 e1, e2;
 	e1 = float(1.0f / Length(a)) * a;

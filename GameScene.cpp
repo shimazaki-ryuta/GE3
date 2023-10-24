@@ -12,6 +12,8 @@
 #include <cassert>
 #include <list>
 
+#include "collision.h"
+
 GameScene::GameScene() {
 
 }
@@ -75,6 +77,34 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	ground_.reset(new Ground);
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 
+	//床
+	//flooar_.reset(new MovingFlooar);
+	//flooar_->Initialize();
+	/*
+	for (int index = 0; index < 5;index++) {
+		flooars_[index].reset(new MovingFlooar);
+		flooars_[index]->Initialize();
+	}*/
+	flooars_[0].reset(new Flooar);
+	flooars_[0]->Initialize();
+	flooars_[1].reset(new MovingFlooar);
+	flooars_[1]->Initialize();
+	flooars_[1]->SetOffset({0.0f,0.0f,6.0f});
+	flooars_[2].reset(new Flooar);
+	flooars_[2]->Initialize();
+	flooars_[2]->SetOffset({ 0.0f,0.0f,20.0f });
+	flooars_[2]->SetSize({10.0f,0.0f,10.0f});
+	flooars_[3].reset(new MovingFlooar);
+	flooars_[3]->Initialize();
+	flooars_[3]->SetOffset({ 0.0f,0.0f,34.0f });
+	flooars_[4].reset(new Flooar);
+	flooars_[4]->Initialize();
+	flooars_[4]->SetOffset({ 0.0f,0.0f,40.0f });
+
+	//ゴール
+	goal_.reset(new Goal);
+	goal_->Initialize();
+
 	// カメラ生成
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
@@ -96,30 +126,42 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 }
 
 void GameScene::Update() {
-	/*XINPUT_STATE joyState;
-	Input::GetJoystickState(0,joyState);
-
-	worldTransformObj_.translation_.x += float(joyState.Gamepad.sThumbLX) / SHRT_MAX;
-
-	ImGui::Begin("obj1");
-	ImGui::DragFloat3("Scale", &worldTransformObj_.scale_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("Rotate", &worldTransformObj_.rotation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("Translate", &worldTransformObj_.translation_.x, 1.0f,-1000.0f, 1000.0f);
-	ImGui::End();
-	ImGui::Begin("obj2");
-	ImGui::DragFloat3("Scale", &worldTransformObj2_.scale_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("Rotate", &worldTransformObj2_.rotation_.x, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("Translate", &worldTransformObj2_.translation_.x, 1.0f, - 1000.0f, 1000.0f); ImGui::End();
-
-
-	worldTransformObj_.UpdateMatrix();
-	worldTransformObj2_.UpdateMatrix();
-
-	viewProjection_.UpdateMatrix();*/
+	
+	for (int index = 0; index < 5; index++) {
+		flooars_[index]->Update();
+	}
+	//flooar_->Update();
 	player_->Update();
 	enemy_->Update();
+	goal_->Update();
 	//debugCamera_->Update();
 	followCamera_->Update();
+	//flooar_->Update();
+	/*
+	if (IsCollision(player_->GetOBB(),flooar_->GetOBB()))
+	{
+		player_->OnCollision(flooar_->GetWorldTransform());
+	}
+	else {
+		player_->OutCollision();
+	}*/
+	bool isCollision = false;
+	for (int index = 0; index < 5; index++) {
+		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
+		{
+			player_->OnCollision(flooars_[index]->GetWorldTransform());
+			isCollision = true;
+		}
+	}
+	if (!isCollision) {
+		player_->OutCollision();
+	}
+	if (IsCollision(player_->GetOBB(),goal_->GetOBB())) {
+		player_->ReStart();
+	}
+	if (IsCollision(player_->GetOBB(), enemy_->GetSphere())) {
+		player_->OnCollisionEnemy();
+	}
 
 	if (isDebugCameraActive_) {
 		//viewProjection_.matView = debugCamera_->GetViewProjection().matView;
@@ -143,10 +185,14 @@ void GameScene::Draw3D() {
 	Primitive3D::PostDraw();*/
 	Model::PreDraw(dxCommon_->GetCommandList());
 	skydome_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
+	//flooar_->Draw(viewProjection_);
+	for (int index = 0; index < 5; index++) {
+		flooars_[index]->Draw(viewProjection_);
+	}
 	player_->Draw(viewProjection_);
 	enemy_->Draw(viewProjection_);
-
+	goal_->Draw(viewProjection_);
 	Model::PostDraw();
 }
 

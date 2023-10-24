@@ -30,6 +30,10 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 
 	//assert(model);
 	BaseCharacter::Initialize(models);
+	obb_.center = worldTransform_.translation_;
+	obb_.size = {1.0f,1.0f,1.0f};
+	obb_.center.y += obb_.size.y / 2.0f;
+	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	input_ = Input::GetInstance();
 
 	for (HierarchicalAnimation& model_ : models_) {
@@ -51,6 +55,14 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(
 	    groupName, "ArmR Translation", models_[3].worldTransform_.translation_);
 	
+}
+
+void Player::ReStart() {
+	behaviorRequest_ = Behavior::kRoot;
+	worldTransform_.parent_ = nullptr;
+	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
+	worldTransform_.translation_ = {0.0f,0.0f,0.0f};
+	worldTransform_.Initialize();
 }
 
 void Player::BehaviorRootInitialize() {
@@ -121,6 +133,17 @@ void Player::Update() {
 		break;
 	}
 
+	if (worldTransform_.parent_) {
+		worldTransform_.translation_.y = 0.0f;
+	}
+	else {
+		worldTransform_.translation_.y -= 0.4f;
+	}
+
+	if (worldTransform_.translation_.y < -10.0f) {
+		ReStart();
+	}
+
 	// 行列更新
 	worldTransform_.UpdateMatrix();
 
@@ -138,6 +161,11 @@ void Player::Update() {
 	ImGui::End();
 #endif // _DEBUG
 */
+
+	obb_.center = worldTransform_.GetWorldPosition();
+	obb_.size = { 1.0f,1.0f,1.0f };
+	obb_.center.y += obb_.size.y / 2.0f;
+	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
 	}
@@ -164,7 +192,7 @@ void Player::BehaviorRootUpdate()
 		    float(joyState.Gamepad.sThumbLX) / SHRT_MAX, 0,
 		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
 
-		move = Nomalize(move) * kCharacterSpeed;
+		move = Normalize(move) * kCharacterSpeed;
 		Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->rotation_.y, 0.0f};
 		move = Transform(move, MakeRotateMatrix(cameraDirectionYcorection));
 		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
@@ -298,4 +326,27 @@ void Player::ApplyGlobalVariables()
 	    globalVariables->GetVector3Value(groupName, "ArmL Translation");
 	models_[3].worldTransform_.translation_ =
 	    globalVariables->GetVector3Value(groupName, "ArmR Translation");
+}
+
+void Player::OnCollision(WorldTransform& parent)
+{
+	if (worldTransform_.parent_ != &parent) {
+		Matrix4x4 rocal = worldTransform_.matWorld_ * (Inverse(parent.matWorld_));
+		worldTransform_.translation_.x = rocal.m[3][0];
+		worldTransform_.translation_.y = rocal.m[3][1];
+		worldTransform_.translation_.z = rocal.m[3][2];
+
+		worldTransform_.parent_ = &parent;
+		isFlooar_ = true;
+	}
+}
+
+void Player::OutCollision() {
+	if (worldTransform_.parent_) {
+		worldTransform_.parent_ = nullptr;
+		Matrix4x4 world = worldTransform_.matWorld_;
+		worldTransform_.translation_.x = world.m[3][0];
+		worldTransform_.translation_.y = world.m[3][1];
+		worldTransform_.translation_.z = world.m[3][2];
+	}
 }

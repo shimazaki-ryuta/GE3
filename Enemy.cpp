@@ -18,14 +18,22 @@ void Enemy::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	     childlen != models_.end(); childlen++) {
 		childlen->worldTransform_.parent_ = &(body->worldTransform_);
 	}
+	position_ = {0.0f,0.0f,0.0f};
+	sphere_.center = worldTransform_.translation_;
+	sphere_.radius = 0.5f;
 }
 
 void Enemy::Update() { 
 
 	const float rotateY = 0.05f;
 	worldTransform_.rotation_.y += rotateY;
-	Vector3 move = {0.0f,0.0f,0.5f};
-	worldTransform_.translation_ += Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
+	Vector3 move = {0.0f,0.0f,0.2f};
+	Vector3 offset = {-4.0f,0.0f,20.0f};
+	
+	position_ += Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
+	worldTransform_.translation_ = position_ + offset;
+	sphere_.center = worldTransform_.translation_;
+	sphere_.radius = 0.5f;
 	models_[1].worldTransform_.rotation_.x += 0.1f;
 	BaseCharacter::Update();
 	for (HierarchicalAnimation& model : models_) {

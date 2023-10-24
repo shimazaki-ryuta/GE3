@@ -14,7 +14,7 @@ public:
 	void Update();
 
 
-	inline void SetTarget(const WorldTransform* target) { target_ = target; };
+	inline void SetTarget(WorldTransform* target) { target_ = target; };
 
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
 
@@ -23,6 +23,6 @@ private:
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
-	const WorldTransform* target_ = nullptr;
+	WorldTransform* target_ = nullptr;
 
 };

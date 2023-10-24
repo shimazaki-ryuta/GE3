@@ -19,15 +19,18 @@
     <Filter Include="CommonFiles">
       <UniqueIdentifier>{66f8b25c-5e32-43e3-a6e6-86fd8472e476}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{cc21af82-3c0c-41f2-bc85-d89c01223dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Colider">
+      <UniqueIdentifier>{335105fc-adba-4971-8bdf-ca4aeb29a971}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="WIndowProcedure.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="MatrixFunction.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -50,9 +53,6 @@
     </ClCompile>
     <ClCompile Include="externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="VectorFunction.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="CommonFiles\WinApp.cpp">
       <Filter>CommonFiles</Filter>
@@ -102,12 +102,6 @@
     <ClCompile Include="BaseCharacter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Curve.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -141,21 +135,51 @@
     <ClCompile Include="GetDescriptorHandle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Math\MatrixFunction.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\VectorFunction.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\AABB.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\Collision.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\OBB.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\Plane.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\Sphere.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\Collider.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Colider\CollisionManager.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="flooar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MovingFlooar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Goal.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowProcedure.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="ConvertString.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="MatrixFunction.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -182,9 +206,6 @@
     <ClInclude Include="externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="VectorFunction.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="CommonFiles\WinApp.h">
       <Filter>CommonFiles</Filter>
     </ClInclude>
@@ -201,9 +222,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="ShaderCompiler.h">
@@ -233,15 +251,6 @@
     <ClInclude Include="BaseCharacter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Collider.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionConfig.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Curve.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -266,9 +275,6 @@
     <ClInclude Include="Skydome.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="FixFPS.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -276,6 +282,60 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="GetDescriptorHandle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MatrixFunction.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\VectorFunction.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\AABB.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\Collision.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\OBB.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\Plane.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\Sphere.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\Collider.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\CollisionConfig.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Colider\CollisionManager.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="flooar.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MovingFlooar.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Goal.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

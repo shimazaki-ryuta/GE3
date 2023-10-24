@@ -10,7 +10,9 @@ Vector3 Subtruct(const Vector3&, const Vector3&);
 Vector3 Multiply(float, const Vector3&);
 float Dot(const Vector3&, const Vector3&);
 float Length(const Vector3&);
-Vector3 Nomalize(const Vector3&);
+Vector3 Normalize(const Vector3&);
+Vector3 Cross(const Vector3& v1, const Vector3& v2);
+
 
 Vector2 Lerp(const Vector2& v1, const Vector2& v2, float t);
 Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);

@@ -32,7 +32,7 @@ void FollowCamera::Update()
 		
 		offset = TransformNormal(offset,rotateMatrix);
 
-		viewProjection_.translation_ = target_->translation_ + offset;
+		viewProjection_.translation_ = target_->GetWorldPosition() + offset;
 	}
 
 	viewProjection_.UpdateMatrix();

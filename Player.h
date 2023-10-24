@@ -6,7 +6,7 @@
 #include <vector>
 #include "BaseCharacter.h"
 #include <optional>
-
+#include "OBB.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -54,6 +54,15 @@ public:
 	
 	void ApplyGlobalVariables();
 
+	void OnCollision(WorldTransform& parent);
+	void OutCollision();
+
+	void OnCollisionEnemy() { ReStart(); };
+
+	OBB& GetOBB() { return obb_; };
+
+	void ReStart();
+
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
@@ -78,6 +87,10 @@ private:
 	std::optional<Behavior> behaviorRequest_ = std::nullopt;
 
 	AttackBehavior attackBehavior_ = AttackBehavior::kPre;
+
+	bool isFlooar_ = false;
+
+	OBB obb_;
 
 	//調整用
 	int frameCount_ = 0;
