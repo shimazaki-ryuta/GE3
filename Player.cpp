@@ -163,7 +163,7 @@ void Player::Update() {
 */
 
 	obb_.center = worldTransform_.GetWorldPosition();
-	obb_.size = { 1.0f,1.0f,1.0f };
+	obb_.size = { 0.5f,1.0f,0.5f };
 	obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	for (HierarchicalAnimation& model : models_) {
