@@ -15,6 +15,7 @@
 #include <memory>
 class Particle
 {
+public:
 	struct VertexData
 	{
 		Vector4 position;
@@ -39,6 +40,13 @@ class Particle
 		Vector3 velocity;
 	};
 
+	struct Transform 
+	{
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
+	};
+
 	// 頂点数
 	static const int kVertNum = 4;
 	// デバイス
@@ -60,10 +68,13 @@ class Particle
 
 	static void StaticInitialize(
 		ID3D12Device* device,
+		ID3D12DescriptorHeap* descriptorHeap,
 		const std::wstring& directoryPath = L"Resources/");
 
+	void Updade();
+
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-	void Draw();
+	void Draw(const ViewProjection& viewProjection);
 	static void PostDraw();
 
 	static Particle* Create(uint32_t textureHandle, uint32_t numInstance);
@@ -98,6 +109,7 @@ private:
 	Material* materialData_ = nullptr;
 	//TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	TransformationMatrix* instancingData = nullptr;
+	std::vector< struct Transform> transforms;
 
 	Vector4 color_;
 	uint32_t textureHandle_;

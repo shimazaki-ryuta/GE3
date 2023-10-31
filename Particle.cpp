@@ -3,9 +3,13 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "GetDescriptorHandle.h"
-
+#include "LoadModel.h"
 #include <fstream>
 #include <sstream>
+#include <cassert>
+#include <numbers>
+#include <string>
+#include <wrl.h>
 //std::shared_ptr<D3DResourceLeakChacker>Particle::leakchecker;
 ID3D12Device* Particle::sDevice = nullptr;
 UINT Particle::sDescriptorHandleIncrementSize;
@@ -16,10 +20,11 @@ ID3D12DescriptorHeap* Particle::srvDescriptorHeap_ = nullptr;
 size_t Particle::kSrvStructuredBufferUseBegin;
 
 void Particle::StaticInitialize(
-	ID3D12Device* device, const std::wstring& directoryPath)
+	ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap, const std::wstring& directoryPath)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
+	srvDescriptorHeap_ = descriptorHeap;
 	sDescriptorHandleIncrementSize =
 		sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -185,30 +190,40 @@ void Particle::Initialize(uint32_t numInstance)
 	numInstance_ = numInstance;
 	//textureHandle_ = textureHandle;
 	//Sprite用のリソースを作る
-	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 4);
+	std::string directory = "Resources/Plane";
+	std::string filename = "Plane";
+	filename = filename + ".obj";
+	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directory,filename);
+	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 6);
 	//頂点バッファビューを作る
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
-	//1枚目
+	
+	/*//1枚目
+	//左下
 	vertexDataSprite_[0].position = { -1.0f,-1.0f,0.0f,1.0f };
-	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
+	vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
 	vertexDataSprite_[0].normal = {0.0f,0.0f,1.0f};
+	//右下
 	vertexDataSprite_[1].position = { 1.0f,-1,0.0f,1.0f };
-	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
+	vertexDataSprite_[1].texcoord = { 1.0f,1.0f };
 	vertexDataSprite_[1].normal = { 0.0f,0.0f,1.0f };
+	//左上
 	vertexDataSprite_[2].position = { -1.0f,1.0f,0.0f,1.0f };
-	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
+	vertexDataSprite_[2].texcoord = { 0.0f,0.0f };
 	vertexDataSprite_[2].normal = { 0.0f,0.0f,1.0f };
+	//右上
 	vertexDataSprite_[3].position = { 1.0f,1.0f,0.0f,1.0f };
-	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
-	vertexDataSprite_[3].normal = { 0.0f,0.0f,1.0f };
+	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
+	vertexDataSprite_[3].normal = { 0.0f,0.0f,1.0f };*/
+	std::memcpy(vertexDataSprite_, modelData.meshs.vertices.data(), sizeof(VertexData) * 6);
 
 	//インデックス
 	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * 6);
@@ -252,7 +267,18 @@ void Particle::Initialize(uint32_t numInstance)
 	
 	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
 	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
+	
+	sDevice->CreateShaderResourceView(instancingResource_.Get(),&srvDesc,srvHandleCPU);
 	kSrvStructuredBufferUseBegin++;
+
+	//transform(仮)
+	for (uint32_t index = 0; index < numInstance_; ++index) {
+		struct Transform transform;
+		transform.scale = {1.0f,1.0f,1.0f};
+		transform.rotate = {0.0f,std::numbers::pi_v<float>,0.0f};
+		transform.translate = {index*0.1f,index * 0.1f, index * 0.1f};
+		transforms.push_back(transform);
+	}
 }
 
 Particle* Particle::Create(uint32_t textureHandle, uint32_t numInstance)
@@ -270,3 +296,58 @@ Particle* Particle::Create(uint32_t numInstance)
 	return particle;
 }
 
+void Particle::Updade() {
+	
+}
+
+void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
+	// PreDrawとPostDrawがペアで呼ばれていなければエラー
+	assert(Particle::sCommandList == nullptr);
+
+	// コマンドリストをセット
+	sCommandList = commandList;
+
+	// パイプラインステートの設定
+	sCommandList->SetPipelineState(sPipelineState.Get());
+
+	// ルートシグネチャの設定
+	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+}
+
+void Particle::PostDraw() {
+	// コマンドリストを解除
+	Particle::sCommandList = nullptr;
+}
+
+void Particle::Draw(const ViewProjection& viewProjection) {
+
+	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
+	//transformationMatrixData->World = worldTransform.matWorld_;
+	//worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
+
+	Matrix4x4 viewProjectionMatrix = viewProjection.matView * viewProjection.matProjection;
+	for (uint32_t index = 0; index < numInstance_; ++index) {
+		Matrix4x4 world = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		Matrix4x4 worldViewProjection = world*viewProjectionMatrix;
+		instancingData[index].WVP = worldViewProjection;
+		instancingData[index].World = world;
+	}
+
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//wvp用のCBufferの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootDescriptorTable(1, srvHandleGPU);
+	
+	//Lighting用のリソースの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+
+
+	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
+
+	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//sCommandList->IASetIndexBuffer(&indexBufferView_);
+	sCommandList->DrawInstanced(6, numInstance_, 0, 0);
+
+}

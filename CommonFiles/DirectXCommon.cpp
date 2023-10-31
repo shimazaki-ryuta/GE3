@@ -324,7 +324,7 @@ void DirectXCommon::CreateRenderTargetView()
 
 void DirectXCommon::CreateShaderResourceView()
 {
-	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNumSrvDescriptors, true);
 }
 
 void DirectXCommon::CreateDepthStencilView()

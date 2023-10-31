@@ -14,6 +14,8 @@
 
 #include "CommonFiles/DirectXCommon.h"
 
+#include "DebugCamera.h"
+
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
@@ -22,6 +24,7 @@
 #include "flooar.h"
 #include "Goal.h"
 #include "MovingFlooar.h"
+#include "Particle.h"
 #include <array>
 #include <memory>
 class GameScene
@@ -48,30 +51,16 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 
+	std::unique_ptr<DebugCamera> debugCamera_;
 
 	struct Transforms cameraTransform { {1.0f, 1.0f, 1.0f}, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f } };
 
-	//Model model_;
-
-	//WorldTransform worldTransformObj_;
-	//WorldTransform worldTransformObj2_;
-	//ViewProjection viewProjection_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
-	// 自キャラ
-	std::unique_ptr<Player> player_;
-	std::unique_ptr<Model> modelPlayerBody_;
-	std::unique_ptr<Model> modelPlayerHead_;
-	std::unique_ptr<Model> modelPlayerL_arm_;
-	std::unique_ptr<Model> modelPlayerR_arm_;
-	std::unique_ptr<Model> modelWepon_;
 
-	//敵
-	std::unique_ptr<Enemy> enemy_;
-	std::unique_ptr<Model> modelEnemyBody_;
-	std::unique_ptr<Model> modelEnemyWheel_;
-
+	uint32_t uvCheckerTextureHandle_;
+	
 	bool isDebugCameraActive_ = false;
 	//DebugCamera* debugCamera_ = nullptr;
 
@@ -81,12 +70,6 @@ private:
 	std::unique_ptr<Ground> ground_;
 	Model* modelGround_ = nullptr;
 
-	std::array<std::unique_ptr<Flooar>,size_t(5)> flooars_;
-	//std::unique_ptr<Flooar> flooar_;
-
-	std::unique_ptr<Goal> goal_;
-
-	std::unique_ptr<FollowCamera> followCamera_;
-
+	std::unique_ptr<Particle> particle;
 };
 

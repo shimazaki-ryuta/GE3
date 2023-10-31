@@ -159,6 +159,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="ConvertString.cpp" />
     <ClCompile Include="Curve.cpp" />
     <ClCompile Include="D3DResourceLeakChacker.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DeltaTime.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
@@ -198,6 +199,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LoadModel.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MatrixFunction.cpp" />
     <ClCompile Include="Math\VectorFunction.cpp" />
@@ -232,6 +234,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="ConvertString.h" />
     <ClInclude Include="Curve.h" />
     <ClInclude Include="D3DResourceLeakChacker.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DeltaTime.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -251,6 +254,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="LoadModel.h" />
     <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="Math\MatrixFunction.h" />
     <ClInclude Include="Math\Vector2.h" />
