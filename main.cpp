@@ -38,6 +38,9 @@ LeackChecker leackChecker;
 
 #include "WorldTransform.h"
 
+//ファイル書き出し
+#include "GlobalVariables.h"
+
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
 const std::string kTitle = "";
@@ -134,7 +137,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			ImGui_ImplDX12_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();			
-
+			GlobalVariables::GetInstance()->Update();
 			gameScene->Update();
 
 			//描画
