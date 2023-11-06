@@ -4,7 +4,7 @@
 #include <dxgi1_6.h>
 #include <cassert>
 #include <dxgidebug.h>
-
+#include <wrl.h>
 #include "WinApp.h"
 #include "../FixFPS.h"
 
@@ -38,10 +38,10 @@ public:
 	//画像データをGPUに送信する
 	void  UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
-	inline ID3D12Device* GetDevice() { return device_; };
-	inline ID3D12GraphicsCommandList* GetCommandList() { return commandList_; };
-	inline ID3D12CommandQueue* GetCommandQueue() { return commandQueue_; };
-	inline ID3D12CommandAllocator* GetCommandAllocator() { return commandAllocator_; };
+	inline ID3D12Device* GetDevice() { return device_.Get(); };
+	inline ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
+	inline ID3D12CommandQueue* GetCommandQueue() { return commandQueue_.Get(); };
+	inline ID3D12CommandAllocator* GetCommandAllocator() { return commandAllocator_.Get(); };
 	inline void SetDescriptorSizeSRV(uint32_t descriptorSizeSRV) { descriptorSizeSRV_ = descriptorSizeSRV; };
 	inline void SetDescriptorSizeRTV(uint32_t descriptorSizeRTV) { descriptorSizeRTV_ = descriptorSizeRTV; };
 	inline void SetDescriptorSizeDSV(uint32_t descriptorSizeDSV) { descriptorSizeDSV_ = descriptorSizeDSV; };
@@ -50,7 +50,7 @@ public:
 	static ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 
 	//仮
-	inline ID3D12DescriptorHeap* GetsrvDescriptorHeap() { return srvDescriptorHeap_; };
+	inline ID3D12DescriptorHeap* GetsrvDescriptorHeap() { return srvDescriptorHeap_.Get(); };
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
@@ -65,32 +65,32 @@ public:
 private:
 	Window* win_=nullptr;
 
-	IDXGIFactory7* dxgiFactory_ = nullptr;
-	ID3D12Device* device_ = nullptr;
-	IDXGIAdapter4* useAdapter_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
 
 	//コマンド関係
-	ID3D12CommandQueue* commandQueue_ = nullptr;
-	ID3D12CommandAllocator* commandAllocator_ = nullptr;
-	ID3D12GraphicsCommandList* commandList_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 	//swapChain
-	IDXGISwapChain4* swapChain_ = nullptr;
-	ID3D12Resource* swapChainResources_[2] = { nullptr };
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
 	//discriptorHeap
-	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
-	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
-	ID3D12DescriptorHeap* dsvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 
 
 	//RenderTarget
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	//DepthBuffer
-	ID3D12Resource* depthStencilResource_  = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_  = nullptr;
 
 	//Fence
-	ID3D12Fence* fence_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	HANDLE fenceEvent_;
 	uint64_t fenceValue_ = 0;
 	//TransitionBarrier
@@ -102,7 +102,7 @@ private:
 	//texture
 	std::list<DirectX::ScratchImage*> mipImages_;
 	//std::list<const DirectX::TexMetadata&> metadatas_;
-	std::list<ID3D12Resource*> textureResources_;
+	std::list<Microsoft::WRL::ComPtr<ID3D12Resource>> textureResources_;
 	int32_t textureCount_=0;
 
 
