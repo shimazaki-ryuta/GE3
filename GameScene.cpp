@@ -45,11 +45,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	particle.reset(Particle::Create(uvCheckerTextureHandle_,10));
 
-	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,240 }, {1.0f,1.0f,1.0f,1.0f}));
+	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, {1.0f,1.0f,1.0f,1.0f}));
 	sprite_->SetAnchorPoint({0,0});
 	spritePosition_ = {0,0};
 	ancorPoint_ = {0,0};
 	rotate_ = 0;
+	leftTop = {0,0};
+	rightDown = {720.0f,360.0f};
 }
 
 void GameScene::Update() {
@@ -63,10 +65,13 @@ void GameScene::Update() {
 	ImGui::DragFloat2("position",&spritePosition_.x,1.0f);
 	ImGui::DragFloat2("anchor", &ancorPoint_.x, 0.1f);
 	ImGui::DragFloat("rotate",&rotate_,0.1f);
+	ImGui::DragFloat2("leftTop", &leftTop.x, 1.0f);
+	ImGui::DragFloat2("rightDown", &rightDown.x, 1.0f);
 	ImGui::End();
 	sprite_->SetPosition(spritePosition_);
 	sprite_->SetAnchorPoint(ancorPoint_);
 	sprite_->SetRotate(rotate_);
+	sprite_->SetRange(leftTop,rightDown);
 #endif // _DEBUG
 	
 	if (isDebugCameraActive_) {

@@ -43,6 +43,13 @@ public:
 		Matrix4x4 World;
 	};
 
+	struct SRT
+	{
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
+	};
+
 	// 頂点数
 	static const int kVertNum = 4;
 	// デバイス
@@ -84,6 +91,8 @@ public:
 	inline void SetBlendMode(const BlendMode& blendmode) { blendMode_ = blendmode; };
 
 	inline void SetRotate(float rotate) { rotate_ = rotate; };
+
+	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;

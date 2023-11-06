@@ -76,5 +76,7 @@ private:
 	Vector2 spritePosition_;
 	Vector2 ancorPoint_;
 	float rotate_;
+	Vector2 leftTop;
+	Vector2 rightDown;
 };
 

@@ -269,6 +269,11 @@ void Sprite::Initialize()
 
 }
 
+void Sprite::SetRange(const Vector2& leftTop, const Vector2& rightDown) {
+	struct SRT uvTransform = { {(rightDown.x - leftTop.x)/size_.x,(rightDown.y - leftTop.y)/size_.y ,1},{0,0,0},{leftTop.x/size_.x,leftTop.y/size_.y,0} };
+	uvTransform_ = MakeAffineMatrix(uvTransform.scale,uvTransform.rotate,uvTransform.translate);
+}
+
 void Sprite::Draw()
 {
 	// パイプラインステートの設定
