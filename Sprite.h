@@ -78,20 +78,27 @@ public:
 
 	void Initialize();
 
+	//座標指定(スクリーン座標)
 	inline void SetPosition(const Vector2& pos) { position_ = pos; };
 
-	inline void SetWVP(const Matrix4x4& wvp) { wvp_ = wvp; };
+	
+	//inline void SetWVP(const Matrix4x4& wvp) { wvp_ = wvp; };
 
+	//カラー(RGBA)の設定
 	inline void SetColor(const Vector4& color) { materialData_->color = color; };
-
+	// アンカーポイントの設定
 	inline void SetAnchorPoint(const Vector2& anchorPoint) { anchorPoint_ = anchorPoint; };
 
+	//uvTransformの直接指定(基本使わない)
 	inline void SetUVTransform(const Matrix4x4& uvTransform) { uvTransform_ = uvTransform; };
 
+	//ブレンドモードの指定
 	inline void SetBlendMode(const BlendMode& blendmode) { blendMode_ = blendmode; };
 
+	//z軸回転
 	inline void SetRotate(float rotate) { rotate_ = rotate; };
 
+	//テクスチャの範囲切り出し
 	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
 
 private:
