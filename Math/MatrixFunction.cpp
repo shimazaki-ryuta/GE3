@@ -1,4 +1,5 @@
 #include "MatrixFunction.h"
+#include "VectorFunction.h"
 #include <math.h>
 
 template<typename MatrixSize>
@@ -543,7 +544,26 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	return transform;
 }
 
+Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to) {
+	Matrix4x4 result = MakeIdentity4x4();
+	Vector3 normal = Normalize(Cross(from,to));
+	float cos = Dot(from,to);
+	float sin = Length(Cross(from,to));
 
+	result.m[0][0] = normal.x * normal.x * (1.0f - cos) + cos;
+	result.m[0][1] = normal.x * normal.y * (1.0f - cos) + normal.z*sin;
+	result.m[0][2] = normal.x * normal.z * (1.0f - cos) - normal.y * sin;
+
+	result.m[1][0] = normal.x * normal.y * (1.0f - cos) - normal.z * sin;
+	result.m[1][1] = normal.y * normal.y * (1.0f - cos) + cos;
+	result.m[1][2] = normal.y * normal.z * (1.0f - cos) + normal.x * sin;
+
+	result.m[2][0] = normal.x * normal.z * (1.0f - cos) + normal.y * sin;
+	result.m[2][1] = normal.y * normal.z * (1.0f - cos) -normal.x* sin;
+	result.m[2][2] = normal.z * normal.z * (1.0f - cos) + cos;
+
+	return result;
+}
 
 Matrix4x4 operator+(Matrix4x4 m1, Matrix4x4 m2) { return Add(m1, m2); }
 

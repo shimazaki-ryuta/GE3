@@ -13,7 +13,7 @@
 #include <list>
 
 #include "collision.h"
-
+#include "CollisionManager.h"
 GameScene::GameScene() {
 
 }
@@ -27,7 +27,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	input_ = Input::GetInstance();
 
-
+	CollisionManager::GetInstance()->ClearList();
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
@@ -158,10 +158,13 @@ void GameScene::Update() {
 	}
 	if (IsCollision(player_->GetOBB(),goal_->GetOBB())) {
 		player_->ReStart();
+		enemy_->ReStart();
 	}
-	if (IsCollision(player_->GetOBB(), enemy_->GetSphere())) {
+	if (IsCollision(player_->GetOBB(), enemy_->GetSphere())&&(!enemy_->IsDead())) {
 		player_->OnCollisionEnemy();
 	}
+
+	CollisionManager::GetInstance()->CheckAllCollisions();
 
 	if (isDebugCameraActive_) {
 		//viewProjection_.matView = debugCamera_->GetViewProjection().matView;

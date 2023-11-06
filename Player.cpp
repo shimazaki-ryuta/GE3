@@ -13,6 +13,8 @@
 
 #include "GlobalVariables.h"
 
+#include "CollisionManager.h"
+
 static int startFrame = 0;
 static int endFrame = 60;
 static int rigidityFrame = 30;
@@ -35,6 +37,8 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	input_ = Input::GetInstance();
+	direction_ = {0,0,1.0f};
+	directionMatrix_ = MakeIdentity4x4();
 
 	for (HierarchicalAnimation& model_ : models_) {
 		model_.worldTransform_.Initialize();
@@ -55,6 +59,11 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(
 	    groupName, "ArmR Translation", models_[3].worldTransform_.translation_);
 	
+	weaponOBB_.center = worldTransformWepon_.translation_;
+	weaponOBB_.size = {1.0f,3.0f,1.0f};
+	weaponCollider_.SetOBB(weaponOBB_);
+	weaponCollider_.SetIsCollision(false);
+	CollisionManager::GetInstance()->PushCollider(&weaponCollider_);
 }
 
 void Player::ReStart() {
@@ -63,6 +72,8 @@ void Player::ReStart() {
 	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
 	worldTransform_.translation_ = {0.0f,0.0f,0.0f};
 	worldTransform_.Initialize();
+	direction_ = { 0,0,1.0f };
+	directionMatrix_ = MakeIdentity4x4();
 }
 
 void Player::BehaviorRootInitialize() {
@@ -104,6 +115,7 @@ void Player::BehaviorAttackInitialize() {
 	models_[2].worldTransform_.parent_ = &worldTransformWepon_;
 	models_[3].worldTransform_.parent_ = &worldTransformWepon_;
 	attackBehavior_ = AttackBehavior::kPre;
+	weaponCollider_.SetIsCollision(true);
 }
 
 void Player::Update() {
@@ -145,8 +157,11 @@ void Player::Update() {
 	}
 
 	// 行列更新
-	worldTransform_.UpdateMatrix();
-
+	//worldTransform_.UpdateMatrix();
+	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
+	if (worldTransform_.parent_){
+		worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
+	}
 	// キャラクタの座標を表示する
 	float* slider3[3] = {
 	    &worldTransform_.translation_.x, &worldTransform_.translation_.y,
@@ -191,12 +206,17 @@ void Player::BehaviorRootUpdate()
 		Vector3 move = {
 		    float(joyState.Gamepad.sThumbLX) / SHRT_MAX, 0,
 		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
-
+		//Matrix4x4 newrotation = DirectionToDIrection({0,0.0f,1.0f}, {0, 0.0f, -1.0f});
 		move = Normalize(move) * kCharacterSpeed;
 		Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->rotation_.y, 0.0f};
 		move = Transform(move, MakeRotateMatrix(cameraDirectionYcorection));
 		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
-			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+			Matrix4x4 newDirection = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(move));
+			directionMatrix_ = newDirection;
+			//worldTransform_.matWorld_ *= newDirection;
+			//worldTransform_.rotation_.y = newDirection.m[1][0] * newDirection.m[1][1] * newDirection.m[1][2];
+			direction_ = move;
 		}
 		worldTransform_.translation_ += move;
 	}
@@ -232,11 +252,16 @@ void Player::BehaviorAttackUpdate()
 	}
 	if (frameCount_ == endFrame) {
 		// behavior_ = Behavior::kRoot;
+		weaponCollider_.SetIsCollision(false);
 		behaviorRequest_ = Behavior::kRoot;
 	}
 	Vector3 move = {0.0f, 0.0f, frontLength / float(attackFrame)};
-	
-	move = Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
+	Matrix4x4 rotateMatrix = worldTransform_.matWorld_;
+	rotateMatrix.m[3][0] = 0;
+	rotateMatrix.m[3][1] = 0;
+	rotateMatrix.m[3][2] = 0;
+
+	move = Transform(move, (rotateMatrix));
 
 	switch (attackBehavior_) {
 	case Player::AttackBehavior::kPre:
@@ -248,25 +273,13 @@ void Player::BehaviorAttackUpdate()
 		break;
 
 	}
-	/*
-#ifdef _DEBUG
-	ImGui::Begin("Player");
-	ImGui::SliderFloat3(
-	    "ArmL Transform", &models_[2].worldTransform_.translation_.x, -10.0f, 10.0f);
-	ImGui::SliderFloat3(
-	    "ArmL Rotate", &models_[2].worldTransform_.rotation_.x, -3.0f, 3.0f);
-	ImGui::SliderFloat3(
-	    "ArmR Transform", &models_[3].worldTransform_.translation_.x, -10.0f, 10.0f);
-	ImGui::SliderFloat3("ArmR Rotate", &models_[3].worldTransform_.rotation_.x, -3.0f, 3.0f);
-	ImGui::SliderInt("Attack", &attackFrame, 1, 240);
-	ImGui::SliderInt("Rigd", &rigidityFrame, 1, 240);
-	ImGui::SliderInt("End", &endFrame, 1, 240);
-	ImGui::SliderFloat("wepon", &weponRotateEnd, 0.0f, 2.0f);
-	ImGui::SliderFloat("front", &frontLength, 0.0f, 10.0f);
-	ImGui::End();
-#endif // _DEBUG
-*/
+
 	worldTransformWepon_.UpdateMatrix();
+	weaponOBB_.center = { worldTransformWepon_.matWorld_.m[3][0] ,worldTransformWepon_.matWorld_.m[3][1] ,worldTransformWepon_.matWorld_.m[3][2] };
+	weaponOBB_.size = { 1.0f,3.0f,1.0f };
+	SetOridentatios(weaponOBB_,worldTransformWepon_.matWorld_);
+	weaponCollider_.SetOBB(weaponOBB_);
+
 	frameCount_++;
 }
 

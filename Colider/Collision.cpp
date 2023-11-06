@@ -394,3 +394,15 @@ bool IsCollision(const OBB& obb1, const OBB& obb2)
 	}
 	return true;
 }
+
+bool IsCollision(const Sphere& s, const AABB& aabb) {
+	return IsCollision(aabb,s);
+}
+bool IsCollision(const Sphere& s, const OBB& obb) {
+	return IsCollision(obb, s);
+}
+/*
+bool IsCollision(const AABB& aabb, const OBB& obb) {
+	return IsCollision(obb, aabb);
+}
+*/

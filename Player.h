@@ -7,6 +7,7 @@
 #include "BaseCharacter.h"
 #include <optional>
 #include "OBB.h"
+#include "Collider.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -94,4 +95,11 @@ private:
 
 	//調整用
 	int frameCount_ = 0;
+
+	//向き
+	Vector3 direction_;
+	Matrix4x4 directionMatrix_;
+
+	OBB weaponOBB_;
+	Collider weaponCollider_;
 };
