@@ -71,5 +71,10 @@ private:
 	Model* modelGround_ = nullptr;
 
 	std::unique_ptr<Particle> particle;
+
+	std::unique_ptr<Sprite> sprite_;
+	Vector2 spritePosition_;
+	Vector2 ancorPoint_;
+	float rotate_;
 };
 

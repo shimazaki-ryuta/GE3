@@ -44,6 +44,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	uvCheckerTextureHandle_ = TextureManager::LoadTexture("uvChecker.png");
 
 	particle.reset(Particle::Create(uvCheckerTextureHandle_,10));
+
+	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,240 }, {1.0f,1.0f,1.0f,1.0f}));
+	sprite_->SetAnchorPoint({0,0});
+	spritePosition_ = {0,0};
+	ancorPoint_ = {0,0};
+	rotate_ = 0;
 }
 
 void GameScene::Update() {
@@ -53,6 +59,14 @@ void GameScene::Update() {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
 	}
+	ImGui::Begin("Sprite");
+	ImGui::DragFloat2("position",&spritePosition_.x,1.0f);
+	ImGui::DragFloat2("anchor", &ancorPoint_.x, 0.1f);
+	ImGui::DragFloat("rotate",&rotate_,0.1f);
+	ImGui::End();
+	sprite_->SetPosition(spritePosition_);
+	sprite_->SetAnchorPoint(ancorPoint_);
+	sprite_->SetRotate(rotate_);
 #endif // _DEBUG
 	
 	if (isDebugCameraActive_) {
@@ -70,20 +84,20 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw2D() {
-
+	sprite_->Draw();
 }
 
 void GameScene::Draw3D() {
 /*	Primitive3D::PreDraw(dxCommon_->GetCommandList());
 	Primitive3D::PostDraw();*/
 	Model::PreDraw(dxCommon_->GetCommandList());
-	skydome_->Draw(viewProjection_);
+	//skydome_->Draw(viewProjection_);
 	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
-	particle->Draw(viewProjection_);
+	//particle->Draw(viewProjection_);
 	Particle::PostDraw();
 }
 

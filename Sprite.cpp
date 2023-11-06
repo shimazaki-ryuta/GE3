@@ -204,7 +204,9 @@ Sprite* Sprite::Create(uint32_t textureHandle, Vector2 position, Vector2 size, V
 	sprite->position_ = position;
 	sprite->size_ = size;
 	sprite->color_ = color;
+	sprite->anchorPoint_ = {0.5f,0.5f};
 	sprite->blendMode_ = BlendMode::Normal;
+	sprite->rotate_ = 0;
 	sprite->Initialize();
 
 	return sprite;
@@ -227,13 +229,13 @@ void Sprite::Initialize()
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
 	//1枚目
-	vertexDataSprite_[0].position = { position_.x - size_.x / 2.0f,position_.y - size_.y / 2.0f,0.0f,1.0f };
+	vertexDataSprite_[0].position = {  - size_.x * anchorPoint_.x, - size_.y * anchorPoint_.y,0.0f,1.0f };
 	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
-	vertexDataSprite_[1].position = { position_.x + size_.x / 2.0f,position_.y - size_.y / 2,0.0f,1.0f };
+	vertexDataSprite_[1].position = {  + size_.x *(1.0f- anchorPoint_.x), - size_.y * anchorPoint_.y,0.0f,1.0f};
 	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
-	vertexDataSprite_[2].position = { position_.x - size_.x / 2.0f,position_.y + size_.y / 2.0f,0.0f,1.0f };
+	vertexDataSprite_[2].position = {  - size_.x * anchorPoint_.x, + size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
 	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
-	vertexDataSprite_[3].position = { position_.x + size_.x / 2.0f,position_.y + size_.y / 2.0f,0.0f,1.0f };
+	vertexDataSprite_[3].position = {  + size_.x * (1.0f - anchorPoint_.x), + size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
 	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
 
 	//インデックス
@@ -272,11 +274,20 @@ void Sprite::Draw()
 	// パイプラインステートの設定
 	sCommandList->SetPipelineState(sPipelineStates[size_t(blendMode_)].Get());
 
-	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(Vector3{ 0,0,0 }, Vector3{ 0,0,0 }, Vector3{ position_.x,position_.y,0.0f });
+	//1枚目
+	vertexDataSprite_[0].position = { -size_.x * anchorPoint_.x, -size_.y * anchorPoint_.y,0.0f,1.0f };
+	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
+	vertexDataSprite_[1].position = { +size_.x * (1.0f - anchorPoint_.x), -size_.y * anchorPoint_.y,0.0f,1.0f };
+	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
+	vertexDataSprite_[2].position = { -size_.x * anchorPoint_.x, +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
+	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
+	vertexDataSprite_[3].position = { +size_.x * (1.0f - anchorPoint_.x), +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
+	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
+	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(Vector3{ 1.0f,1.0f,1.0f }, Vector3{ 0,0,rotate_ }, Vector3{ position_.x,position_.y,0.0f });
 	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 100.0f);
+	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 1.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-	transformationMatrixDataSprite->WVP = wvp_;
+	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
 	materialData_->uvTransform = uvTransform_;
 
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());

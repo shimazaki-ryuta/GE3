@@ -77,9 +77,13 @@ public:
 
 	inline void SetColor(const Vector4& color) { materialData_->color = color; };
 
+	inline void SetAnchorPoint(const Vector2& anchorPoint) { anchorPoint_ = anchorPoint; };
+
 	inline void SetUVTransform(const Matrix4x4& uvTransform) { uvTransform_ = uvTransform; };
 
 	inline void SetBlendMode(const BlendMode& blendmode) { blendMode_ = blendmode; };
+
+	inline void SetRotate(float rotate) { rotate_ = rotate; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -95,6 +99,8 @@ private:
 	Vector2 position_;
 	Vector2 size_;
 	Vector4 color_;
+	Vector2 anchorPoint_;
+	float rotate_;
 	uint32_t textureHandle_;
 
 	Matrix4x4 uvTransform_;
