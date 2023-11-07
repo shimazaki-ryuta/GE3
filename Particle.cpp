@@ -342,10 +342,16 @@ void Particle::Draw(const ViewProjection& viewProjection) {
 	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	//worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
-
+	Matrix4x4 billBoardMatrix = MakeIdentity4x4();
+	if (isBillboard_) {
+		billBoardMatrix = /*MakeRotateMatrix({0.0f,std::numbers::pi_v<float>,0.0f}) */ (viewProjection.matView);
+		billBoardMatrix.m[3][0] = 0;
+		billBoardMatrix.m[3][1] = 0;
+		billBoardMatrix.m[3][2] = 0;
+	}
 	Matrix4x4 viewProjectionMatrix = viewProjection.matView * viewProjection.matProjection;
 	for (uint32_t index = 0; index < numInstance_; ++index) {
-		Matrix4x4 world = MakeAffineMatrix(particleData_[index].transform.scale, particleData_[index].transform.rotate, particleData_[index].transform.translate);
+		Matrix4x4 world = MakeAffineMatrix(particleData_[index].transform.scale, particleData_[index].transform.rotate, particleData_[index].transform.translate) * billBoardMatrix;
 		Matrix4x4 worldViewProjection = world*viewProjectionMatrix;
 		instancingData[index].WVP = worldViewProjection;
 		instancingData[index].World = world;

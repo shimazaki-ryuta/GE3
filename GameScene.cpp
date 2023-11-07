@@ -11,7 +11,7 @@
 #include "externals/imgui/imgui_impl_win32.h"
 #include <cassert>
 #include <list>
-
+#include <numbers>
 #include "collision.h"
 
 GameScene::GameScene() {
@@ -45,15 +45,18 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	particle.reset(Particle::Create(100));
 
-	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, {1.0f,1.0f,1.0f,1.0f}));
-	sprite_->SetAnchorPoint({0,0});
-	spritePosition_ = {0,0};
-	ancorPoint_ = {0,0};
+	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, { 1.0f,1.0f,1.0f,1.0f }));
+	sprite_->SetAnchorPoint({ 0,0 });
+	spritePosition_ = { 0,0 };
+	ancorPoint_ = { 0,0 };
 	rotate_ = 0;
-	leftTop = {0,0};
-	rightDown = {720.0f,360.0f};
+	leftTop = { 0,0 };
+	rightDown = { 720.0f,360.0f };
 #ifdef _DEBUG
 	isDebugCameraActive_ = true;
+	debugCamera_->SetUses(isDebugCameraActive_);
+	debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
+	debugCamera_->SetPosition({0.0f, 23.0f, 10.0f});
 #endif // _DEBUG
 }
 
@@ -75,6 +78,10 @@ void GameScene::Update() {
 	sprite_->SetAnchorPoint(ancorPoint_);
 	sprite_->SetRotate(rotate_);
 	sprite_->SetRange(leftTop,rightDown);
+	ImGui::Begin("Particle");
+	ImGui::Checkbox("UseBillboard", &usebillboard);
+	ImGui::End();
+	particle->UseBillboard(usebillboard);
 #endif // _DEBUG
 	
 

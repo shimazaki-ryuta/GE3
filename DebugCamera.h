@@ -16,7 +16,8 @@ public:
 	void SetUses(bool is){ isUses_ = is; };
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
 
-
+	void SetRotate(const Vector3& rotate) { viewProjection_.rotation_ = rotate; };
+	void SetPosition(const Vector3& position) { viewProjection_.translation_ = position; };
 private:
 	// ビュープロジェクション
 	ViewProjection viewProjection_;

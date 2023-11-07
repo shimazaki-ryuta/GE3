@@ -78,5 +78,7 @@ private:
 	float rotate_;
 	Vector2 leftTop;
 	Vector2 rightDown;
+
+	bool usebillboard;
 };
 

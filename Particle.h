@@ -100,6 +100,7 @@ public:
 
 	//static uint32_t CreateStructuredBuffer();
 
+	void UseBillboard(bool is) { isBillboard_ = is; };
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -130,5 +131,7 @@ private:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+
+	bool isBillboard_;
 };
 
