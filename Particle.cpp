@@ -10,6 +10,9 @@
 #include <numbers>
 #include <string>
 #include <wrl.h>
+#include "DeltaTime.h"
+#include "VectorFunction.h"
+#include "RandomEngine.h"
 //std::shared_ptr<D3DResourceLeakChacker>Particle::leakchecker;
 ID3D12Device* Particle::sDevice = nullptr;
 UINT Particle::sDescriptorHandleIncrementSize;
@@ -276,8 +279,12 @@ void Particle::Initialize(uint32_t numInstance)
 		struct Transform transform;
 		transform.scale = {1.0f,1.0f,1.0f};
 		transform.rotate = {0.0f,std::numbers::pi_v<float>,0.0f};
-		transform.translate = {index*0.1f,index * 0.1f, index * 0.1f};
-		transforms.push_back(transform);
+		transform.translate = {RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		//transforms.push_back(transform);
+		//ParticleData particle;
+		//particle.transform = transform;
+		Vector3 velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		particleData_.push_back(ParticleData{ transform,velocity });
 	}
 }
 
@@ -297,7 +304,10 @@ Particle* Particle::Create(uint32_t numInstance)
 }
 
 void Particle::Updade() {
-	
+	for (uint32_t index = 0; index < numInstance_; ++index) {
+		float deltaTime = 1.0f/60.0f;
+		particleData_[index].transform.translate += deltaTime*particleData_[index].velocity;
+	}
 }
 
 void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
@@ -328,7 +338,7 @@ void Particle::Draw(const ViewProjection& viewProjection) {
 
 	Matrix4x4 viewProjectionMatrix = viewProjection.matView * viewProjection.matProjection;
 	for (uint32_t index = 0; index < numInstance_; ++index) {
-		Matrix4x4 world = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		Matrix4x4 world = MakeAffineMatrix(particleData_[index].transform.scale, particleData_[index].transform.rotate, particleData_[index].transform.translate);
 		Matrix4x4 worldViewProjection = world*viewProjectionMatrix;
 		instancingData[index].WVP = worldViewProjection;
 		instancingData[index].World = world;

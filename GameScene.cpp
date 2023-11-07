@@ -43,7 +43,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	uvCheckerTextureHandle_ = TextureManager::LoadTexture("uvChecker.png");
 
-	particle.reset(Particle::Create(uvCheckerTextureHandle_,10));
+	particle.reset(Particle::Create(uvCheckerTextureHandle_,100));
 
 	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, {1.0f,1.0f,1.0f,1.0f}));
 	sprite_->SetAnchorPoint({0,0});
@@ -52,6 +52,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	rotate_ = 0;
 	leftTop = {0,0};
 	rightDown = {720.0f,360.0f};
+#ifdef _DEBUG
+	isDebugCameraActive_ = true;
+#endif // _DEBUG
 }
 
 void GameScene::Update() {
@@ -74,6 +77,9 @@ void GameScene::Update() {
 	sprite_->SetRange(leftTop,rightDown);
 #endif // _DEBUG
 	
+
+	particle->Updade();
+
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
@@ -102,7 +108,7 @@ void GameScene::Draw3D() {
 	
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
-	//particle->Draw(viewProjection_);
+	particle->Draw(viewProjection_);
 	Particle::PostDraw();
 }
 

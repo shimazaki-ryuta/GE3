@@ -34,17 +34,17 @@ public:
 		Matrix4x4 World;
 	};
 
-	struct ParticleData
-	{
-		TransformationMatrix transform;
-		Vector3 velocity;
-	};
-
 	struct Transform 
 	{
 		Vector3 scale;
 		Vector3 rotate;
 		Vector3 translate;
+	};
+
+	struct ParticleData
+	{
+		Transform transform;
+		Vector3 velocity;
 	};
 
 	// 頂点数
@@ -109,8 +109,8 @@ private:
 	Material* materialData_ = nullptr;
 	//TransformationMatrix* transformationMatrixDataSprite = nullptr;
 	TransformationMatrix* instancingData = nullptr;
-	std::vector< struct Transform> transforms;
-
+	//std::vector< struct Transform> transforms;
+	std::vector< ParticleData> particleData_;
 	Vector4 color_;
 	uint32_t textureHandle_;
 
