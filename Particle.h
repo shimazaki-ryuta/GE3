@@ -28,10 +28,11 @@ public:
 		Matrix4x4 uvTransform;
 	};
 
-	struct TransformationMatrix
+	struct ParticleForGPU
 	{
 		Matrix4x4 WVP;
 		Matrix4x4 World;
+		Vector4 Color;
 	};
 
 	struct Transform 
@@ -45,6 +46,9 @@ public:
 	{
 		Transform transform;
 		Vector3 velocity;
+		Vector4 color;
+		float lifeTime;
+		float currentTime;
 	};
 
 	// 頂点数
@@ -108,7 +112,7 @@ private:
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	//TransformationMatrix* transformationMatrixDataSprite = nullptr;
-	TransformationMatrix* instancingData = nullptr;
+	ParticleForGPU* instancingData = nullptr;
 	//std::vector< struct Transform> transforms;
 	std::vector< ParticleData> particleData_;
 	Vector4 color_;

@@ -140,16 +140,16 @@ void Particle::StaticInitialize(
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	//BlendDtateの設定
+	//BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	/*blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
@@ -175,7 +175,7 @@ void Particle::StaticInitialize(
 	//DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -198,6 +198,7 @@ void Particle::Initialize(uint32_t numInstance)
 	filename = filename + ".obj";
 	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directory,filename);
 	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 6);
+	textureHandle_ = modelData.meshs.material.textureHandle;
 	//頂点バッファビューを作る
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
@@ -243,12 +244,13 @@ void Particle::Initialize(uint32_t numInstance)
 	indexData_[4] = 2;
 	indexData_[5] = 3;
 	
-	instancingResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(TransformationMatrix)*numInstance_);
+	instancingResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(ParticleForGPU)*numInstance_);
 
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 	for (uint32_t index = 0; index < numInstance_;++index) {
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].Color = Vector4(1.0f,1.0f,1.0f,1.0f);
 	}
 
 	uvTransform_ = MakeIdentity4x4();
@@ -266,7 +268,7 @@ void Particle::Initialize(uint32_t numInstance)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = numInstance_;
-	srvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
+	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	
 	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
 	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
@@ -284,7 +286,9 @@ void Particle::Initialize(uint32_t numInstance)
 		//ParticleData particle;
 		//particle.transform = transform;
 		Vector3 velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-		particleData_.push_back(ParticleData{ transform,velocity });
+		Vector4 color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
+		float lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+		particleData_.push_back(ParticleData{ transform,velocity,color,lifeTime,0 });
 	}
 }
 
@@ -307,6 +311,9 @@ void Particle::Updade() {
 	for (uint32_t index = 0; index < numInstance_; ++index) {
 		float deltaTime = 1.0f/60.0f;
 		particleData_[index].transform.translate += deltaTime*particleData_[index].velocity;
+		particleData_[index].currentTime += deltaTime;
+		float alpha = 1.0f - (particleData_[index].currentTime / particleData_[index].lifeTime);
+		particleData_[index].color.w = alpha;
 	}
 }
 
@@ -342,6 +349,7 @@ void Particle::Draw(const ViewProjection& viewProjection) {
 		Matrix4x4 worldViewProjection = world*viewProjectionMatrix;
 		instancingData[index].WVP = worldViewProjection;
 		instancingData[index].World = world;
+		instancingData[index].Color = particleData_[index].color;
 	}
 
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());

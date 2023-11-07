@@ -43,7 +43,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	uvCheckerTextureHandle_ = TextureManager::LoadTexture("uvChecker.png");
 
-	particle.reset(Particle::Create(uvCheckerTextureHandle_,100));
+	particle.reset(Particle::Create(100));
 
 	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, {1.0f,1.0f,1.0f,1.0f}));
 	sprite_->SetAnchorPoint({0,0});
