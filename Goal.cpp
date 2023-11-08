@@ -7,7 +7,7 @@
 
 void Goal::Initialize() {
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = {0.0f,1.5f,40.0f};
+	worldTransform_.translation_ = {0.0f,1.5f,80.0f};
 	model_.reset(Model::CreateFromOBJ("Cube"));
 	textureHandle_ = TextureManager::LoadTexture("g.png");
 	size_ = { 1.0f,1.0f,1.0f };

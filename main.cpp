@@ -119,6 +119,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
 	directinalLightData->intensity = 1.0f;
 
+	//グローバル変数の読み込み
+	GlobalVariables::GetInstance()->LoadFiles();
+
 	///メインループ
 	MSG msg{};
 	DeltaTime::GameLoopStart();

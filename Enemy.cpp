@@ -34,7 +34,7 @@ void Enemy::Update() {
 		const float rotateY = 0.05f;
 		worldTransform_.rotation_.y += rotateY;
 		Vector3 move = { 0.0f,0.0f,0.2f };
-		Vector3 offset = { -4.0f,0.0f,20.0f };
+		Vector3 offset = { -4.0f,0.0f,44.0f };
 
 		position_ += Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
 		worldTransform_.translation_ = position_ + offset;

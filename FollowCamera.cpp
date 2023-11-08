@@ -4,13 +4,18 @@
 #include "Input.h"
 #include <algorithm>
 #include <numbers>
+#include "GlobalVariables.h"
 void FollowCamera::Initialize()
 {
 	viewProjection_.Initialize(); 
-
+	GlobalVariables* grovalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "FollowCamera";
+	grovalVariables->CreateGroup(groupName);
+	grovalVariables->AddItem(groupName, "CameraDelay", cameraDelay_);
 }
 void FollowCamera::Update() 
 {
+	ApplyGlobalVariables();
 	// ゲームパッドの状態をえる
 	XINPUT_STATE joyState;
 
@@ -32,8 +37,33 @@ void FollowCamera::Update()
 		
 		offset = TransformNormal(offset,rotateMatrix);
 
-		viewProjection_.translation_ = target_->GetWorldPosition() + offset;
+		interTargert_ = Lerp(interTargert_,target_->GetWorldPosition(),cameraDelay_);
+
+		viewProjection_.translation_ = interTargert_ + offset;
 	}
 
 	viewProjection_.UpdateMatrix();
+}
+
+void FollowCamera::Reset() {
+	if (target_)
+	{
+		Vector3 offset = { 0.0f,2.0f,-20.0f };
+
+		Matrix4x4 rotateMatrix = MakeRotateMatrix(viewProjection_.rotation_);
+
+		offset = TransformNormal(offset, rotateMatrix);
+
+		viewProjection_.translation_ = target_->GetWorldPosition() + offset;
+		interTargert_ = target_->GetWorldPosition();
+	}
+
+	viewProjection_.UpdateMatrix();
+}
+
+void FollowCamera::ApplyGlobalVariables()
+{
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "FollowCamera";
+	cameraDelay_ = globalVariables->GetFloatValue(groupName, "CameraDelay");
 }

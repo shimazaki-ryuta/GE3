@@ -17,12 +17,14 @@ public:
 	inline void SetTarget(WorldTransform* target) { target_ = target; };
 
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
-
-
+	void Reset();
+	void ApplyGlobalVariables();
 private:
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
 	WorldTransform* target_ = nullptr;
-
+	Vector3 interTargert_;
+	//補間の強さ
+	float cameraDelay_;
 };

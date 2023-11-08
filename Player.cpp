@@ -25,8 +25,6 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	GlobalVariables* grovalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	grovalVariables->CreateGroup(groupName);
-	//grovalVariables->AddItem(groupName, "Test",90);
-	//grovalVariables->AddItem(groupName, "Test2", 5.0f);
 	//grovalVariables->AddItem(groupName, "Test3", Vector3{1.0f,2.0f,3.0f});
 
 
@@ -59,11 +57,17 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(
 	    groupName, "ArmR Translation", models_[3].worldTransform_.translation_);
 	
+	grovalVariables->AddItem(groupName, "DashSpeed", dashSpeed_);
+	grovalVariables->AddtValue(groupName, "DashLength", dashLength_);
+
 	weaponOBB_.center = worldTransformWepon_.translation_;
 	weaponOBB_.size = {1.0f,3.0f,1.0f};
 	weaponCollider_.SetOBB(weaponOBB_);
 	weaponCollider_.SetIsCollision(false);
 	CollisionManager::GetInstance()->PushCollider(&weaponCollider_);
+
+	obbModel_.reset(Model::CreateFromOBJ("cube"));
+	worldTtansformOBB_.Initialize();
 }
 
 void Player::ReStart() {
@@ -118,6 +122,10 @@ void Player::BehaviorAttackInitialize() {
 	weaponCollider_.SetIsCollision(true);
 }
 
+void Player::BehaviorDashInitialize() {
+
+}
+
 void Player::Update() {
 	ApplyGlobalVariables();
 	if (behaviorRequest_) {
@@ -131,6 +139,9 @@ void Player::Update() {
 		case Player::Behavior::kAttack:
 			BehaviorAttackInitialize();
 			break;
+		case Player::Behavior::kDash:
+			BehaviorDashInitialize();
+			break;
 		}
 		behaviorRequest_ = std::nullopt;
 	}
@@ -142,6 +153,9 @@ void Player::Update() {
 		break;
 	case Player::Behavior::kAttack:
 		BehaviorAttackUpdate();
+		break;
+	case Player::Behavior::kDash:
+		BehaviorDashUpdate();
 		break;
 	}
 
@@ -184,6 +198,13 @@ void Player::Update() {
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
 	}
+
+#ifdef _DEBUG
+	// デバッグカメラを有効化
+	if (input_->GetKeyDown(DIK_9)) {
+		isDrawOBB_ = !isDrawOBB_;
+	}
+#endif // _DEBUG
 }
 
 void Player::BehaviorRootUpdate()
@@ -197,6 +218,11 @@ void Player::BehaviorRootUpdate()
 	{
 		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kAttack;
+	}
+	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X))
+	{
+		//behavior_ = Behavior::kAttack;
+		behaviorRequest_ = Behavior::kDash;
 	}
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
@@ -221,18 +247,19 @@ void Player::BehaviorRootUpdate()
 		worldTransform_.translation_ += move;
 	}
 	UpdateFloatingGimmick();
+	preJoyState_ = joyState;
 }
 
 void Player::BehaviorAttackUpdate()
 {
 	static float weponRotateEnd = 3.14f;
-	
+
 	static float frontLength = 5.0f;
 	/*
 	if (frameCount_ < startFrame) {
 		Vector3 move = {0.0f, 0.0f, frontLength / float(startFrame)};
 		worldTransform_.translation_ +=
-		    Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
+			Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
 	}
 	if (frameCount_ >= startFrame)
 	{
@@ -255,7 +282,7 @@ void Player::BehaviorAttackUpdate()
 		weaponCollider_.SetIsCollision(false);
 		behaviorRequest_ = Behavior::kRoot;
 	}
-	Vector3 move = {0.0f, 0.0f, frontLength / float(attackFrame)};
+	Vector3 move = { 0.0f, 0.0f, frontLength / float(attackFrame) };
 	Matrix4x4 rotateMatrix = worldTransform_.matWorld_;
 	rotateMatrix.m[3][0] = 0;
 	rotateMatrix.m[3][1] = 0;
@@ -275,11 +302,30 @@ void Player::BehaviorAttackUpdate()
 	}
 
 	worldTransformWepon_.UpdateMatrix();
-	weaponOBB_.center = { worldTransformWepon_.matWorld_.m[3][0] ,worldTransformWepon_.matWorld_.m[3][1] ,worldTransformWepon_.matWorld_.m[3][2] };
-	weaponOBB_.size = { 1.0f,3.0f,1.0f };
+	Vector3 weaponColliderCenter = worldTransformWepon_.GetWorldPosition();
+	Vector3 offset{0, 5.0f, 0};
+	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
+	weaponOBB_.center = weaponColliderCenter + offset;
+	weaponOBB_.size = { 1.0f,1.5f,1.0f };
 	SetOridentatios(weaponOBB_,worldTransformWepon_.matWorld_);
 	weaponCollider_.SetOBB(weaponOBB_);
+	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
+	frameCount_++;
+}
 
+void Player::BehaviorDashUpdate() {
+	//const float kCharacterSpeed = 0.3f;
+
+	Vector3 move = {0,0,dashSpeed_};
+	Matrix4x4 rotate = worldTransform_.matWorld_;
+	rotate.m[3][0] = 0;
+	rotate.m[3][1] = 0;
+	rotate.m[3][2] = 0;
+	move = Transform(move, rotate);
+	worldTransform_.translation_ += move;
+	if (frameCount_ >= dashLength_) {
+		behaviorRequest_ = Behavior::kRoot;
+	}
 	frameCount_++;
 }
 
@@ -292,6 +338,9 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	if (behavior_ == Player::Behavior::kAttack)
 	{
 		modelWepon_->Draw(worldTransformWepon_, viewProjection);
+		if (isDrawOBB_) {
+			obbModel_->Draw(worldTtansformOBB_,viewProjection);
+		}
 	}
 }
 
@@ -339,6 +388,8 @@ void Player::ApplyGlobalVariables()
 	    globalVariables->GetVector3Value(groupName, "ArmL Translation");
 	models_[3].worldTransform_.translation_ =
 	    globalVariables->GetVector3Value(groupName, "ArmR Translation");
+	dashSpeed_ = globalVariables->GetFloatValue(groupName,"DashSpeed");
+	dashLength_ = globalVariables->GetIntValue(groupName, "DashLength");
 }
 
 void Player::OnCollision(WorldTransform& parent)

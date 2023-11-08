@@ -87,19 +87,29 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	}*/
 	flooars_[0].reset(new Flooar);
 	flooars_[0]->Initialize();
+	flooars_[0]->SetOffset({ 0.0f,0.0f,-10.0f });
+	flooars_[0]->SetSize({ 20.0f,0.0f,20.0f });
+
+
 	flooars_[1].reset(new MovingFlooar);
 	flooars_[1]->Initialize();
-	flooars_[1]->SetOffset({0.0f,0.0f,6.0f});
+	flooars_[1]->SetOffset({0.0f,0.0f,22.0f});
+	flooars_[1]->SetSize({ 10.0f,0.0f,10.0f });
+
+
 	flooars_[2].reset(new Flooar);
 	flooars_[2]->Initialize();
-	flooars_[2]->SetOffset({ 0.0f,0.0f,20.0f });
+	flooars_[2]->SetOffset({ 0.0f,0.0f,44.0f });
 	flooars_[2]->SetSize({10.0f,0.0f,10.0f});
+
 	flooars_[3].reset(new MovingFlooar);
 	flooars_[3]->Initialize();
-	flooars_[3]->SetOffset({ 0.0f,0.0f,34.0f });
+	flooars_[3]->SetOffset({ 0.0f,0.0f,66.0f });
+	flooars_[3]->SetSize({ 10.0f,0.0f,10.0f });
+
 	flooars_[4].reset(new Flooar);
 	flooars_[4]->Initialize();
-	flooars_[4]->SetOffset({ 0.0f,0.0f,40.0f });
+	flooars_[4]->SetOffset({ 0.0f,0.0f,80.0f });
 
 	//ゴール
 	goal_.reset(new Goal);
@@ -109,6 +119,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	followCamera_ = std::make_unique<FollowCamera>();
 	followCamera_->Initialize();
 	followCamera_->SetTarget(player_->GetWorldTransform());
+	followCamera_->Reset();
 
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
 

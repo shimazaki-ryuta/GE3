@@ -547,6 +547,9 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Vector3 normal = Normalize(Cross(from,to));
+	if (normal.x == normal.y && normal.x == normal.z) {
+		normal.y = 1.0f;
+	}
 	float cos = Dot(from,to);
 	float sin = Length(Cross(from,to));
 

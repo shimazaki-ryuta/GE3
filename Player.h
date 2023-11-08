@@ -8,11 +8,13 @@
 #include <optional>
 #include "OBB.h"
 #include "Collider.h"
+#include "input.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
 		kRoot,
 		kAttack,
+		kDash,
 	};
 
 	enum class AttackBehavior {
@@ -27,14 +29,14 @@ public:
 	void Initialize(const std::vector<HierarchicalAnimation>& models) override;
 	void BehaviorRootInitialize();
 	void BehaviorAttackInitialize();
-
+	void BehaviorDashInitialize();
 	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update() override;
 	void BehaviorRootUpdate();
 	void BehaviorAttackUpdate();
-
+	void BehaviorDashUpdate();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -102,4 +104,17 @@ private:
 
 	OBB weaponOBB_;
 	Collider weaponCollider_;
+
+	//ダッシュ用変数
+	//ダッシュ中の速度
+	float dashSpeed_;
+	//ダッシュのフレーム数
+	int dashLength_;
+
+	std::unique_ptr<Model> obbModel_;
+	bool isDrawOBB_=false;
+	WorldTransform worldTtansformOBB_;
+
+	//1フレーム前の入力情報
+	XINPUT_STATE preJoyState_;
 };
