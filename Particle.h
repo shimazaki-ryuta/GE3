@@ -121,6 +121,7 @@ public:
 
 	//パーティクルを一つ生成する
 	void MakeNewParticle(const Vector3& translate);
+	void MakeNewParticle(const ParticleData& particleData);
 
 	void Emit(const Emitter& emitter);
 

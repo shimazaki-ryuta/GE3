@@ -307,10 +307,21 @@ void Particle::MakeNewParticle(const Vector3& translate) {
 	particleData_.push_back(ParticleData{ transform,velocity,color,lifeTime,0 });
 }
 
+void Particle::MakeNewParticle(const ParticleData& particleData) {
+	particleData_.push_back(particleData);
+}
+
 void Particle::Emit(const Emitter& emitter) {
+	ParticleData particleData;
 	for (uint32_t count = 0; count < emitter.count;count++) {
-		Vector3 translate = emitter.transform.translate + Vector3{ RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f) };
-		MakeNewParticle(translate);
+		particleData.transform.scale = { 1.0f,1.0f,1.0f };
+		particleData.transform.rotate = { 0.0f,0.0f,0.0f };
+		particleData.transform.translate = emitter.transform.translate + Vector3{ RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f) };
+		particleData.velocity =  { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		particleData.color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
+		particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+		particleData.currentTime = 0;
+		MakeNewParticle(particleData);
 	}
 }
 
