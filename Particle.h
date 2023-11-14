@@ -13,6 +13,7 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 #include <memory>
+#include <list>
 class Particle
 {
 public:
@@ -50,6 +51,13 @@ public:
 		float lifeTime;
 		float currentTime;
 	};
+	//クラス化までの仮置き
+	struct Emitter {
+		Transform transform;
+		uint32_t count;
+		float frequency;
+		float frequencyTime;
+	};
 
 	// 頂点数
 	static const int kVertNum = 4;
@@ -81,7 +89,16 @@ public:
 	void Draw(const ViewProjection& viewProjection);
 	static void PostDraw();
 
+	/// <summary>
+	/// パーティクル管理用のオブジェクトを生成
+	/// </summary>
+	/// <param name="textureHandle">テクスチャハンドル</param>
+	/// /// <param name="numInstance">操作できるパーティクル最大数</param>
 	static Particle* Create(uint32_t textureHandle, uint32_t numInstance);
+	/// <summary>
+	/// パーティクル管理用のオブジェクトを生成
+	/// </summary>
+	/// <param name="numInstance">操作できるパーティクル最大数</param>
 	static Particle* Create(uint32_t numInstance);
 
 	void Initialize(uint32_t numInstance);
@@ -101,6 +118,15 @@ public:
 	//static uint32_t CreateStructuredBuffer();
 
 	void UseBillboard(bool is) { isBillboard_ = is; };
+
+	//パーティクルを一つ生成する
+	void MakeNewParticle(const Vector3& translate);
+
+	void Emit(const Emitter& emitter);
+
+	std::vector<ParticleData>* GetParticleDate(){ return &particleData_; };
+
+	static const uint32_t kNumInstanceMax = 1000;
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -126,6 +152,7 @@ private:
 	//BlendMode blendMode_;
 
 	uint32_t numInstance_;
+	uint32_t numInstanceMax_;
 
 	D3D12_RESOURCE_DESC resourceDesc_;
 

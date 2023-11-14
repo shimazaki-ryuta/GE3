@@ -27,6 +27,7 @@
 #include "Particle.h"
 #include <array>
 #include <memory>
+#include "AABB.h"
 class GameScene
 {
 public:
@@ -35,6 +36,12 @@ public:
 		Vector3 scale;
 		Vector3 rotate;
 		Vector3 translate;
+	};
+
+	struct AccelerationField
+	{
+		Vector3 acceleration;
+		AABB area;
 	};
 
 	GameScene();
@@ -80,5 +87,8 @@ private:
 	Vector2 rightDown;
 
 	bool usebillboard;
+
+	Particle::Emitter emitter;
+	AccelerationField accelerationField;
 };
 

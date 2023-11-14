@@ -152,6 +152,17 @@ bool IsCollision(const AABB& aabb1, const AABB& aabb2)
 	return false;
 }
 
+bool IsCollision(const AABB& aabb, const Vector3& vector)
+{
+	if ((aabb.min.x <=vector.x && vector.x <= aabb.max.x) && 
+		(aabb.min.y <= vector.y && vector.y <= aabb.max.y)&& 
+		(aabb.min.z <= vector.x && vector.z <= aabb.max.z))
+	{
+		return true;
+	}
+	return false;
+}
+
 bool IsCollision(const AABB& aabb, const Sphere& sphere)
 {
 	Vector3 closestPoint{std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
