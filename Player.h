@@ -15,6 +15,7 @@ public:
 		kRoot,
 		kAttack,
 		kDash,
+		kJump,
 	};
 
 	enum class AttackBehavior {
@@ -30,6 +31,7 @@ public:
 	void BehaviorRootInitialize();
 	void BehaviorAttackInitialize();
 	void BehaviorDashInitialize();
+	void BehaviorJumpInitialize();
 	/// <summary>
 	/// 更新
 	/// </summary>
@@ -37,6 +39,7 @@ public:
 	void BehaviorRootUpdate();
 	void BehaviorAttackUpdate();
 	void BehaviorDashUpdate();
+	void BehaviorJumpUpdate();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -110,6 +113,12 @@ private:
 	float dashSpeed_;
 	//ダッシュのフレーム数
 	int dashLength_;
+
+	//ジャンプ用変数
+	Vector3 velocity_;
+	Vector3 acceleration_;
+	Vector3 kGravity;
+	Vector3 kJumpVelocity;
 
 	std::unique_ptr<Model> obbModel_;
 	bool isDrawOBB_=false;

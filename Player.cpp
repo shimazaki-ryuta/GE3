@@ -60,6 +60,10 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(groupName, "DashSpeed", dashSpeed_);
 	grovalVariables->AddtValue(groupName, "DashLength", dashLength_);
 
+	grovalVariables->AddItem(groupName, "JumpVelocity", kJumpVelocity);
+	grovalVariables->AddItem(groupName, "Gravity", kGravity);
+
+
 	weaponOBB_.center = worldTransformWepon_.translation_;
 	weaponOBB_.size = {1.0f,3.0f,1.0f};
 	weaponCollider_.SetOBB(weaponOBB_);
@@ -120,10 +124,16 @@ void Player::BehaviorAttackInitialize() {
 	models_[3].worldTransform_.parent_ = &worldTransformWepon_;
 	attackBehavior_ = AttackBehavior::kPre;
 	weaponCollider_.SetIsCollision(true);
+	velocity_ = { 0,0,0 };
 }
 
 void Player::BehaviorDashInitialize() {
+	velocity_ = { 0,0,0 };
+}
 
+void Player::BehaviorJumpInitialize() {
+	velocity_ = {0,0,0};
+	acceleration_ = {0,0,0};
 }
 
 void Player::Update() {
@@ -142,11 +152,22 @@ void Player::Update() {
 		case Player::Behavior::kDash:
 			BehaviorDashInitialize();
 			break;
+		case Player::Behavior::kJump:
+			BehaviorJumpInitialize();
+			break;
 		}
 		behaviorRequest_ = std::nullopt;
 	}
 	//BehaviorRootUpdate();
 	//BehaviorAttackUpdate();
+	if (worldTransform_.parent_) {
+		if (worldTransform_.translation_.y < 0.0f) {
+			worldTransform_.translation_.y = 0.0f;
+		}
+
+	}
+	
+
 	switch (behavior_) {
 	case Player::Behavior::kRoot:
 		BehaviorRootUpdate();
@@ -157,13 +178,9 @@ void Player::Update() {
 	case Player::Behavior::kDash:
 		BehaviorDashUpdate();
 		break;
-	}
-
-	if (worldTransform_.parent_) {
-		worldTransform_.translation_.y = 0.0f;
-	}
-	else {
-		worldTransform_.translation_.y -= 0.4f;
+	case Player::Behavior::kJump:
+		BehaviorJumpUpdate();
+		break;
 	}
 
 	if (worldTransform_.translation_.y < -10.0f) {
@@ -224,6 +241,11 @@ void Player::BehaviorRootUpdate()
 		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kDash;
 	}
+	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) && 
+		worldTransform_.parent_)
+	{
+		behaviorRequest_ = Behavior::kJump;
+	}
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 
@@ -246,6 +268,10 @@ void Player::BehaviorRootUpdate()
 		}
 		worldTransform_.translation_ += move;
 	}
+	if (!worldTransform_.parent_) {
+		velocity_ += kGravity;
+	}
+	worldTransform_.translation_ += velocity_;
 	UpdateFloatingGimmick();
 	preJoyState_ = joyState;
 }
@@ -329,6 +355,11 @@ void Player::BehaviorDashUpdate() {
 	frameCount_++;
 }
 
+void Player::BehaviorJumpUpdate() {
+	velocity_ = kJumpVelocity * directionMatrix_;
+	behaviorRequest_ = Behavior::kRoot;
+}
+
 void Player::Draw(const ViewProjection& viewProjection) {
 	//model_->Draw(worldTransform_, viewProjection);
 	for (HierarchicalAnimation& model : models_)
@@ -390,6 +421,8 @@ void Player::ApplyGlobalVariables()
 	    globalVariables->GetVector3Value(groupName, "ArmR Translation");
 	dashSpeed_ = globalVariables->GetFloatValue(groupName,"DashSpeed");
 	dashLength_ = globalVariables->GetIntValue(groupName, "DashLength");
+	kJumpVelocity = globalVariables->GetVector3Value(groupName, "JumpVelocity");
+	kGravity = globalVariables->GetVector3Value(groupName, "Gravity");
 }
 
 void Player::OnCollision(WorldTransform& parent)
@@ -401,6 +434,7 @@ void Player::OnCollision(WorldTransform& parent)
 		worldTransform_.translation_.z = rocal.m[3][2];
 
 		worldTransform_.parent_ = &parent;
+		velocity_ = { 0,0,0 };
 		isFlooar_ = true;
 	}
 }
