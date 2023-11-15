@@ -143,19 +143,15 @@ void GameScene::Update() {
 	}
 	//flooar_->Update();
 	player_->Update();
+	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player_->ReStart();
+		enemy_->ReStart();
+	}
 	enemy_->Update();
 	goal_->Update();
 	//debugCamera_->Update();
 	followCamera_->Update();
-	//flooar_->Update();
-	/*
-	if (IsCollision(player_->GetOBB(),flooar_->GetOBB()))
-	{
-		player_->OnCollision(flooar_->GetWorldTransform());
-	}
-	else {
-		player_->OutCollision();
-	}*/
+	
 	bool isCollision = false;
 	for (int index = 0; index < 5; index++) {
 		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))

@@ -14,6 +14,8 @@ public:
 	enum class Behavior { 
 		kRoot,
 		kAttack,
+		kAttack2,
+		kAttack3,
 		kDash,
 		kJump,
 	};
@@ -30,6 +32,8 @@ public:
 	void Initialize(const std::vector<HierarchicalAnimation>& models) override;
 	void BehaviorRootInitialize();
 	void BehaviorAttackInitialize();
+	void BehaviorAttackSecondInitialize();
+	void BehaviorAttackTherdInitialize();
 	void BehaviorDashInitialize();
 	void BehaviorJumpInitialize();
 	/// <summary>
@@ -38,6 +42,8 @@ public:
 	void Update() override;
 	void BehaviorRootUpdate();
 	void BehaviorAttackUpdate();
+	void BehaviorAttackSecondUpdate();
+	void BehaviorAttackTherdUpdate();
 	void BehaviorDashUpdate();
 	void BehaviorJumpUpdate();
 	/// <summary>
@@ -124,6 +130,11 @@ private:
 	bool isDrawOBB_=false;
 	WorldTransform worldTtansformOBB_;
 
+	XINPUT_STATE joyState_;
 	//1フレーム前の入力情報
 	XINPUT_STATE preJoyState_;
+
+	//コンボ
+	uint32_t comboNum_;
+	bool isCoenectCombo_;
 };

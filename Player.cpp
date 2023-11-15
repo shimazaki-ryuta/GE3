@@ -72,6 +72,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 
 	obbModel_.reset(Model::CreateFromOBJ("cube"));
 	worldTtansformOBB_.Initialize();
+	comboNum_ = 0;
 }
 
 void Player::ReStart() {
@@ -82,6 +83,7 @@ void Player::ReStart() {
 	worldTransform_.Initialize();
 	direction_ = { 0,0,1.0f };
 	directionMatrix_ = MakeIdentity4x4();
+	comboNum_ = 0;
 }
 
 void Player::BehaviorRootInitialize() {
@@ -99,6 +101,7 @@ void Player::BehaviorRootInitialize() {
 	models_[2].worldTransform_.rotation_.y = 0.0f;
 	models_[3].worldTransform_.rotation_.x = 0.0f;
 	models_[3].worldTransform_.rotation_.y = 0.0f;
+	comboNum_ = 0;
 }
 
 void Player::BehaviorAttackInitialize() {
@@ -125,6 +128,63 @@ void Player::BehaviorAttackInitialize() {
 	attackBehavior_ = AttackBehavior::kPre;
 	weaponCollider_.SetIsCollision(true);
 	velocity_ = { 0,0,0 };
+	isCoenectCombo_ = false;
+}
+
+void Player::BehaviorAttackSecondInitialize() {
+
+	worldTransformWepon_.translation_.y = 1.0f;
+	worldTransformWepon_.rotation_.x = 3.14f;
+	worldTransformWepon_.rotation_.z = -1.57f;
+
+	models_[2].worldTransform_.translation_.x = 0.009f;
+	models_[2].worldTransform_.translation_.y = 2.528f;
+	models_[2].worldTransform_.translation_.z = -1.20f;
+	models_[3].worldTransform_.translation_.x = -0.009f;
+	models_[3].worldTransform_.translation_.y = 2.00f;
+	models_[3].worldTransform_.translation_.z = -1.20f;
+
+	models_[2].worldTransform_.rotation_.x = -1.57f;
+	models_[2].worldTransform_.rotation_.y = 0.600f;
+	models_[3].worldTransform_.rotation_.x = -1.57f;
+	models_[3].worldTransform_.rotation_.y = -0.600f;
+
+	//models_[3].worldTransform_.rotation_.x = -float(std::numbers::pi);
+	models_[2].worldTransform_.parent_ = &worldTransformWepon_;
+	models_[3].worldTransform_.parent_ = &worldTransformWepon_;
+	attackBehavior_ = AttackBehavior::kAttack;
+	weaponCollider_.SetIsCollision(true);
+	velocity_ = { 0,0,0 };
+	isCoenectCombo_ = false;
+	frameCount_ = attackFrame;
+}
+
+void Player::BehaviorAttackTherdInitialize() {
+
+	worldTransformWepon_.translation_.y = 1.0f;
+	worldTransformWepon_.rotation_.x = 0.0f;
+	worldTransformWepon_.rotation_.z = -1.57f;
+
+	models_[2].worldTransform_.translation_.x = 0.009f;
+	models_[2].worldTransform_.translation_.y = 2.528f;
+	models_[2].worldTransform_.translation_.z = -1.20f;
+	models_[3].worldTransform_.translation_.x = -0.009f;
+	models_[3].worldTransform_.translation_.y = 2.00f;
+	models_[3].worldTransform_.translation_.z = -1.20f;
+
+	models_[2].worldTransform_.rotation_.x = -1.57f;
+	models_[2].worldTransform_.rotation_.y = 0.600f;
+	models_[3].worldTransform_.rotation_.x = -1.57f;
+	models_[3].worldTransform_.rotation_.y = -0.600f;
+
+	//models_[3].worldTransform_.rotation_.x = -float(std::numbers::pi);
+	models_[2].worldTransform_.parent_ = &worldTransformWepon_;
+	models_[3].worldTransform_.parent_ = &worldTransformWepon_;
+	attackBehavior_ = AttackBehavior::kAttack;
+	weaponCollider_.SetIsCollision(true);
+	velocity_ = { 0,0,0 };
+	isCoenectCombo_ = false;
+	frameCount_ = attackFrame;
 }
 
 void Player::BehaviorDashInitialize() {
@@ -138,6 +198,7 @@ void Player::BehaviorJumpInitialize() {
 
 void Player::Update() {
 	ApplyGlobalVariables();
+	Input::GetInstance()->GetJoystickState(0, joyState_);
 	if (behaviorRequest_) {
 		behavior_ = behaviorRequest_.value();
 		frameCount_ = 0;
@@ -148,6 +209,12 @@ void Player::Update() {
 			break;
 		case Player::Behavior::kAttack:
 			BehaviorAttackInitialize();
+			break;
+		case Player::Behavior::kAttack2:
+			BehaviorAttackSecondInitialize();
+			break;
+		case Player::Behavior::kAttack3:
+			BehaviorAttackTherdInitialize();
 			break;
 		case Player::Behavior::kDash:
 			BehaviorDashInitialize();
@@ -175,6 +242,12 @@ void Player::Update() {
 	case Player::Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
+	case Player::Behavior::kAttack2:
+		BehaviorAttackSecondUpdate();
+		break;
+	case Player::Behavior::kAttack3:
+		BehaviorAttackTherdUpdate();
+		break;
 	case Player::Behavior::kDash:
 		BehaviorDashUpdate();
 		break;
@@ -182,10 +255,10 @@ void Player::Update() {
 		BehaviorJumpUpdate();
 		break;
 	}
-
+	/*
 	if (worldTransform_.translation_.y < -10.0f) {
-		ReStart();
-	}
+		//ReStart();
+	}*/
 
 	// 行列更新
 	//worldTransform_.UpdateMatrix();
@@ -217,11 +290,12 @@ void Player::Update() {
 	}
 
 #ifdef _DEBUG
-	// デバッグカメラを有効化
+	// あたり判定の可視化
 	if (input_->GetKeyDown(DIK_9)) {
 		isDrawOBB_ = !isDrawOBB_;
 	}
 #endif // _DEBUG
+	preJoyState_ = joyState_;
 }
 
 void Player::BehaviorRootUpdate()
@@ -273,7 +347,6 @@ void Player::BehaviorRootUpdate()
 	}
 	worldTransform_.translation_ += velocity_;
 	UpdateFloatingGimmick();
-	preJoyState_ = joyState;
 }
 
 void Player::BehaviorAttackUpdate()
@@ -286,16 +359,132 @@ void Player::BehaviorAttackUpdate()
 		Vector3 move = {0.0f, 0.0f, frontLength / float(startFrame)};
 		worldTransform_.translation_ +=
 			Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
-	}
+	}*/
 	if (frameCount_ >= startFrame)
 	{
-		if (worldTransformWepon_.rotation_.x <= weponRotateEnd) {
-			worldTransformWepon_.rotation_.x += 0.1f;
-			// worldTransformWepon_.rotation_.x = 0.0f;
-			// behavior_ = Behavior::kRoot;
+		if (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		{
+			//behavior_ = Behavior::kAttack;
+			isCoenectCombo_ = true;
 		}
+	}
+	if (frameCount_ == attackFrame)
+	{
 		attackBehavior_ = AttackBehavior::kAttack;
-	}*/
+	}
+	if (frameCount_ == rigidityFrame) {
+		attackBehavior_ = AttackBehavior::kEnd;
+	}
+	if (frameCount_ == endFrame) {
+		// behavior_ = Behavior::kRoot;
+		weaponCollider_.SetIsCollision(false);
+		if (isCoenectCombo_) {
+			behaviorRequest_ = Behavior::kAttack2;
+			comboNum_++;
+		}
+		else {
+			behaviorRequest_ = Behavior::kRoot;
+		}
+	}
+	Vector3 move = { 0.0f, 0.0f, frontLength / float(attackFrame) };
+	Matrix4x4 rotateMatrix = worldTransform_.matWorld_;
+	rotateMatrix.m[3][0] = 0;
+	rotateMatrix.m[3][1] = 0;
+	rotateMatrix.m[3][2] = 0;
+
+	move = Transform(move, (rotateMatrix));
+
+	switch (attackBehavior_) {
+	case Player::AttackBehavior::kPre:
+
+		worldTransform_.translation_ += move;
+		break;
+	case Player::AttackBehavior::kAttack:
+		worldTransformWepon_.rotation_.x += weponRotateEnd / float(rigidityFrame - attackFrame);
+		break;
+
+	}
+
+	worldTransformWepon_.UpdateMatrix();
+	Vector3 weaponColliderCenter = worldTransformWepon_.GetWorldPosition();
+	Vector3 offset{0, 5.0f, 0};
+	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
+	weaponOBB_.center = weaponColliderCenter + offset;
+	weaponOBB_.size = { 1.0f,1.5f,1.0f };
+	SetOridentatios(weaponOBB_,worldTransformWepon_.matWorld_);
+	weaponCollider_.SetOBB(weaponOBB_);
+	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
+	frameCount_++;
+}
+
+void Player::BehaviorAttackSecondUpdate()
+{
+	static float weponRotateEnd = 3.14f *-1.0f;
+
+	static float frontLength = 0.0f;
+	
+	if (frameCount_ >= startFrame)
+	{
+		if (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		{
+			//behavior_ = Behavior::kAttack;
+			isCoenectCombo_ = true;
+		}
+	}
+	if (frameCount_ == attackFrame)
+	{
+		attackBehavior_ = AttackBehavior::kAttack;
+	}
+	if (frameCount_ == rigidityFrame) {
+		attackBehavior_ = AttackBehavior::kEnd;
+	}
+	if (frameCount_ == endFrame) {
+		// behavior_ = Behavior::kRoot;
+		weaponCollider_.SetIsCollision(false);
+		if (isCoenectCombo_) {
+			behaviorRequest_ = Behavior::kAttack3;
+		}
+		else {
+			behaviorRequest_ = Behavior::kRoot;
+		}
+	}
+	Vector3 move = { 0.0f, 0.0f, frontLength / float(attackFrame) };
+	Matrix4x4 rotateMatrix = worldTransform_.matWorld_;
+	rotateMatrix.m[3][0] = 0;
+	rotateMatrix.m[3][1] = 0;
+	rotateMatrix.m[3][2] = 0;
+
+	move = Transform(move, (rotateMatrix));
+
+	switch (attackBehavior_) {
+	case Player::AttackBehavior::kPre:
+
+		worldTransform_.translation_ += move;
+		break;
+	case Player::AttackBehavior::kAttack:
+		worldTransformWepon_.rotation_.x += weponRotateEnd / float(rigidityFrame - attackFrame);
+		break;
+
+	}
+
+	worldTransformWepon_.UpdateMatrix();
+	Vector3 weaponColliderCenter = worldTransformWepon_.GetWorldPosition();
+	Vector3 offset{ 0, 5.0f, 0 };
+	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
+	weaponOBB_.center = weaponColliderCenter + offset;
+	weaponOBB_.size = { 1.0f,1.5f,1.0f };
+	SetOridentatios(weaponOBB_, worldTransformWepon_.matWorld_);
+	weaponCollider_.SetOBB(weaponOBB_);
+	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
+	frameCount_++;
+}
+
+void Player::BehaviorAttackTherdUpdate()
+{
+	static float weponRotateEnd = 3.14f * 2.0f;
+
+	static float frontLength = 0.0f;
+
 	if (frameCount_ == attackFrame)
 	{
 		attackBehavior_ = AttackBehavior::kAttack;
@@ -329,16 +518,15 @@ void Player::BehaviorAttackUpdate()
 
 	worldTransformWepon_.UpdateMatrix();
 	Vector3 weaponColliderCenter = worldTransformWepon_.GetWorldPosition();
-	Vector3 offset{0, 5.0f, 0};
+	Vector3 offset{ 0, 5.0f, 0 };
 	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
 	weaponOBB_.center = weaponColliderCenter + offset;
 	weaponOBB_.size = { 1.0f,1.5f,1.0f };
-	SetOridentatios(weaponOBB_,worldTransformWepon_.matWorld_);
+	SetOridentatios(weaponOBB_, worldTransformWepon_.matWorld_);
 	weaponCollider_.SetOBB(weaponOBB_);
 	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
 	frameCount_++;
 }
-
 void Player::BehaviorDashUpdate() {
 	//const float kCharacterSpeed = 0.3f;
 
@@ -366,7 +554,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	{
 		model.model_->Draw(model.worldTransform_, viewProjection);
 	}
-	if (behavior_ == Player::Behavior::kAttack)
+	if (behavior_ == Player::Behavior::kAttack || behavior_ == Player::Behavior::kAttack2 || behavior_ == Player::Behavior::kAttack3)
 	{
 		modelWepon_->Draw(worldTransformWepon_, viewProjection);
 		if (isDrawOBB_) {
