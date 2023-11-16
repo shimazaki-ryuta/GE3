@@ -4,6 +4,8 @@ void Skydome::Initialize(Model* model, const Vector3& position) {
 	model_.reset(model);
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
+	worldTransform_.scale_ = {10.0f,10.0f,10.0f};
+	worldTransform_.UpdateMatrix();
 }
 
 void Skydome::Update()

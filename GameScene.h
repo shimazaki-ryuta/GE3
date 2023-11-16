@@ -68,7 +68,7 @@ private:
 	std::unique_ptr<Model> modelWepon_;
 
 	//敵
-	std::unique_ptr<Enemy> enemy_;
+	std::list<std::unique_ptr<Enemy>> enemies_;
 	std::unique_ptr<Model> modelEnemyBody_;
 	std::unique_ptr<Model> modelEnemyWheel_;
 

@@ -87,10 +87,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	}*/
 	flooars_[0].reset(new Flooar);
 	flooars_[0]->Initialize();
-	flooars_[0]->SetOffset({ 0.0f,0.0f,-10.0f });
-	flooars_[0]->SetSize({ 20.0f,0.0f,20.0f });
+	flooars_[0]->SetOffset({ 0.0f,0.0f,24.0f });
+	flooars_[0]->SetSize({ 60.0f,0.0f,60.0f });
 
-
+	/*
 	flooars_[1].reset(new MovingFlooar);
 	flooars_[1]->Initialize();
 	flooars_[1]->SetOffset({0.0f,0.0f,22.0f});
@@ -101,15 +101,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	flooars_[2]->Initialize();
 	flooars_[2]->SetOffset({ 0.0f,0.0f,44.0f });
 	flooars_[2]->SetSize({10.0f,0.0f,10.0f});
+	*/
+	flooars_[1].reset(new MovingFlooar);
+	flooars_[1]->Initialize();
+	flooars_[1]->SetOffset({ 0.0f,0.0f,96.0f });
+	flooars_[1]->SetSize({ 10.0f,0.0f,10.0f });
 
-	flooars_[3].reset(new MovingFlooar);
-	flooars_[3]->Initialize();
-	flooars_[3]->SetOffset({ 0.0f,0.0f,66.0f });
-	flooars_[3]->SetSize({ 10.0f,0.0f,10.0f });
-
-	flooars_[4].reset(new Flooar);
-	flooars_[4]->Initialize();
-	flooars_[4]->SetOffset({ 0.0f,0.0f,80.0f });
+	flooars_[2].reset(new Flooar);
+	flooars_[2]->Initialize();
+	flooars_[2]->SetOffset({ 0.0f,0.0f,110.0f });
 
 	//ゴール
 	goal_.reset(new Goal);
@@ -132,28 +132,36 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	animationEnemy.push_back({ modelEnemyBody_.get(), worldTransformEnemyBody });
 	animationEnemy.push_back({ modelEnemyWheel_.get(), worldTransformEnemyWheel });
 
-	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(animationEnemy);
+	enemies_.clear();
+	enemies_.push_back(std::make_unique<Enemy>());
+	//enemies_->Initialize(animationEnemy);
+	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end();enemy++) {
+		enemy->get()->Initialize(animationEnemy);
+	}
 }
 
 void GameScene::Update() {
 	
-	for (int index = 0; index < 5; index++) {
+	for (int index = 0; index < 3; index++) {
 		flooars_[index]->Update();
 	}
 	//flooar_->Update();
 	player_->Update();
 	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
 		player_->ReStart();
-		enemy_->ReStart();
+		for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+			enemy->get()->ReStart();
+		}
 	}
-	enemy_->Update();
+	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+		enemy->get()->Update();
+	}
 	goal_->Update();
 	//debugCamera_->Update();
 	followCamera_->Update();
 	
 	bool isCollision = false;
-	for (int index = 0; index < 5; index++) {
+	for (int index = 0; index < 3; index++) {
 		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
 		{
 			player_->OnCollision(flooars_[index]->GetWorldTransform());
@@ -165,11 +173,16 @@ void GameScene::Update() {
 	}
 	if (IsCollision(player_->GetOBB(),goal_->GetOBB())) {
 		player_->ReStart();
-		enemy_->ReStart();
+		for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+			enemy->get()->ReStart();
+		}
 	}
-	if (IsCollision(player_->GetOBB(), enemy_->GetSphere())&&(!enemy_->IsDead())) {
-		player_->OnCollisionEnemy();
+	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+		if (IsCollision(player_->GetOBB(), enemy->get()->GetSphere()) && (!enemy->get()->IsDead())) {
+			player_->OnCollisionEnemy();
+		}
 	}
+	
 
 	CollisionManager::GetInstance()->CheckAllCollisions();
 
@@ -197,11 +210,13 @@ void GameScene::Draw3D() {
 	skydome_->Draw(viewProjection_);
 	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
-	for (int index = 0; index < 5; index++) {
+	for (int index = 0; index < 3; index++) {
 		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
-	enemy_->Draw(viewProjection_);
+	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+		enemy->get()->Draw(viewProjection_);
+	}
 	goal_->Draw(viewProjection_);
 	Model::PostDraw();
 }

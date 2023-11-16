@@ -198,6 +198,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LockOn.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MatrixFunction.cpp" />
     <ClCompile Include="Math\VectorFunction.cpp" />
@@ -251,6 +252,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="LockOn.h" />
     <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="Math\MatrixFunction.h" />
     <ClInclude Include="Math\Vector2.h" />
