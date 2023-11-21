@@ -85,7 +85,7 @@ void GameScene::Update() {
 	directinalLightData->direction = Normalize(directinalLightData->direction);
 	ImGui::SliderFloat("Intensity", &directinalLightData->intensity, 0.0f, 1.0f, 0);
 	ImGui::ColorEdit4("DirectionalLightColor", &directinalLightData->color.x);
-	ImGui::SliderFloat("Shininess",&shininess_,0.0f,200.0f);
+	ImGui::DragFloat("Shininess",&shininess_,0.001f,0.0f,200.0f);
 	ImGui::End();
 	sphere_->SetShiniess(shininess_);
 	ImGui::Begin("Sprite");
