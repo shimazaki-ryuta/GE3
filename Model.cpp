@@ -46,7 +46,7 @@ void Model::StaticInitialize(
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -69,6 +69,10 @@ void Model::StaticInitialize(
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[3].Descriptor.ShaderRegister = 1;
 
+	//camera
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[4].Descriptor.ShaderRegister = 2;
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -194,14 +198,11 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
-
-	/*
-	transformResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(TransformationMatrix));
-
-	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
-	transformationMatrixData->WVP = MakeIdentity4x4();
-	transformationMatrixData->World = MakeIdentity4x4();
-	*/
+	materialData_->shininess = 100.0f;
+	//ライティング用のカメラリソース
+	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	cameraData_->worldPosition = {0,0,0};
 }
 
 Model* Model::CreateFromOBJ(const  std::string& filename)
@@ -263,13 +264,14 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
-
+	cameraData_->worldPosition = viewProjection.translation_;
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//Lighting用のリソースの場所を設定
 	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-
+	//camera用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle);

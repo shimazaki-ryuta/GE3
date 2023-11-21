@@ -15,6 +15,7 @@
 #include "collision.h"
 #include "DeltaTime.h"
 #include "VectorFunction.h"
+#include "MatrixFunction.h"
 GameScene::GameScene() {
 
 }
@@ -43,8 +44,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 
 	uvCheckerTextureHandle_ = TextureManager::LoadTexture("uvChecker.png");
-
-	particle.reset(Particle::Create(500));
+	monsterTextureHandle_ = TextureManager::LoadTexture("monsterBall.png");
+	//particle.reset(Particle::Create(500));
 
 	sprite_.reset(Sprite::Create(uvCheckerTextureHandle_, { 0,0 }, { 720,360 }, { 1.0f,1.0f,1.0f,1.0f }));
 	sprite_->SetAnchorPoint({ 0,0 });
@@ -56,34 +57,37 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 #ifdef _DEBUG
 	isDebugCameraActive_ = true;
 	debugCamera_->SetUses(isDebugCameraActive_);
-	debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
-	debugCamera_->SetPosition({0.0f, 23.0f, 10.0f});
+	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
+	debugCamera_->SetPosition({0.0f, 0.0f, -10.0f});
 #endif // _DEBUG
-	usebillboard = true;
-	emitter.count = 3;
-	emitter.frequency = 0.5f;
-	emitter.frequencyTime = 0.0f;
-	emitter.transform.translate = {0,0,0};
-	/*for (int index = 0; index < 10000; index++) {
-		particle->MakeNewParticle(emitter.transform.translate);
-	}*/
-	accelerationField.acceleration = {15.0f,0.0f,0.0f};
-	accelerationField.area.min = { -1.0f,-1.0f,-1.0f };
-	accelerationField.area.max = { 1.0f,1.0f,1.0f };
+	
+	//DirectionalLight用のリソース
+	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
+	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
+	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
+	directinalLightData->intensity = 1.0f;
+	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
+	sphere_->SetEnableLighting(2);
+	worldTransformSphere_.Initialize();
 }
 
 void GameScene::Update() {
 #ifdef _DEBUG
 	//デバッグカメラを有効化
-	if (Input::GetKeyDown(DIK_0)) {
+	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
 	}
-	ImGui::Begin("FPS");
-	ImGui::Text("%f", DeltaTime::GetFramePerSecond());
-	ImGui::Text("%f", ImGui::GetIO().Framerate);
-	ImGui::End();
 
+	ImGui::Begin("DirectionalLight");
+	ImGui::SliderFloat3("DirectionalLight", &directinalLightData->direction.x, -1.0f, 1.0f, 0);
+	directinalLightData->direction = Normalize(directinalLightData->direction);
+	ImGui::SliderFloat("Intensity", &directinalLightData->intensity, 0.0f, 1.0f, 0);
+	ImGui::ColorEdit4("DirectionalLightColor", &directinalLightData->color.x);
+	ImGui::SliderFloat("Shininess",&shininess_,0.0f,200.0f);
+	ImGui::End();
+	sphere_->SetShiniess(shininess_);
 	ImGui::Begin("Sprite");
 	ImGui::DragFloat2("position",&spritePosition_.x,1.0f);
 	ImGui::DragFloat2("anchor", &ancorPoint_.x, 0.1f);
@@ -95,33 +99,14 @@ void GameScene::Update() {
 	sprite_->SetAnchorPoint(ancorPoint_);
 	sprite_->SetRotate(rotate_);
 	sprite_->SetRange(leftTop,rightDown);
-	ImGui::Begin("Particle");
-	ImGui::Checkbox("UseBillboard", &usebillboard);
-	ImGui::DragFloat3("EmitterTranslate",&emitter.transform.translate.x,0.01f,-100.0f,100.0f);
-	if (ImGui::Button("AddParticle")) {
-		particle->Emit(emitter);
-	}
-	ImGui::End();
-	particle->UseBillboard(usebillboard);
+	
 #endif // _DEBUG
 	
-	float deltaTime = 1.0f / 60.0f;
-	emitter.frequencyTime += deltaTime;
-	if (emitter.frequency <= emitter.frequencyTime) {
-		particle->Emit(emitter);
-		emitter.frequencyTime -= emitter.frequency;
-	}
-	std::vector<Particle::ParticleData>* particleData = particle->GetParticleDate();
-	for (std::vector<Particle::ParticleData>::iterator particleIterator = particleData->begin(); particleIterator != particleData->end();particleIterator++) {
-		if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
-			(*particleIterator).velocity += deltaTime * accelerationField.acceleration;
-		}
-	}
-		particle->Updade();
-
+	
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = debugCamera_->GetViewProjection().translation_;
 		//viewProjection_.TransferMatrix();
 	}
 	else {
@@ -138,16 +123,17 @@ void GameScene::Draw2D() {
 }
 
 void GameScene::Draw3D() {
-/*	Primitive3D::PreDraw(dxCommon_->GetCommandList());
-	Primitive3D::PostDraw();*/
+	//Primitive3D::PreDraw(dxCommon_->GetCommandList());
+	//Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
 	//skydome_->Draw(viewProjection_);
 	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
-	particle->Draw(viewProjection_);
 	Particle::PostDraw();
 }
 

@@ -11,7 +11,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Model.h"
-
+#include "Primitive3D.h"
 #include "CommonFiles/DirectXCommon.h"
 
 #include "DebugCamera.h"
@@ -44,6 +44,13 @@ public:
 		AABB area;
 	};
 
+	struct DirectionalLight
+	{
+		Vector4 color;
+		Vector3 direction;
+		float intensity;
+	};
+
 	GameScene();
 	~GameScene();
 	void Initialize(DirectXCommon* dxCommon);
@@ -67,7 +74,9 @@ private:
 
 
 	uint32_t uvCheckerTextureHandle_;
-	
+	uint32_t monsterTextureHandle_;
+
+
 	bool isDebugCameraActive_ = false;
 	//DebugCamera* debugCamera_ = nullptr;
 
@@ -77,9 +86,14 @@ private:
 	std::unique_ptr<Ground> ground_;
 	Model* modelGround_ = nullptr;
 
+	std::unique_ptr<Model> sphere_;
+
+	//std::unique_ptr<Primitive3D> sphere_;
+
 	std::unique_ptr<Particle> particle;
 
 	std::unique_ptr<Sprite> sprite_;
+
 	Vector2 spritePosition_;
 	Vector2 ancorPoint_;
 	float rotate_;
@@ -90,5 +104,9 @@ private:
 
 	Particle::Emitter emitter;
 	AccelerationField accelerationField;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
+	DirectionalLight* directinalLightData = nullptr;
+	WorldTransform worldTransformSphere_;
+	float shininess_;
 };
 
