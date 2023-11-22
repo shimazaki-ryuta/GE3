@@ -135,6 +135,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	enemies_.clear();
 	enemies_.push_back(std::make_unique<Enemy>());
 	enemies_.push_back(std::make_unique<Enemy>());
+	enemies_.push_back(std::make_unique<Enemy>());
+	enemies_.push_back(std::make_unique<Enemy>());
+	enemies_.push_back(std::make_unique<Enemy>());
 
 	//enemies_->Initialize(animationEnemy);
 	int index=-2;

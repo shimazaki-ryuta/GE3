@@ -32,4 +32,5 @@ private:
 
 	Matrix4x4 rotateMatrix_;
 	Matrix4x4 rotateMatrix2_;
+	Matrix4x4 rotateMatrix3_;
 };

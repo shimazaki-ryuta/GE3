@@ -19,7 +19,8 @@ void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 	}
 
 	if (isLockOn_ && target_->IsDead()) {
-		isLockOn_ = false;
+		//isLockOn_ = false;
+		Search(enemies, viewProjection);
 	}
 
 
@@ -42,10 +43,13 @@ void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 			Vector3 newEnemyPosition = enemy->get()->GetWorldTransform()->GetWorldPosition();
 			Vector3 innerCameraPos = newEnemyPosition;
 			innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
+			Vector3 oldCameraPos = targetPosition;
+			oldCameraPos = oldCameraPos * viewProjection.matView * viewProjection.matProjection;
+
 			float oldLength = Length(targetPosition - viewProjection.translation_);
 			float newLength = Length(newEnemyPosition - viewProjection.translation_);
 			if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
-				newLength <= oldLength && !enemy->get()->IsDead()) {
+				std::abs(innerCameraPos.x) <= std::abs(oldCameraPos.x) && !enemy->get()->IsDead() ) {
 				target = enemy->get();
 				target_ = target;
 				isLockOn_ = true;

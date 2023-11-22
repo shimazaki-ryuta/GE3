@@ -30,7 +30,7 @@ void FollowCamera::Update()
 	}
 
 	Matrix4x4 rotateMatrix1 = MakeRotateMatrix(viewProjection_.rotation_);
-	//Matrix4x4 rotateMatrix2 = MakeIdentity4x4();
+	rotateMatrix3_ = MakeIdentity4x4();
 	if (target_)
 	{
 		Vector3 offset = {0.0f,3.0f,-20.0f};
@@ -56,7 +56,7 @@ void FollowCamera::Update()
 			//toLockOn.y /= Length(toLockOn);
 			//toLockOn.y = -std::abs(toLockOn.y);
 
-			rotateMatrix2_ = rotateMatrix2_ * DirectionToDIrection(Normalize({ toLockOn.x,0.0f,toLockOn.z }), Normalize(toLockOn));
+			rotateMatrix3_ = DirectionToDIrection(Normalize({ toLockOn.x,0.0f,toLockOn.z }), Normalize(toLockOn));
 			//rotateMatrix2_.m[0][1] = 0;
 
 			//rotateMatrix2_.m[1][0] = 0;
@@ -67,16 +67,16 @@ void FollowCamera::Update()
 			
 			Vector3 axis;
 			for (int32_t index = 0; index < 3; index++) {
-				axis = { rotateMatrix2_.m[index][0],rotateMatrix2_.m[index][1],rotateMatrix2_.m[index][2] };
+				axis = { rotateMatrix3_.m[index][0],rotateMatrix3_.m[index][1],rotateMatrix3_.m[index][2] };
 				float length = Length(axis);
-				rotateMatrix2_.m[index][0] /= length;
-				rotateMatrix2_.m[index][1] /= length;
-				rotateMatrix2_.m[index][2] /= length;
+				rotateMatrix3_.m[index][0] /= length;
+				rotateMatrix3_.m[index][1] /= length;
+				rotateMatrix3_.m[index][2] /= length;
 			}
 
 			//rotateMatrix_ = rotateMatrix1* rotateMatrix2_;
 		}
-		rotateMatrix_ = rotateMatrix1 * rotateMatrix2_;
+		rotateMatrix_ = rotateMatrix1 * rotateMatrix2_ * rotateMatrix3_;
 		offset = TransformNormal(offset,rotateMatrix_);
 
 		interTargert_ = Lerp(interTargert_,target_->GetWorldPosition(),cameraDelay_);

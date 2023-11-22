@@ -559,6 +559,9 @@ void Player::BehaviorDashUpdate() {
 	rotate.m[3][0] = 0;
 	rotate.m[3][1] = 0;
 	rotate.m[3][2] = 0;
+	if (target_) {
+		rotate = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(direction_));
+	}
 	move = Transform(move, rotate);
 	worldTransform_.translation_ += move;
 	if (frameCount_ >= dashLength_) {
