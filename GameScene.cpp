@@ -134,14 +134,25 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	enemies_.clear();
 	enemies_.push_back(std::make_unique<Enemy>());
+	enemies_.push_back(std::make_unique<Enemy>());
+
 	//enemies_->Initialize(animationEnemy);
+	int index=-2;
 	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end();enemy++) {
 		enemy->get()->Initialize(animationEnemy);
+		enemy->get()->SetOffset({-4.0f + (index++)*20.0f,0.0f,44.0f});
 	}
+	lockOn_.reset(new LockOn);
+	lockOn_->Initialize();
 }
 
 void GameScene::Update() {
-	
+	/*enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
+		if (enemy->IsDead()) {
+			return true;
+		}
+		return false;
+		});*/
 	for (int index = 0; index < 3; index++) {
 		flooars_[index]->Update();
 	}
@@ -180,6 +191,9 @@ void GameScene::Update() {
 	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
 		if (IsCollision(player_->GetOBB(), enemy->get()->GetSphere()) && (!enemy->get()->IsDead())) {
 			player_->OnCollisionEnemy();
+			for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+				enemy->get()->ReStart();
+			}
 		}
 	}
 	
@@ -195,7 +209,17 @@ void GameScene::Update() {
 		// viewProjection_.UpdateMatrix();
 		viewProjection_.matView = followCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
 		//viewProjection_.TransferMatrix();
+	}
+	lockOn_->Update(enemies_,viewProjection_);
+	if (lockOn_->IsLockOn()) {
+		followCamera_->SetLockOnTarget(lockOn_->GetTarget());
+		player_->SetTarget(lockOn_->GetTarget());
+	}
+	else {
+		followCamera_->SetLockOnTarget(nullptr);
+		player_->SetTarget(nullptr);
 	}
 }
 

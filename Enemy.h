@@ -24,6 +24,7 @@ public:
 	void OnCollision() { isDead_ = true; };
 	void ReStart() { isDead_ = false; };
 	bool IsDead() { return isDead_; };
+	void SetOffset(const Vector3& offset) { offset_ = offset; };
 private:
 	Vector3 position_;
 
@@ -31,4 +32,5 @@ private:
 
 	bool isDead_;
 	Collider sphereCollider_;
+	Vector3 offset_;
 };

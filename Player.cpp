@@ -76,6 +76,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 }
 
 void Player::ReStart() {
+	target_ = nullptr;
 	behaviorRequest_ = Behavior::kRoot;
 	worldTransform_.parent_ = nullptr;
 	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
@@ -330,8 +331,26 @@ void Player::BehaviorRootUpdate()
 		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
 		//Matrix4x4 newrotation = DirectionToDIrection({0,0.0f,1.0f}, {0, 0.0f, -1.0f});
 		move = Normalize(move) * kCharacterSpeed;
-		Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->rotation_.y, 0.0f};
-		move = Transform(move, MakeRotateMatrix(cameraDirectionYcorection));
+		//Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->matView.m[1][0] * viewProjection_->matView.m[1][0]* viewProjection_->matView.m[1][2], 0.0f};
+		Matrix4x4 cameraRotateY = Inverse(viewProjection_->matView);
+		//cameraRotateY.m[0][0] = 1;
+		cameraRotateY.m[0][1] = 0;
+		//cameraRotateY.m[0][2] = 0;
+
+		cameraRotateY.m[1][0] = 0;
+		cameraRotateY.m[1][1] = 1;
+		cameraRotateY.m[1][2] = 0;
+
+
+		//cameraRotateY.m[2][0] = 0;
+		cameraRotateY.m[2][1] = 0;
+		//cameraRotateY.m[2][2] = 1;
+		
+		cameraRotateY.m[3][0] = 0;
+		cameraRotateY.m[3][1] = 0;
+		cameraRotateY.m[3][2] = 0;
+		//cameraRotateY = Inverse(cameraRotateY);
+		move = Transform(move, cameraRotateY);
 		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
 			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 			Matrix4x4 newDirection = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(move));
@@ -339,6 +358,11 @@ void Player::BehaviorRootUpdate()
 			//worldTransform_.matWorld_ *= newDirection;
 			//worldTransform_.rotation_.y = newDirection.m[1][0] * newDirection.m[1][1] * newDirection.m[1][2];
 			direction_ = move;
+		}
+		if (target_) {
+			Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
+			toTarget.y = 0;
+			directionMatrix_=DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 		}
 		worldTransform_.translation_ += move;
 	}

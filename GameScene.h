@@ -24,6 +24,7 @@
 #include "MovingFlooar.h"
 #include <array>
 #include <memory>
+#include "LockOn.h"
 class GameScene
 {
 public:
@@ -87,6 +88,6 @@ private:
 	std::unique_ptr<Goal> goal_;
 
 	std::unique_ptr<FollowCamera> followCamera_;
-
+	std::unique_ptr<LockOn> lockOn_;
 };
 

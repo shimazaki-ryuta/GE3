@@ -15,6 +15,7 @@ public:
 
 
 	inline void SetTarget(WorldTransform* target) { target_ = target; };
+	inline void SetLockOnTarget(WorldTransform* target) { lockOnTarget_ = target; };
 
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
 	void Reset();
@@ -24,7 +25,11 @@ private:
 	ViewProjection viewProjection_;
 
 	WorldTransform* target_ = nullptr;
+	WorldTransform* lockOnTarget_ = nullptr;
 	Vector3 interTargert_;
 	//補間の強さ
 	float cameraDelay_;
+
+	Matrix4x4 rotateMatrix_;
+	Matrix4x4 rotateMatrix2_;
 };

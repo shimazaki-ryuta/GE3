@@ -74,6 +74,7 @@ public:
 	OBB& GetOBB() { return obb_; };
 
 	void ReStart();
+	void SetTarget(WorldTransform* target) { target_ = target; };
 
 private:
 	//WorldTransform worldTransform_;
@@ -137,4 +138,6 @@ private:
 	//コンボ
 	uint32_t comboNum_;
 	bool isCoenectCombo_;
+
+	WorldTransform* target_;
 };

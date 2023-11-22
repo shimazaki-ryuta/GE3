@@ -15,6 +15,8 @@ public:
 	void Draw();
 
 	void Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection);
+	bool IsLockOn() { return isLockOn_; };
+	WorldTransform* GetTarget() { return target_->GetWorldTransform(); };
 private:
 	uint32_t txetureHandle_;
 	std::unique_ptr<Sprite> AnchorSprite_;
