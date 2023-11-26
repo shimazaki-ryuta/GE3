@@ -16,9 +16,9 @@
 #include "CollisionManager.h"
 
 static int startFrame = 0;
-static int endFrame = 60;
+static int endFrame = 40;
 static int rigidityFrame = 30;
-static int attackFrame = 20;
+static int attackFrame = 15;
 
 
 void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
@@ -384,7 +384,7 @@ void Player::BehaviorAttackUpdate()
 		worldTransform_.translation_ +=
 			Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
 	}*/
-	if (frameCount_ >= startFrame)
+	if (frameCount_ >= attackFrame)
 	{
 		if (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
@@ -416,12 +416,24 @@ void Player::BehaviorAttackUpdate()
 	rotateMatrix.m[3][1] = 0;
 	rotateMatrix.m[3][2] = 0;
 
+	if (target_) {
+		Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
+		toTarget.y = 0;
+		directionMatrix_ = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
+	}
+
 	move = Transform(move, (rotateMatrix));
 
 	switch (attackBehavior_) {
 	case Player::AttackBehavior::kPre:
-
-		worldTransform_.translation_ += move;
+		if (target_) {
+			if (Length(target_->GetWorldPosition() - worldTransform_.GetWorldPosition()) > 5.0f) {
+				worldTransform_.translation_ += move;
+			}
+		}
+		else {
+			worldTransform_.translation_ += move;
+		}
 		break;
 	case Player::AttackBehavior::kAttack:
 		worldTransformWepon_.rotation_.x += weponRotateEnd / float(rigidityFrame - attackFrame);
@@ -434,7 +446,7 @@ void Player::BehaviorAttackUpdate()
 	Vector3 offset{0, 5.0f, 0};
 	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
 	weaponOBB_.center = weaponColliderCenter + offset;
-	weaponOBB_.size = { 1.0f,1.5f,1.0f };
+	weaponOBB_.size = { 1.0f,2.5f,1.0f };
 	SetOridentatios(weaponOBB_,worldTransformWepon_.matWorld_);
 	weaponCollider_.SetOBB(weaponOBB_);
 	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
@@ -496,7 +508,7 @@ void Player::BehaviorAttackSecondUpdate()
 	Vector3 offset{ 0, 5.0f, 0 };
 	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
 	weaponOBB_.center = weaponColliderCenter + offset;
-	weaponOBB_.size = { 1.0f,1.5f,1.0f };
+	weaponOBB_.size = { 1.0f,2.5f,1.0f };
 	SetOridentatios(weaponOBB_, worldTransformWepon_.matWorld_);
 	weaponCollider_.SetOBB(weaponOBB_);
 	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);
@@ -545,7 +557,7 @@ void Player::BehaviorAttackTherdUpdate()
 	Vector3 offset{ 0, 5.0f, 0 };
 	offset = TransformNormal(offset, worldTransformWepon_.GetRotate());
 	weaponOBB_.center = weaponColliderCenter + offset;
-	weaponOBB_.size = { 1.0f,1.5f,1.0f };
+	weaponOBB_.size = { 1.0f,2.5f,1.0f };
 	SetOridentatios(weaponOBB_, worldTransformWepon_.matWorld_);
 	weaponCollider_.SetOBB(weaponOBB_);
 	worldTtansformOBB_.matWorld_ = MakeScaleMatrix(weaponOBB_.size) * worldTransformWepon_.GetRotate() * MakeTranslateMatrix(weaponOBB_.center);

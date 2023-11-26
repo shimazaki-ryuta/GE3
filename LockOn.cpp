@@ -4,28 +4,61 @@
 #include "VectorFunction.h"
 void LockOn::Initialize() {
 	isLockOn_ = false;
+	isAutoLock_ = false;
+	textureHandle_ = TextureManager::LoadTexture("2DReticle.png");
+	//AnchorSprite_.reset(Sprite::Create());
 }
 
 void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection) {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
-		!(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
-		isLockOn_ = !isLockOn_;
-		if (isLockOn_) {
-			Search(enemies,viewProjection);
+	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) &&
+		!(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)) {
+		isAutoLock_ = !isAutoLock_;
+		if (isAutoLock_) {
+			Search(enemies, viewProjection);
+			if (isLockOn_) {
+				isAutoLock_ = true;
+			}
+			else {
+				isAutoLock_ = false;
+			}
+		}
+		else {
+			isLockOn_ = false;
+		}
+		
+	}
+
+	if(isAutoLock_){
+		Search(enemies, viewProjection);
+		isForcus_ = false;
+	}
+	else {
+		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
+			!(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
+			isLockOn_ = !isLockOn_;
+			isForcus_ = isLockOn_;
+			if (isLockOn_) {
+				Search(enemies, viewProjection);
+			}
+		}
+
+		if (isLockOn_ && target_->GetHP() <= 0) {
+			//isLockOn_ = false;
+			Search(enemies, viewProjection);
 		}
 	}
 
-	if (isLockOn_ && target_->IsDead()) {
-		//isLockOn_ = false;
-		Search(enemies, viewProjection);
-	}
-
-
-
 	preJoyState_ = joyState;
+}
+
+bool LockOn::isInnerCamera(const Vector3& vector) {
+	if (std::abs(vector.x) <=1.0f && std::abs(vector.y) <= 1.0f && vector.z > 0.0f){
+		return true;
+	}
+	return false;
 }
 
 void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection) {
@@ -48,8 +81,15 @@ void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 
 			float oldLength = Length(targetPosition - viewProjection.translation_);
 			float newLength = Length(newEnemyPosition - viewProjection.translation_);
+			bool modeCheck;
+			if (isAutoLock_) {
+				modeCheck = (oldLength  >= newLength) || !isInnerCamera(oldCameraPos);
+			}
+			else {
+				modeCheck = std::abs(innerCameraPos.x) <= std::abs(oldCameraPos.x);
+			}
 			if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
-				std::abs(innerCameraPos.x) <= std::abs(oldCameraPos.x) && !enemy->get()->IsDead() ) {
+				modeCheck && enemy->get()->GetHP() > 0) {
 				target = enemy->get();
 				target_ = target;
 				isLockOn_ = true;

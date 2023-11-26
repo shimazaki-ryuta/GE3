@@ -144,6 +144,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end();enemy++) {
 		enemy->get()->Initialize(animationEnemy);
 		enemy->get()->SetOffset({-4.0f + (index++)*20.0f,0.0f,44.0f});
+		enemy->get()->setTarget(player_->GetWorldTransform());
 	}
 	lockOn_.reset(new LockOn);
 	lockOn_->Initialize();
@@ -217,7 +218,12 @@ void GameScene::Update() {
 	}
 	lockOn_->Update(enemies_,viewProjection_);
 	if (lockOn_->IsLockOn()) {
-		followCamera_->SetLockOnTarget(lockOn_->GetTarget());
+		if (lockOn_->IsForcus()) {
+			followCamera_->SetLockOnTarget(lockOn_->GetTarget());
+		}
+		else {
+			followCamera_->SetLockOnTarget(nullptr);
+		}
 		player_->SetTarget(lockOn_->GetTarget());
 	}
 	else {

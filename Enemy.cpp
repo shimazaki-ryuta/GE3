@@ -27,21 +27,35 @@ void Enemy::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	sphereCollider_.SetSphere(sphere_);
 	sphereCollider_.SetOnCollisionEvent(std::bind(&Enemy::OnCollision,this));
 	CollisionManager::GetInstance()->PushCollider(&sphereCollider_);
+
+	hitPoint_ = 3;
 }
 
-void Enemy::Update() { 
+void Enemy::Update() {
 	if (!isDead_) {
-		const float rotateY = 0.05f;
-		worldTransform_.rotation_.y += rotateY;
-		Vector3 move = { 0.0f,0.0f,0.2f };
-		//Vector3 offset = { -4.0f,0.0f,44.0f };
+		if (hitPoint_>0) {
+			const float rotateY = 0.05f;
+			worldTransform_.rotation_.y += rotateY;
+			Vector3 move = { 0.0f,0.0f,0.2f };
+			//Vector3 offset = { -4.0f,0.0f,44.0f };
 
-		position_ += Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
-		worldTransform_.translation_ = position_ + offset_;
-		sphere_.center = worldTransform_.translation_;
-		sphere_.radius = 0.5f;
-		sphereCollider_.SetSphere(sphere_);
-		models_[1].worldTransform_.rotation_.x += 0.1f;
+			position_ += Transform(move, MakeRotateMatrix(worldTransform_.rotation_));
+			worldTransform_.translation_ = position_ + offset_;
+			//worldTransform_.translation_.y += 0.5f;
+			sphere_.center = worldTransform_.translation_;
+			sphere_.radius = 0.5f;
+			sphereCollider_.SetSphere(sphere_);
+			models_[1].worldTransform_.rotation_.x += 0.1f;
+			invincibleTime_--;
+		}
+		else {
+			veloity_ += gravity_;
+			worldTransform_.translation_ += veloity_;
+			worldTransform_.scale_ *= 0.8f;
+			if (worldTransform_.scale_.x < 0.1f) {
+				isDead_ = true;
+			}
+		}
 		BaseCharacter::Update();
 		for (HierarchicalAnimation& model : models_) {
 			model.worldTransform_.UpdateMatrix();
@@ -60,3 +74,19 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 	}
 }
 
+void Enemy::OnCollision() {
+	//isDead_ = true;
+	if (invincibleTime_<=0) {
+		hitPoint_--;
+		invincibleTime_ = 40;
+	}
+	if (hitPoint_ == 0 ) {
+		if (target_) {
+			Vector3 direction = worldTransform_.GetWorldPosition() - target_->GetWorldPosition();
+			direction = Normalize(direction);
+			veloity_ = direction * 0.1f;
+			veloity_.y = 0.2f;
+			gravity_ = {0,-0.01f,0};
+		}
+	}
+}
