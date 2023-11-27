@@ -36,5 +36,5 @@ private:
 	Matrix4x4 rotateMatrix3_;
 	bool isShake_;
 	float shakeForce_;
-	float kShakeForce_=10;
+	float kShakeForce_=5;
 };

@@ -51,7 +51,7 @@ void Enemy::Update() {
 		else {
 			veloity_ += gravity_;
 			worldTransform_.translation_ += veloity_;
-			worldTransform_.scale_ *= 0.8f;
+			worldTransform_.scale_ *= 0.95f;
 			if (worldTransform_.scale_.x < 0.1f) {
 				isDead_ = true;
 			}
@@ -87,9 +87,9 @@ void Enemy::OnCollision() {
 		if (target_) {
 			Vector3 direction = worldTransform_.GetWorldPosition() - target_->GetWorldPosition();
 			direction = Normalize(direction);
-			veloity_ = direction * 0.1f;
-			veloity_.y = 0.2f;
-			gravity_ = {0,-0.01f,0};
+			veloity_ = direction * 1.0f;
+			veloity_.y = 0.4f;
+			gravity_ = {0,-0.05f,0};
 		}
 	}
 }
