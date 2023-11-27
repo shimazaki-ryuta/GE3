@@ -9,6 +9,7 @@
 #include "OBB.h"
 #include "Collider.h"
 #include "input.h"
+#include "Particle.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -75,6 +76,7 @@ public:
 
 	void ReStart();
 	void SetTarget(WorldTransform* target) { target_ = target; };
+	void SetParticle(Particle* particle) { particle_ = particle; };
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
@@ -139,4 +141,6 @@ private:
 	bool isCoenectCombo_;
 
 	WorldTransform* target_;
+	Particle* particle_;
+	Particle::Emitter emitter;
 };

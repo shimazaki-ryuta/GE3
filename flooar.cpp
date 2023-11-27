@@ -9,7 +9,7 @@ void Flooar::Initialize() {
 	worldTransform_.Initialize();
 	modelWorldTransform_.Initialize();
 	modelWorldTransform_.parent_ = &worldTransform_;
-	model_.reset(Model::CreateFromOBJ("Plane"));
+	model_.reset(Model::CreateFromOBJ("Floor"));
 	size_ = {2.0f,0.0f,2.0f};
 	obb_.center = worldTransform_.translation_;
 	obb_.size = size_;

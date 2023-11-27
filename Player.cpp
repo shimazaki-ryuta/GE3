@@ -14,6 +14,7 @@
 #include "GlobalVariables.h"
 
 #include "CollisionManager.h"
+#include "RandomEngine.h"
 
 static int startFrame = 0;
 static int endFrame = 40;
@@ -73,6 +74,11 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	obbModel_.reset(Model::CreateFromOBJ("cube"));
 	worldTtansformOBB_.Initialize();
 	comboNum_ = 0;
+
+	emitter.count = 3;
+	emitter.frequency = 0.5f;
+	emitter.frequencyTime = 0.0f;
+	emitter.transform.translate = { 0,0,0 };
 }
 
 void Player::ReStart() {
@@ -297,6 +303,7 @@ void Player::Update() {
 		isDrawOBB_ = !isDrawOBB_;
 	}
 #endif // _DEBUG
+	
 	preJoyState_ = joyState_;
 }
 
@@ -366,6 +373,19 @@ void Player::BehaviorRootUpdate()
 			directionMatrix_=DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 		}
 		worldTransform_.translation_ += move;
+		if (worldTransform_.parent_ && particle_ && Length(move) !=0.0f) {
+			Particle::ParticleData particleData;
+			for (uint32_t count = 0; count < emitter.count; count++) {
+				particleData.transform.scale = { 1.0f,1.0f,1.0f };
+				particleData.transform.rotate = { 0.0f,0.0f,0.0f };
+				particleData.transform.translate = worldTransform_.GetWorldPosition() + Vector3{ RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f) };
+				particleData.velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+				particleData.color = { 1.0f,1.0f,1.0f,1.0f };
+				particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+				particleData.currentTime = 0;
+				particle_->MakeNewParticle(particleData);
+			}
+		}
 	}
 	if (!worldTransform_.parent_) {
 		velocity_ += kGravity;

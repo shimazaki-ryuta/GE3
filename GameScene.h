@@ -11,6 +11,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "Model.h"
+#include "Particle.h"
 
 #include "CommonFiles/DirectXCommon.h"
 
@@ -99,5 +100,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
 	DirectionalLight* directinalLightData = nullptr;
+
+	std::unique_ptr<Particle> particle;
 };
 

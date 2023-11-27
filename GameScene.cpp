@@ -156,6 +156,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
 	directinalLightData->intensity = 1.0f;
+
+	particle.reset(Particle::Create(500));
+	particle->UseBillboard(true);
+	player_->SetParticle(particle.get());
 }
 
 void GameScene::Update() {
@@ -238,6 +242,7 @@ void GameScene::Update() {
 		followCamera_->SetLockOnTarget(nullptr);
 		player_->SetTarget(nullptr);
 	}
+	particle->Updade();
 }
 
 void GameScene::Draw2D() {
@@ -261,5 +266,9 @@ void GameScene::Draw3D() {
 	}
 	goal_->Draw(viewProjection_);
 	Model::PostDraw();
+
+	Particle::PreDraw(dxCommon_->GetCommandList());
+	particle->Draw(viewProjection_);
+	Particle::PostDraw();
 }
 
