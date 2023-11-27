@@ -145,9 +145,17 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 		enemy->get()->Initialize(animationEnemy);
 		enemy->get()->SetOffset({-4.0f + (index++)*20.0f,0.0f,44.0f});
 		enemy->get()->setTarget(player_->GetWorldTransform());
+		enemy->get()->SetCamera(followCamera_.get());
 	}
 	lockOn_.reset(new LockOn);
 	lockOn_->Initialize();
+
+	//DirectionalLight用のリソース
+	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
+	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
+	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
+	directinalLightData->intensity = 1.0f;
 }
 
 void GameScene::Update() {
@@ -233,13 +241,14 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw2D() {
-
+	lockOn_->Draw();
 }
 
 void GameScene::Draw3D() {
 /*	Primitive3D::PreDraw(dxCommon_->GetCommandList());
 	Primitive3D::PostDraw();*/
 	Model::PreDraw(dxCommon_->GetCommandList());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
 	skydome_->Draw(viewProjection_);
 	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);

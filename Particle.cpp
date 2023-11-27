@@ -3,9 +3,16 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "GetDescriptorHandle.h"
-
+#include "LoadModel.h"
 #include <fstream>
 #include <sstream>
+#include <cassert>
+#include <numbers>
+#include <string>
+#include <wrl.h>
+#include "DeltaTime.h"
+#include "VectorFunction.h"
+#include "RandomEngine.h"
 //std::shared_ptr<D3DResourceLeakChacker>Particle::leakchecker;
 ID3D12Device* Particle::sDevice = nullptr;
 UINT Particle::sDescriptorHandleIncrementSize;
@@ -16,10 +23,11 @@ ID3D12DescriptorHeap* Particle::srvDescriptorHeap_ = nullptr;
 size_t Particle::kSrvStructuredBufferUseBegin;
 
 void Particle::StaticInitialize(
-	ID3D12Device* device, const std::wstring& directoryPath)
+	ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap, const std::wstring& directoryPath)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
+	srvDescriptorHeap_ = descriptorHeap;
 	sDescriptorHandleIncrementSize =
 		sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -132,16 +140,16 @@ void Particle::StaticInitialize(
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
-	//BlendDtateの設定
+	//BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	/*blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
@@ -167,7 +175,7 @@ void Particle::StaticInitialize(
 	//DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -182,33 +190,45 @@ void Particle::StaticInitialize(
 
 void Particle::Initialize(uint32_t numInstance)
 {
-	numInstance_ = numInstance;
+	numInstanceMax_ = numInstance;
+	numInstance_ = numInstanceMax_;
 	//textureHandle_ = textureHandle;
 	//Sprite用のリソースを作る
-	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 4);
+	std::string directory = "Resources/Plane";
+	std::string filename = "Plane";
+	filename = filename + ".obj";
+	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directory, filename);
+	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 6);
+	textureHandle_ = modelData.meshs.material.textureHandle;
 	//頂点バッファビューを作る
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
-	//1枚目
+
+	/*//1枚目
+	//左下
 	vertexDataSprite_[0].position = { -1.0f,-1.0f,0.0f,1.0f };
-	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
+	vertexDataSprite_[0].texcoord = { 0.0f,1.0f };
 	vertexDataSprite_[0].normal = {0.0f,0.0f,1.0f};
+	//右下
 	vertexDataSprite_[1].position = { 1.0f,-1,0.0f,1.0f };
-	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
+	vertexDataSprite_[1].texcoord = { 1.0f,1.0f };
 	vertexDataSprite_[1].normal = { 0.0f,0.0f,1.0f };
+	//左上
 	vertexDataSprite_[2].position = { -1.0f,1.0f,0.0f,1.0f };
-	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
+	vertexDataSprite_[2].texcoord = { 0.0f,0.0f };
 	vertexDataSprite_[2].normal = { 0.0f,0.0f,1.0f };
+	//右上
 	vertexDataSprite_[3].position = { 1.0f,1.0f,0.0f,1.0f };
-	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
-	vertexDataSprite_[3].normal = { 0.0f,0.0f,1.0f };
+	vertexDataSprite_[3].texcoord = { 1.0f,0.0f };
+	vertexDataSprite_[3].normal = { 0.0f,0.0f,1.0f };*/
+	std::memcpy(vertexDataSprite_, modelData.meshs.vertices.data(), sizeof(VertexData) * 6);
 
 	//インデックス
 	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * 6);
@@ -224,13 +244,14 @@ void Particle::Initialize(uint32_t numInstance)
 	indexData_[3] = 1;
 	indexData_[4] = 2;
 	indexData_[5] = 3;
-	
-	instancingResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(TransformationMatrix)*numInstance_);
+
+	instancingResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(ParticleForGPU) * numInstance_);
 
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < numInstance_;++index) {
+	for (uint32_t index = 0; index < numInstance_; ++index) {
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].Color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	uvTransform_ = MakeIdentity4x4();
@@ -248,11 +269,60 @@ void Particle::Initialize(uint32_t numInstance)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = numInstance_;
-	srvDesc.Buffer.StructureByteStride = sizeof(TransformationMatrix);
-	
+	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
+
 	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
 	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
+
+	sDevice->CreateShaderResourceView(instancingResource_.Get(), &srvDesc, srvHandleCPU);
 	kSrvStructuredBufferUseBegin++;
+	/*
+	//transform(仮)
+	for (uint32_t index = 0; index < numInstance_; ++index) {
+		struct Transform transform;
+		transform.scale = {1.0f,1.0f,1.0f};
+		transform.rotate = {0.0f,std::numbers::pi_v<float>,0.0f};
+		transform.translate = {RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		//transforms.push_back(transform);
+		//ParticleData particle;
+		//particle.transform = transform;
+		Vector3 velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		Vector4 color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
+		float lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+		particleData_.push_back(ParticleData{ transform,velocity,color,lifeTime,0 });
+	}*/
+}
+
+void Particle::MakeNewParticle(const Vector3& translate) {
+	struct Transform transform;
+	transform.scale = { 1.0f,1.0f,1.0f };
+	transform.rotate = { 0.0f,0.0f,0.0f };
+	transform.translate = translate;
+	//transforms.push_back(transform);
+	//ParticleData particle;
+	//particle.transform = transform;
+	Vector3 velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+	Vector4 color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
+	float lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+	particleData_.push_back(ParticleData{ transform,velocity,color,lifeTime,0 });
+}
+
+void Particle::MakeNewParticle(const ParticleData& particleData) {
+	particleData_.push_back(particleData);
+}
+
+void Particle::Emit(const Emitter& emitter) {
+	ParticleData particleData;
+	for (uint32_t count = 0; count < emitter.count; count++) {
+		particleData.transform.scale = { 1.0f,1.0f,1.0f };
+		particleData.transform.rotate = { 0.0f,0.0f,0.0f };
+		particleData.transform.translate = emitter.transform.translate + Vector3{ RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f) };
+		particleData.velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
+		particleData.color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
+		particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+		particleData.currentTime = 0;
+		MakeNewParticle(particleData);
+	}
 }
 
 Particle* Particle::Create(uint32_t textureHandle, uint32_t numInstance)
@@ -270,3 +340,79 @@ Particle* Particle::Create(uint32_t numInstance)
 	return particle;
 }
 
+void Particle::Updade() {
+	numInstance_ = 0;
+	for (std::vector<ParticleData>::iterator particleIterator = particleData_.begin(); particleIterator != particleData_.end();) {
+		if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
+			particleIterator = particleData_.erase(particleIterator);
+			continue;
+		}
+
+		float deltaTime = 1.0f / 60.0f;
+		(*particleIterator).transform.translate += deltaTime * (*particleIterator).velocity;
+		(*particleIterator).currentTime += deltaTime;
+		float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+		(*particleIterator).color.w = alpha;
+		numInstance_++;
+		++particleIterator;
+	}
+	numInstance_ = std::clamp(numInstance_, uint32_t(0), numInstanceMax_);
+}
+
+void Particle::PreDraw(ID3D12GraphicsCommandList* commandList) {
+	// PreDrawとPostDrawがペアで呼ばれていなければエラー
+	assert(Particle::sCommandList == nullptr);
+
+	// コマンドリストをセット
+	sCommandList = commandList;
+
+	// パイプラインステートの設定
+	sCommandList->SetPipelineState(sPipelineState.Get());
+
+	// ルートシグネチャの設定
+	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+}
+
+void Particle::PostDraw() {
+	// コマンドリストを解除
+	Particle::sCommandList = nullptr;
+}
+
+void Particle::Draw(const ViewProjection& viewProjection) {
+
+	Matrix4x4 billBoardMatrix = MakeIdentity4x4();
+	if (isBillboard_) {
+		billBoardMatrix = MakeRotateMatrix({ 0.0f,std::numbers::pi_v<float>,0.0f }) * Inverse(viewProjection.matView);
+		billBoardMatrix.m[3][0] = 0;
+		billBoardMatrix.m[3][1] = 0;
+		billBoardMatrix.m[3][2] = 0;
+		//billBoardMatrix = Inverse(billBoardMatrix);
+	}
+	Matrix4x4 viewProjectionMatrix = viewProjection.matView * viewProjection.matProjection;
+	for (uint32_t index = 0; index < numInstance_; index++) {
+		//Matrix4x4 world = MakeAffineMatrix(particleData_[index].transform.scale, particleData_[index].transform.rotate, particleData_[index].transform.translate) * billBoardMatrix;
+		Matrix4x4 world = MakeScaleMatrix(particleData_[index].transform.scale) * MakeRotateMatrix(particleData_[index].transform.rotate) * billBoardMatrix * MakeTranslateMatrix(particleData_[index].transform.translate);
+		Matrix4x4 worldViewProjection = world * viewProjectionMatrix;
+		instancingData[index].WVP = worldViewProjection;
+		instancingData[index].World = world;
+		instancingData[index].Color = particleData_[index].color;
+	}
+
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//wvp用のCBufferの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootDescriptorTable(1, srvHandleGPU);
+
+	//Lighting用のリソースの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+
+
+	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
+
+	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//sCommandList->IASetIndexBuffer(&indexBufferView_);
+	sCommandList->DrawInstanced(6, numInstance_, 0, 0);
+
+}

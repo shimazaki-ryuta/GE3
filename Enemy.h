@@ -2,6 +2,7 @@
 #include "BaseCharacter.h"
 #include "Sphere.h"
 #include "collider.h"
+#include "FollowCamera.h"
 class Enemy : public BaseCharacter
 {
 public:
@@ -33,6 +34,7 @@ public:
 	void SetOffset(const Vector3& offset) { offset_ = offset; };
 	void setTarget(WorldTransform* target) { target_ = target; };
 	int GetHP() { return hitPoint_; };
+	void SetCamera(FollowCamera* camera) { camera_ = camera; };
 private:
 	Vector3 position_;
 
@@ -47,4 +49,5 @@ private:
 	Vector3 veloity_;
 	Vector3 gravity_;
 	int invincibleTime_;
+	FollowCamera* camera_;
 };

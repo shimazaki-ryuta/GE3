@@ -75,7 +75,6 @@ public:
 
 	void ReStart();
 	void SetTarget(WorldTransform* target) { target_ = target; };
-
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;

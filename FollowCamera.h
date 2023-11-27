@@ -20,6 +20,7 @@ public:
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
 	void Reset();
 	void ApplyGlobalVariables();
+	void Shake();
 private:
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -33,4 +34,7 @@ private:
 	Matrix4x4 rotateMatrix_;
 	Matrix4x4 rotateMatrix2_;
 	Matrix4x4 rotateMatrix3_;
+	bool isShake_;
+	float shakeForce_;
+	float kShakeForce_=10;
 };

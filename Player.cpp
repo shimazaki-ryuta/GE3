@@ -85,6 +85,7 @@ void Player::ReStart() {
 	direction_ = { 0,0,1.0f };
 	directionMatrix_ = MakeIdentity4x4();
 	comboNum_ = 0;
+	weaponCollider_.SetIsCollision(false);
 }
 
 void Player::BehaviorRootInitialize() {

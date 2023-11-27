@@ -13,8 +13,10 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 #include <memory>
+#include <list>
 class Particle
 {
+public:
 	struct VertexData
 	{
 		Vector4 position;
@@ -27,16 +29,34 @@ class Particle
 		Matrix4x4 uvTransform;
 	};
 
-	struct TransformationMatrix
+	struct ParticleForGPU
 	{
 		Matrix4x4 WVP;
 		Matrix4x4 World;
+		Vector4 Color;
+	};
+
+	struct Transform 
+	{
+		Vector3 scale;
+		Vector3 rotate;
+		Vector3 translate;
 	};
 
 	struct ParticleData
 	{
-		TransformationMatrix transform;
+		Transform transform;
 		Vector3 velocity;
+		Vector4 color;
+		float lifeTime;
+		float currentTime;
+	};
+	//クラス化までの仮置き
+	struct Emitter {
+		Transform transform;
+		uint32_t count;
+		float frequency;
+		float frequencyTime;
 	};
 
 	// 頂点数
@@ -60,13 +80,25 @@ class Particle
 
 	static void StaticInitialize(
 		ID3D12Device* device,
+		ID3D12DescriptorHeap* descriptorHeap,
 		const std::wstring& directoryPath = L"Resources/");
 
+	void Updade();
+
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-	void Draw();
+	void Draw(const ViewProjection& viewProjection);
 	static void PostDraw();
 
+	/// <summary>
+	/// パーティクル管理用のオブジェクトを生成
+	/// </summary>
+	/// <param name="textureHandle">テクスチャハンドル</param>
+	/// /// <param name="numInstance">操作できるパーティクル最大数</param>
 	static Particle* Create(uint32_t textureHandle, uint32_t numInstance);
+	/// <summary>
+	/// パーティクル管理用のオブジェクトを生成
+	/// </summary>
+	/// <param name="numInstance">操作できるパーティクル最大数</param>
 	static Particle* Create(uint32_t numInstance);
 
 	void Initialize(uint32_t numInstance);
@@ -85,6 +117,17 @@ class Particle
 
 	//static uint32_t CreateStructuredBuffer();
 
+	void UseBillboard(bool is) { isBillboard_ = is; };
+
+	//パーティクルを一つ生成する
+	void MakeNewParticle(const Vector3& translate);
+	void MakeNewParticle(const ParticleData& particleData);
+
+	void Emit(const Emitter& emitter);
+
+	std::vector<ParticleData>* GetParticleDate(){ return &particleData_; };
+
+	static const uint32_t kNumInstanceMax = 1000;
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -97,8 +140,9 @@ private:
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	//TransformationMatrix* transformationMatrixDataSprite = nullptr;
-	TransformationMatrix* instancingData = nullptr;
-
+	ParticleForGPU* instancingData = nullptr;
+	//std::vector< struct Transform> transforms;
+	std::vector< ParticleData> particleData_;
 	Vector4 color_;
 	uint32_t textureHandle_;
 
@@ -109,10 +153,13 @@ private:
 	//BlendMode blendMode_;
 
 	uint32_t numInstance_;
+	uint32_t numInstanceMax_;
 
 	D3D12_RESOURCE_DESC resourceDesc_;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+
+	bool isBillboard_;
 };
 

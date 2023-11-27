@@ -6,7 +6,7 @@ void LockOn::Initialize() {
 	isLockOn_ = false;
 	isAutoLock_ = false;
 	textureHandle_ = TextureManager::LoadTexture("2DReticle.png");
-	//AnchorSprite_.reset(Sprite::Create());
+	AnchorSprite_.reset(Sprite::Create(textureHandle_, {0.0f,0.0f}, {30.0f,30.0f}, {1.0f,1.0f,1.0f,1.0f}));
 }
 
 void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection) {
@@ -50,7 +50,12 @@ void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 			Search(enemies, viewProjection);
 		}
 	}
-
+	if (isLockOn_) {
+		Vector3 targetPos = target_->GetWorldTransform()->GetWorldPosition();
+		targetPos = targetPos *viewProjection.matView * viewProjection.matProjection;
+		targetPos = targetPos * MakeViewportMatrix(0, 0, viewProjection.width, viewProjection.height, 0, 1);
+		AnchorSprite_->SetPosition({ targetPos.x ,targetPos.y });
+	}
 	preJoyState_ = joyState;
 }
 
@@ -100,5 +105,7 @@ void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 }
 
 void LockOn::Draw() {
-
+	if (isLockOn_) {
+		AnchorSprite_->Draw();
+	}
 }

@@ -35,6 +35,13 @@ public:
 		Vector3 translate;
 	};
 
+	struct DirectionalLight
+	{
+		Vector4 color;
+		Vector3 direction;
+		float intensity;
+	};
+
 	GameScene();
 	~GameScene();
 	void Initialize(DirectXCommon* dxCommon);
@@ -89,5 +96,8 @@ private:
 
 	std::unique_ptr<FollowCamera> followCamera_;
 	std::unique_ptr<LockOn> lockOn_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
+	DirectionalLight* directinalLightData = nullptr;
 };
 

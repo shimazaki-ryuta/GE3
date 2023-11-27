@@ -78,6 +78,9 @@ void Enemy::OnCollision() {
 	//isDead_ = true;
 	if (invincibleTime_<=0) {
 		hitPoint_--;
+		if (camera_) {
+			camera_->Shake();
+		}
 		invincibleTime_ = 40;
 	}
 	if (hitPoint_ == 0 ) {

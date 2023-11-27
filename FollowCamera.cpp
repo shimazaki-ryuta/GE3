@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <numbers>
 #include "GlobalVariables.h"
+#include "RandomEngine.h"
 void FollowCamera::Initialize()
 {
 	viewProjection_.Initialize(); 
@@ -84,6 +85,16 @@ void FollowCamera::Update()
 		viewProjection_.translation_ = interTargert_ + offset;
 	}
 
+	if (isShake_) {
+		viewProjection_.translation_.x += RandomEngine::GetInstance()->GetRandom(-shakeForce_ / 2.0f, shakeForce_ / 2.0f);
+		viewProjection_.translation_.y += RandomEngine::GetInstance()->GetRandom(-shakeForce_ / 2.0f, shakeForce_ / 2.0f);
+		viewProjection_.translation_.z += RandomEngine::GetInstance()->GetRandom(-shakeForce_ / 2.0f, shakeForce_ / 2.0f);
+		shakeForce_ *= 0.8f;
+		if (shakeForce_ <= 0.1f) {
+			isShake_ = false;
+		}
+	}
+
 	//viewProjection_.UpdateMatrix();
 	viewProjection_.matView = Inverse(rotateMatrix_* MakeTranslateMatrix(viewProjection_.translation_));
 	viewProjection_.matProjection = MakePerspectiveFovMatrix(viewProjection_.fovAngleY, viewProjection_.width / viewProjection_.height, viewProjection_.nearZ, viewProjection_.farZ);
@@ -111,4 +122,8 @@ void FollowCamera::ApplyGlobalVariables()
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "FollowCamera";
 	cameraDelay_ = globalVariables->GetFloatValue(groupName, "CameraDelay");
+}
+void FollowCamera::Shake() {
+	isShake_ = true;
+	shakeForce_ = kShakeForce_;
 }
