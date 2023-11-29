@@ -588,8 +588,10 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
 Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Vector3 normal = Normalize(Cross(from,to));
-	if (normal.x == normal.y && normal.x == normal.z) {
-		normal.y = 1.0f;
+	if (normal.x == normal.y && normal.x == normal.z && normal.x == 0.0f) {
+		normal.z = 0.0f;
+		normal.x = from.y;
+		normal.y = -from.x;
 	}
 	float cos = Dot(from,to);
 	float sin = Length(Cross(from,to));
