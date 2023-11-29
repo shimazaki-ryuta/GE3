@@ -589,9 +589,14 @@ Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Vector3 normal = Normalize(Cross(from,to));
 	if (normal.x == normal.y && normal.x == normal.z && normal.x == 0.0f) {
-		normal.z = 0.0f;
-		normal.x = from.y;
-		normal.y = -from.x;
+		if (from.x!=0.0f ||from.y != 0) {
+			normal.z = 0.0f;
+			normal.x = from.y;
+			normal.y = -from.x;
+		}
+		else {
+			normal.y = 1.0f;
+		}
 	}
 	float cos = Dot(from,to);
 	float sin = Length(Cross(from,to));
