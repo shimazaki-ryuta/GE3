@@ -16,6 +16,7 @@
 #include "DeltaTime.h"
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
+#include "RandomEngine.h"
 GameScene::GameScene() {
 
 }
@@ -39,7 +40,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
 
 	// 地面
-	modelGround_ = Model::CreateFromOBJ("Ground");
+	modelGround_ = Model::CreateFromOBJ("terrain");
 	ground_.reset(new Ground);
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 
@@ -58,7 +59,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	isDebugCameraActive_ = true;
 	debugCamera_->SetUses(isDebugCameraActive_);
 	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
-	debugCamera_->SetPosition({0.0f, 0.0f, -10.0f});
+	debugCamera_->SetPosition({0.0f, 1.7f, -10.0f});
 #endif // _DEBUG
 	
 	//DirectionalLight用のリソース
@@ -66,10 +67,21 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
-	directinalLightData->intensity = 1.0f;
+	directinalLightData->intensity = 0.0f;
+
+	//PointLight用のリソース
+	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	pointLightData->position = { 0.0f,0.0f,0.0f };
+	pointLightData->intensity = 1.0f;
+	pointLightData->radius = 1.0f;
+	pointLightData->decay = 1.0f;
+
 	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
 	sphere_->SetEnableLighting(2);
 	worldTransformSphere_.Initialize();
+	shininess_ = 40.0f;
 }
 
 void GameScene::Update() {
@@ -85,13 +97,26 @@ void GameScene::Update() {
 	directinalLightData->direction = Normalize(directinalLightData->direction);
 	ImGui::SliderFloat("Intensity", &directinalLightData->intensity, 0.0f, 1.0f, 0);
 	ImGui::ColorEdit4("DirectionalLightColor", &directinalLightData->color.x);
-	ImGui::DragFloat("Shininess",&shininess_,0.001f,0.0f,200.0f);
 	ImGui::End();
+
+	ImGui::Begin("PointLight");
+	ImGui::DragFloat3("position", &pointLightData->position.x);
+	ImGui::SliderFloat("Intensity", &pointLightData->intensity, 0.0f, 1.0f, 0);
+	ImGui::DragFloat("radius", &pointLightData->radius);
+	ImGui::DragFloat("decay", &pointLightData->decay,0.1f);
+	ImGui::ColorEdit4("Color", &pointLightData->color.x);
+	ImGui::End();
+	//pointLightData->color.x = RandomEngine::GetRandom(0.0f, 1.0f);
+	//pointLightData->color.y = RandomEngine::GetRandom(0.0f, 1.0f);
+	//pointLightData->color.z = RandomEngine::GetRandom(0.0f, 1.0f);
+
+
 	sphere_->SetShiniess(shininess_);
 	ImGui::Begin("Sphere");
 	ImGui::DragFloat3("scale", &worldTransformSphere_.scale_.x, 1.0f);
 	ImGui::DragFloat3("rotate", &worldTransformSphere_.rotation_.x, 1.0f);
 	ImGui::DragFloat3("position", &worldTransformSphere_.translation_.x, 1.0f);
+	ImGui::DragFloat("Shininess", &shininess_, 1.0f, 0.0f, 200.0f);
 	ImGui::End();
 
 	worldTransformSphere_.UpdateMatrix();
@@ -135,9 +160,10 @@ void GameScene::Draw3D() {
 	//Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
 	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
 	//skydome_->Draw(viewProjection_);
-	//ground_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PostDraw();

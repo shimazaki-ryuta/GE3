@@ -51,6 +51,16 @@ public:
 		float intensity;
 	};
 
+	struct PointLight
+	{
+		Vector4 color;
+		Vector3 position;
+		float intensity;
+		float radius;
+		float decay;
+		float padding[2];
+	};
+
 	GameScene();
 	~GameScene();
 	void Initialize(DirectXCommon* dxCommon);
@@ -106,6 +116,9 @@ private:
 	AccelerationField accelerationField;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
 	DirectionalLight* directinalLightData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
+	PointLight* pointLightData = nullptr;
 	WorldTransform worldTransformSphere_;
 	float shininess_;
 };
