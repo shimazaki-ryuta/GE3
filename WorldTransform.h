@@ -10,6 +10,7 @@ struct WorldTransform
 	{
 		Matrix4x4 WVP;
 		Matrix4x4 World;
+		Matrix4x4 WorldInverseTranspose;
 	};
 	// デバイス
 	static ID3D12Device* sDevice;

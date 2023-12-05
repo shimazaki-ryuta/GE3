@@ -88,6 +88,14 @@ void GameScene::Update() {
 	ImGui::DragFloat("Shininess",&shininess_,0.001f,0.0f,200.0f);
 	ImGui::End();
 	sphere_->SetShiniess(shininess_);
+	ImGui::Begin("Sphere");
+	ImGui::DragFloat3("scale", &worldTransformSphere_.scale_.x, 1.0f);
+	ImGui::DragFloat3("rotate", &worldTransformSphere_.rotation_.x, 1.0f);
+	ImGui::DragFloat3("position", &worldTransformSphere_.translation_.x, 1.0f);
+	ImGui::End();
+
+	worldTransformSphere_.UpdateMatrix();
+
 	ImGui::Begin("Sprite");
 	ImGui::DragFloat2("position",&spritePosition_.x,1.0f);
 	ImGui::DragFloat2("anchor", &ancorPoint_.x, 0.1f);

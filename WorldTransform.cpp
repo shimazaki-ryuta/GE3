@@ -29,6 +29,7 @@ void WorldTransform::TransfarMatrix(const Matrix4x4& matrix)
 {
 	transformationMatrixData->WVP = matWorld_ * matrix;
 	transformationMatrixData->World = matWorld_;
+	transformationMatrixData->WorldInverseTranspose = Transpose(Inverse(matWorld_));
 }
 
 Vector3 WorldTransform::GetWorldPosition() {
