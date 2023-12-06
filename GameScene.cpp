@@ -47,15 +47,11 @@ void GameScene::Update() {
 		num++;
 	};
 	
-	Quaternion q1 = { 2.0f,3.0f,4.0f,1.0f };
-	Quaternion q2 = { 1.0f,3.0f,5.0f,2.0f };
-	Quaternion identity = IdentityQuaternion();
-	Quaternion conj = Conjugate(q1);
-	Quaternion inv = Inverse(q1);
-	Quaternion normal = Normalize(q1);
-	Quaternion mul1 = Multiply(q1, q2);
-	Quaternion mul2 = Multiply(q2, q1);
-	float norm = Norm(q1);
+	Quaternion rotation = MakeRotateAxisAngleQuaternion(Normalize(Vector3{1.0f,0.4f,-0.2f}),0.45f);
+	Vector3 pointY = {2.1f,-0.9f,1.3f};
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotation);
+	Vector3 rotateByQuaternion = RotateVector(pointY,rotation);
+	Vector3 rotateByMatrix = Transform(pointY,rotateMatrix);
 
 	std::function<void(const Quaternion& q, const char label[])> printQuaternion = [&](const Quaternion& q,const char label[]) {
 #ifdef _DEBUG
@@ -65,15 +61,12 @@ void GameScene::Update() {
 #endif // _DEBUG
 	};
 
-	printQuaternion(identity,"Identity");
-	printQuaternion(conj,"Conjugate");
-	printQuaternion(inv,"Inverse");
-	printQuaternion(normal,"Normalize");
-	printQuaternion(mul1,"Multiply(q1,q2)");
-	printQuaternion(mul2, "Multiply(q2,q1)");
+	printQuaternion(rotation,"rotation");
+	printMatrix4x4(rotateMatrix);
 #ifdef _DEBUG
 	ImGui::Begin("Quaternion");
-	ImGui::Text("%6.2f : %s",norm,"Norm");
+	ImGui::Text("%6.2f %6.2f %6.2f : %s", rotateByQuaternion.x, rotateByQuaternion.y, rotateByQuaternion.z ,"rotateByQuaternion");
+	ImGui::Text("%6.2f %6.2f %6.2f : %s", rotateByMatrix.x, rotateByMatrix.y, rotateByMatrix.z, "rotateByMatrix");
 	ImGui::End();
 #endif // _DEBUG
 }

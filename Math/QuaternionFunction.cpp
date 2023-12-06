@@ -39,3 +39,33 @@ Quaternion Inverse(const Quaternion& q) {
 	result.v.z /= length;
 	return result;
 }
+
+Quaternion MakeRotateAxisAngleQuaternion(const Vector3& vector, float angle) {
+	Quaternion result;
+	result.w = std::cos(angle/2.0f);
+	result.v = std::sin(angle / 2.0f) * Normalize(vector);
+	return result;
+}
+
+Vector3 RotateVector(const Vector3& vector, const Quaternion& q) {
+	Quaternion result = {vector,0};
+	result = Multiply(q, Multiply(result,Conjugate(q)));
+	return result.v;
+}
+
+Matrix4x4 MakeRotateMatrix(const Quaternion& q) {
+	Matrix4x4 result = MakeIdentity4x4();
+	result.m[0][0] = q.w * q.w + q.v.x * q.v.x - q.v.y * q.v.y - q.v.z * q.v.z;
+	result.m[0][1] = 2.0f * (q.v.x * q.v.y + q.w * q.v.z);
+	result.m[0][2] = 2.0f * (q.v.x * q.v.z - q.w * q.v.y);
+	
+	result.m[1][0] = 2.0f * (q.v.x * q.v.y - q.w * q.v.z);
+	result.m[1][1] = q.w * q.w - q.v.x * q.v.x + q.v.y * q.v.y - q.v.z * q.v.z;
+	result.m[1][2] = 2.0f * (q.v.y * q.v.z + q.w * q.v.x);
+
+	result.m[2][0] = 2.0f * (q.v.x * q.v.z + q.w * q.v.y);
+	result.m[2][1] = 2.0f * (q.v.y * q.v.z - q.w * q.v.x);
+	result.m[2][2] = q.w * q.w - q.v.x * q.v.x - q.v.y * q.v.y + q.v.z * q.v.z;
+
+	return result;
+}
