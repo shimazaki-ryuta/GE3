@@ -201,13 +201,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="LockOn.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MatrixFunction.cpp" />
+    <ClCompile Include="Math\QuaternionFunction.cpp" />
     <ClCompile Include="Math\VectorFunction.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="MovingFlooar.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Primitive3D.cpp" />
-    <ClCompile Include="QuaternionFunction.cpp" />
     <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="Skydome.cpp" />
@@ -256,6 +256,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="LockOn.h" />
     <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="Math\MatrixFunction.h" />
+    <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\QuaternionFunction.h" />
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
@@ -265,8 +267,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive3D.h" />
-    <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="QuaternionFunction.h" />
     <ClInclude Include="RailCamera.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="Skydome.h" />
