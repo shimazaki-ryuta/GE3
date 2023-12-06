@@ -49,6 +49,17 @@ void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 			//isLockOn_ = false;
 			Search(enemies, viewProjection);
 		}
+
+		if (isLockOn_) {
+			//右
+			if (float(joyState.Gamepad.sThumbRX) > SHRT_MAX/2 && float(preJoyState_.Gamepad.sThumbRX) <= SHRT_MAX / 2) {
+				LockChange(enemies, viewProjection,1);
+			}
+			//左
+			else if (float(joyState.Gamepad.sThumbRX) < -SHRT_MAX / 2 && float(preJoyState_.Gamepad.sThumbRX) >= -SHRT_MAX / 2) {
+				LockChange(enemies, viewProjection ,-1);
+			}
+		}
 	}
 	if (isLockOn_) {
 		Vector3 targetPos = target_->GetWorldTransform()->GetWorldPosition();
@@ -88,7 +99,7 @@ void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 			float newLength = Length(newEnemyPosition - viewProjection.translation_);
 			bool modeCheck;
 			if (isAutoLock_) {
-				modeCheck = (oldLength  >= newLength) || !isInnerCamera(oldCameraPos);
+				modeCheck = ((oldLength  >= newLength) && isInnerCamera(innerCameraPos)) || !isInnerCamera(oldCameraPos);
 			}
 			else {
 				modeCheck = std::abs(innerCameraPos.x) <= std::abs(oldCameraPos.x);
@@ -102,6 +113,40 @@ void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& 
 		}
 	}
 	
+}
+
+void LockOn::LockChange(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection,int LR) {
+	Enemy* target;
+	Enemy* newTarget = target_;
+	//isLockOn_ = false;
+	if (!enemies.empty()) {
+		std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies.begin();
+		//target = (enemy)->get();
+		target = target_;
+
+		for (enemy = enemies.begin(); enemy != enemies.end(); enemy++) {
+			Vector3 targetPosition = target->GetWorldTransform()->GetWorldPosition();
+			Vector3 newEnemyPosition = enemy->get()->GetWorldTransform()->GetWorldPosition();
+			Vector3 innerCameraPos = newEnemyPosition;
+			innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
+			Vector3 oldCameraPos = targetPosition;
+			oldCameraPos = oldCameraPos * viewProjection.matView * viewProjection.matProjection;
+
+			float oldLength = Length(targetPosition - viewProjection.translation_);
+			float newLength = Length(newEnemyPosition - viewProjection.translation_);
+			bool modeCheck = true;
+			float min = (std::min)(float(LR),0.0f);
+			float max = (std::max)(float(LR), 0.0f);
+			modeCheck = std::abs(innerCameraPos.x) < std::abs(oldCameraPos.x) || !(min < (oldCameraPos.x) && (oldCameraPos.x) <= max) || !isInnerCamera(oldCameraPos) || target == target_;
+			if (min < (innerCameraPos.x) && (innerCameraPos.x) <= max && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
+				modeCheck && enemy->get()->GetHP() > 0 && target_ != enemy->get()) {
+				target = enemy->get();
+				newTarget = target;
+				isLockOn_ = true;
+			}
+		}
+		target_ = newTarget;
+	}
 }
 
 void LockOn::Draw() {

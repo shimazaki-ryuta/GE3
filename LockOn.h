@@ -19,6 +19,7 @@ public:
 	bool IsForcus() { return isForcus_; };
 	WorldTransform* GetTarget() { return target_->GetWorldTransform(); };
 	bool isInnerCamera(const Vector3& );
+	void LockChange(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection,int LR);
 private:
 	uint32_t textureHandle_;
 	std::unique_ptr<Sprite> AnchorSprite_;
