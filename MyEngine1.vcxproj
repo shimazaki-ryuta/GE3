@@ -207,6 +207,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Primitive3D.cpp" />
+    <ClCompile Include="QuaternionFunction.cpp" />
     <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="Skydome.cpp" />
@@ -264,6 +265,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive3D.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="QuaternionFunction.h" />
     <ClInclude Include="RailCamera.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="Skydome.h" />

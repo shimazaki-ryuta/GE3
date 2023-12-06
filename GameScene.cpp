@@ -16,6 +16,7 @@
 #include "CollisionManager.h"
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
+#include "QuaternionFunction.h"
 GameScene::GameScene() {
 
 }
@@ -31,13 +32,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 void GameScene::Update() {
 	
-	Matrix4x4 rotateMatrix0 = DirectionToDIrection({ 1.0f,0.0f,0.0f }, {-1.0f,0.0f,0.0f});
-	Vector3 from0 = Normalize(Vector3{1.0f,0.7f,0.5f});
-	Vector3 to0 = -1.0f* from0;
-	Matrix4x4 rotateMatrix1 = DirectionToDIrection(from0,to0);
-	Vector3 from1 = Normalize(Vector3{ -0.6f,0.9f,0.2f });
-	Vector3 to1 = Normalize(Vector3{ 0.4f,0.7f,-0.5f });
-	Matrix4x4 rotateMatrix2 = DirectionToDIrection(from1, to1);
+	
 	int num = 0;
 	std::function<void(const Matrix4x4& matrix)> printMatrix4x4 = [&](const Matrix4x4& matrix) {
 #ifdef _DEBUG
@@ -52,9 +47,35 @@ void GameScene::Update() {
 		num++;
 	};
 	
-	printMatrix4x4(rotateMatrix0);
-	printMatrix4x4(rotateMatrix1);
-	printMatrix4x4(rotateMatrix2);
+	Quaternion q1 = { 2.0f,3.0f,4.0f,1.0f };
+	Quaternion q2 = { 1.0f,3.0f,5.0f,2.0f };
+	Quaternion identity = IdentityQuaternion();
+	Quaternion conj = Conjugate(q1);
+	Quaternion inv = Inverse(q1);
+	Quaternion normal = Normalize(q1);
+	Quaternion mul1 = Multiply(q1, q2);
+	Quaternion mul2 = Multiply(q2, q1);
+	float norm = Norm(q1);
+
+	std::function<void(const Quaternion& q, const char label[])> printQuaternion = [&](const Quaternion& q,const char label[]) {
+#ifdef _DEBUG
+		ImGui::Begin("Quaternion");
+		ImGui::Text("%6.2f %6.2f %6.2f %6.2f : %s", q.v.x, q.v.y, q.v.z, q.w,label);
+		ImGui::End();
+#endif // _DEBUG
+	};
+
+	printQuaternion(identity,"Identity");
+	printQuaternion(conj,"Conjugate");
+	printQuaternion(inv,"Inverse");
+	printQuaternion(normal,"Normalize");
+	printQuaternion(mul1,"Multiply(q1,q2)");
+	printQuaternion(mul2, "Multiply(q2,q1)");
+#ifdef _DEBUG
+	ImGui::Begin("Quaternion");
+	ImGui::Text("%6.2f : %s",norm,"Norm");
+	ImGui::End();
+#endif // _DEBUG
 }
 
 void GameScene::Draw2D() {
