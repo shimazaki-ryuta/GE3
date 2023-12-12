@@ -60,6 +60,17 @@ public:
 		float decay;
 		float padding[2];
 	};
+	struct SpotLight
+	{
+		Vector4 color;
+		Vector3 position;
+		float intensity;
+		Vector3 direction;
+		float distance;
+		float decay;
+		float cosAngle;
+		float padding[2];
+	};
 
 	GameScene();
 	~GameScene();
@@ -119,6 +130,10 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
 	PointLight* pointLightData = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
+	SpotLight* spotLightData = nullptr;
+
 	WorldTransform worldTransformSphere_;
 	float shininess_;
 };

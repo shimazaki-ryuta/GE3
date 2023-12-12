@@ -74,9 +74,20 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
 	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	pointLightData->position = { 0.0f,0.0f,0.0f };
-	pointLightData->intensity = 1.0f;
+	pointLightData->intensity = 0.0f;
 	pointLightData->radius = 1.0f;
 	pointLightData->decay = 1.0f;
+
+	//PointLight用のリソース
+	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(SpotLight));
+	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+	spotLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	spotLightData->position = { 2.0f,1.25f,0.0f };
+	spotLightData->intensity = 1.0f;
+	spotLightData->direction = Normalize(Vector3{-1.0f,-1.0f,0.0f});
+	spotLightData->distance = 7.0f;
+	spotLightData->decay = 2.0f;
+	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
 	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
 	sphere_->SetEnableLighting(2);
@@ -110,6 +121,16 @@ void GameScene::Update() {
 	//pointLightData->color.y = RandomEngine::GetRandom(0.0f, 1.0f);
 	//pointLightData->color.z = RandomEngine::GetRandom(0.0f, 1.0f);
 
+	ImGui::Begin("SpotLight");
+	ImGui::DragFloat3("position", &spotLightData->position.x);
+	ImGui::DragFloat3("direction", &spotLightData->direction.x);
+	spotLightData->direction = Normalize(spotLightData->direction);
+	ImGui::SliderFloat("Intensity", &spotLightData->intensity, 0.0f, 1.0f, 0);
+	ImGui::DragFloat("distance", &spotLightData->distance);
+	ImGui::DragFloat("decay", &spotLightData->decay, 0.1f);
+	ImGui::DragFloat("Angle", &spotLightData->cosAngle, 0.1f);
+	ImGui::ColorEdit4("Color", &spotLightData->color.x);
+	ImGui::End();
 
 	sphere_->SetShiniess(shininess_);
 	ImGui::Begin("Sphere");
@@ -161,6 +182,8 @@ void GameScene::Draw3D() {
 	Model::PreDraw(dxCommon_->GetCommandList());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+
 	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
 	//skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);

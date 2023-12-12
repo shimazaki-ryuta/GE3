@@ -16,6 +16,8 @@ ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
 ConstantBuffer<PointLight> gPointLight : register(b3);
+ConstantBuffer<SpotLight> gSpotLight : register(b4);
+
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
 };
@@ -33,6 +35,8 @@ PixelShaderOutput main(VertexShaderOutput input){
 	float32_t3 specularDirectionalLight;
 	float32_t3 diffusePointLight;
 	float32_t3 specularPointLight;
+	float32_t3 diffuseSpotLight;
+	float32_t3 specularSpotLight;
 	PixelShaderOutput output;
 	output.color.a = gMaterial.color.a * textureColor.a;
 	if (textureColor.a <= 0.0)
@@ -59,7 +63,23 @@ PixelShaderOutput main(VertexShaderOutput input){
 		specularPointLight = gMaterial.color.rgb * gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
 
 
-		output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight;
+		float32_t3 spotLightDirection = normalize(input.worldPosition - gSpotLight.position);
+		float NdotLspot = dot(normalize(input.normal), -spotLightDirection);
+		float cosspot = pow(NdotLspot * 0.5f + 0.5f, 2.0f);
+		float32_t distance2 = length(gSpotLight.position - input.worldPosition);
+		float32_t factor2 = pow(saturate(-distance2 / gSpotLight.distance + 1.0f), gSpotLight.decay);
+		halfVector = normalize(-spotLightDirection + toEye);
+		NDotH = dot(normalize(input.normal), halfVector);
+		specularPow = pow(saturate(NDotH), gMaterial.shininess);
+
+		float32_t cosAngle = dot(spotLightDirection,gSpotLight.direction);
+		float32_t falloffFactor = saturate((cosAngle - gSpotLight.cosAngle)/(1.0f - gSpotLight.cosAngle));
+
+		diffuseSpotLight = gMaterial.color.rgb * textureColor.xyz * gSpotLight.color.rgb * gSpotLight.intensity * factor2 * falloffFactor;
+		specularSpotLight = gMaterial.color.rgb * gSpotLight.intensity * specularPow * gSpotLight.color.xyz * factor2 * falloffFactor;
+
+
+		output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
 	}else if(gMaterial.enableLighting == 1){
 		float cos = saturate(dot(normalize(input.normal),-gDirectionalLight.direction));
 		output.color.xyz = gMaterial.color.xyz * textureColor.xyz * gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
