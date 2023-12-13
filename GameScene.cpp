@@ -47,11 +47,14 @@ void GameScene::Update() {
 		num++;
 	};
 	
-	Quaternion rotation = MakeRotateAxisAngleQuaternion(Normalize(Vector3{1.0f,0.4f,-0.2f}),0.45f);
-	Vector3 pointY = {2.1f,-0.9f,1.3f};
-	Matrix4x4 rotateMatrix = MakeRotateMatrix(rotation);
-	Vector3 rotateByQuaternion = RotateVector(pointY,rotation);
-	Vector3 rotateByMatrix = Transform(pointY,rotateMatrix);
+	Quaternion rotation0 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{0.71f,0.71f,0.0f}),0.3f);
+	Quaternion rotation1 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{0.71f,0.0f,0.71f }), 3.141592f);
+
+	Quaternion interplate0 = Slerp(rotation0,rotation1,0.0f);
+	Quaternion interplate1 = Slerp(rotation0, rotation1, 0.3f);
+	Quaternion interplate2 = Slerp(rotation0, rotation1, 0.5f);
+	Quaternion interplate3 = Slerp(rotation0, rotation1, 0.7f);
+	Quaternion interplate4 = Slerp(rotation0, rotation1, 1.0f);
 
 	std::function<void(const Quaternion& q, const char label[])> printQuaternion = [&](const Quaternion& q,const char label[]) {
 #ifdef _DEBUG
@@ -61,14 +64,12 @@ void GameScene::Update() {
 #endif // _DEBUG
 	};
 
-	printQuaternion(rotation,"rotation");
-	printMatrix4x4(rotateMatrix);
-#ifdef _DEBUG
-	ImGui::Begin("Quaternion");
-	ImGui::Text("%6.2f %6.2f %6.2f : %s", rotateByQuaternion.x, rotateByQuaternion.y, rotateByQuaternion.z ,"rotateByQuaternion");
-	ImGui::Text("%6.2f %6.2f %6.2f : %s", rotateByMatrix.x, rotateByMatrix.y, rotateByMatrix.z, "rotateByMatrix");
-	ImGui::End();
-#endif // _DEBUG
+	printQuaternion(interplate0, "interplate0, Slerp(q0,q1,0.0f)");
+	printQuaternion(interplate1, "interplate1, Slerp(q0,q1,0.3f)");
+	printQuaternion(interplate2, "interplate2, Slerp(q0,q1,0.5f)");
+	printQuaternion(interplate3, "interplate3, Slerp(q0,q1,0.7f)");
+	printQuaternion(interplate4, "interplate4, Slerp(q0,q1,1.0f)");
+
 }
 
 void GameScene::Draw2D() {

@@ -1,6 +1,21 @@
 #include "QuaternionFunction.h"
 #include "VectorFunction.h"
 #include <cmath>
+
+Quaternion Add(const Quaternion& q, const Quaternion& r) {
+	Quaternion result;
+	result.v = q.v + r.v;
+	result.w = q.w + r.w;
+	return result;
+}
+
+Quaternion Scaler(float scaler, const Quaternion& q) {
+	Quaternion result;
+	result.v = scaler * q.v;
+	result.w = scaler * q.w;
+	return result;
+}
+
 Quaternion Multiply(const Quaternion& q, const Quaternion& r) {
 	Quaternion result;
 	result.w = q.w * r.w - Dot(q.v,r.v);
@@ -68,4 +83,31 @@ Matrix4x4 MakeRotateMatrix(const Quaternion& q) {
 	result.m[2][2] = q.w * q.w - q.v.x * q.v.x - q.v.y * q.v.y + q.v.z * q.v.z;
 
 	return result;
+}
+
+float Dot(const Quaternion& q0, const Quaternion& q1) {
+	return q0.v.x*q1.v.x + q0.v.y * q1.v.y + q0.v.z * q1.v.z + q0.w * q1.w;
+}
+
+Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+	float dot = Dot(q0, q1);
+	Quaternion newQ0 = q0;
+	if (dot < 0) {
+		newQ0 = -1.0f * q0;
+		dot = -dot;
+	}
+	float theta = std::acos(dot);
+	float scale0 = std::sin((1.0f - t) * theta) / std::sin(theta);
+	float scale1 = std::sin(t * theta) / std::sin(theta);
+	return scale0 * newQ0 + scale1 * q1;
+}
+
+Quaternion operator+(const Quaternion& q0, const Quaternion& q1) {
+	return Add(q0,q1);
+}
+Quaternion operator*(float scaler, const Quaternion& q) {
+	return Scaler(scaler,q);
+}
+Quaternion operator*(const Quaternion& q,float scaler) {
+	return Scaler(scaler, q);
 }
