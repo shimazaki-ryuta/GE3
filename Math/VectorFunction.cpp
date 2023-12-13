@@ -75,16 +75,13 @@ Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t)
 Vector3 Slerp(const Vector3& v1, const Vector3& v2, float t) 
 {
 	Vector3 a = Normalize(v1), b = Normalize(v2);
-	float s = (1.0f - t) * Length(a) + t*Length(b);
-	Vector3 e1, e2;
-	e1 = float(1.0f / Length(a)) * a;
-	e2 = float(1.0f / Length(b)) * b;
+	float s = (1.0f - t) * Length(v1) + t*Length(v2);
 
 	float dot = std::clamp(Dot(a, b),0.0f,1.0f);
-	float theta = std::acos(dot/*/( Length(a)*Length(b))*/);
-	if (theta ==0.0f)
+	float theta = std::acos(dot);
+	if (dot >= 1.0f - 0.0005f)
 	{
-		return Lerp(a,b,t);
+		return Lerp(v1,v2,t);
 	}
 	return s*((std::sinf((1.0f-t)*theta)/std::sinf(theta))*a + (std::sinf(t*theta)/std::sinf(theta))*b);
 }
