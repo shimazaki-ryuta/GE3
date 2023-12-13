@@ -48,7 +48,7 @@ void GameScene::Update() {
 	};
 	
 	Quaternion rotation0 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{0.71f,0.71f,0.0f}),0.3f);
-	Quaternion rotation1 = MakeRotateAxisAngleQuaternion(Normalize(Vector3{0.71f,0.0f,0.71f }), 3.141592f);
+	Quaternion rotation1 = {-1.0f*rotation0.v,-rotation0.w};
 
 	Quaternion interplate0 = Slerp(rotation0,rotation1,0.0f);
 	Quaternion interplate1 = Slerp(rotation0, rotation1, 0.3f);
