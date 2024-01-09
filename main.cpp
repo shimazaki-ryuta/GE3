@@ -43,7 +43,7 @@ LeackChecker leackChecker;
 
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
-const std::string kTitle = "";
+const std::string kTitle = "LE2A_11_シマザキ_リュウタ_DOPPELSHOTER";
 
 struct DirectionalLight
 {

@@ -62,11 +62,6 @@ private:
 
 	struct Transforms cameraTransform { {1.0f, 1.0f, 1.0f}, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f } };
 
-	//Model model_;
-
-	//WorldTransform worldTransformObj_;
-	//WorldTransform worldTransformObj2_;
-	//ViewProjection viewProjection_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
@@ -107,5 +102,28 @@ private:
 	std::unique_ptr<Model> modelBullet_;
 
 	std::unique_ptr<PlayerAI> ai_;
+
+	uint32_t backTextureHandle_;
+	std::unique_ptr<Sprite> backSprite_;
+	bool isEnd_;
+	uint32_t endTextureHandle_[2];
+	std::unique_ptr<Sprite> endSprite_;
+
+	bool isIngame_;
+	//1フレーム前の入力情報
+	XINPUT_STATE preJoyState_;
+	uint32_t pressATextureHandle_;
+	std::unique_ptr<Sprite> pressASprite_;
+	int32_t endCount_;
+	bool isButtonDraw_;
+	int32_t buttonCount_;
+	uint32_t shotTextureHandle_;
+	uint32_t dashTextureHandle_;
+	uint32_t jumpTextureHandle_;
+	std::unique_ptr<Sprite> shotSprite_;
+	std::unique_ptr<Sprite> dashSprite_;
+	std::unique_ptr<Sprite> jumpSprite_;
+	uint32_t titleTextureHandle_;
+	std::unique_ptr<Sprite> titleSprite_;
 };
 

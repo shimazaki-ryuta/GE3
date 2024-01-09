@@ -76,12 +76,13 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	worldTtansformOBB_.Initialize();*/
 	comboNum_ = 0;
 
-	emitter.count = 3;
+	emitter.count = 1;
 	emitter.frequency = 0.5f;
 	emitter.frequencyTime = 0.0f;
 	emitter.transform.translate = { 0,0,0 };
 
 	bullets_.clear();
+	isDead_ = false;
 }
 
 void Player::ReStart() {
@@ -89,13 +90,23 @@ void Player::ReStart() {
 	behaviorRequest_ = Behavior::kRoot;
 	worldTransform_.parent_ = nullptr;
 	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
-	worldTransform_.translation_ = {0.0f,0.0f,-60.0f};
-	worldTransform_.Initialize();
+	worldTransform_.translation_ = {0.0f,0.0f,-40.0f};
+	BehaviorRootInitialize();
+	//worldTransform_.UpdateMatrix();
+	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
+	if (worldTransform_.parent_) {
+		worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
+	}
+	models_[0].worldTransform_.rotation_ = { 0,0,0 };
+	for (HierarchicalAnimation& model : models_) {
+		model.worldTransform_.UpdateMatrix();
+	}
 	direction_ = { 0,0,1.0f };
 	directionMatrix_ = MakeIdentity4x4();
 	comboNum_ = 0;
 	//weaponCollider_.SetIsCollision(false);
 	bullets_.clear();
+	isDead_ = false;
 }
 
 void Player::BehaviorRootInitialize() {
@@ -152,62 +163,70 @@ void Player::BehaviorJumpInitialize() {
 
 void Player::Update() {
 	ApplyGlobalVariables();
-	bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
-		if (bullet->GetIsDead()) {
-			return true;
+	if (!isDead_) {
+
+
+		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
+			if (bullet->GetIsDead()) {
+				return true;
+			}
+			return false;
+			});
+		Input::GetInstance()->GetJoystickState(0, joyState_);
+		if (behaviorRequest_) {
+			behavior_ = behaviorRequest_.value();
+			frameCount_ = 0;
+			switch (behavior_) {
+			case Player::Behavior::kRoot:
+			default:
+				BehaviorRootInitialize();
+				break;
+			case Player::Behavior::kAttack:
+				BehaviorAttackInitialize();
+				break;
+			case Player::Behavior::kDash:
+				BehaviorDashInitialize();
+				break;
+			case Player::Behavior::kJump:
+				BehaviorJumpInitialize();
+				break;
+			}
+			behaviorRequest_ = std::nullopt;
 		}
-		return false;
-		});
-	Input::GetInstance()->GetJoystickState(0, joyState_);
-	if (behaviorRequest_) {
-		behavior_ = behaviorRequest_.value();
-		frameCount_ = 0;
+		//BehaviorRootUpdate();
+		//BehaviorAttackUpdate();
+		if (worldTransform_.parent_) {
+			if (worldTransform_.translation_.y < 0.0f) {
+				worldTransform_.translation_.y = 0.0f;
+			}
+
+		}
+
+
 		switch (behavior_) {
 		case Player::Behavior::kRoot:
-		default:
-			BehaviorRootInitialize();
+			BehaviorRootUpdate();
 			break;
 		case Player::Behavior::kAttack:
-			BehaviorAttackInitialize();
+			BehaviorAttackUpdate();
 			break;
 		case Player::Behavior::kDash:
-			BehaviorDashInitialize();
+			BehaviorDashUpdate();
 			break;
 		case Player::Behavior::kJump:
-			BehaviorJumpInitialize();
+			BehaviorJumpUpdate();
 			break;
 		}
-		behaviorRequest_ = std::nullopt;
+		/*
+		if (worldTransform_.translation_.y < -10.0f) {
+			//ReStart();
+		}*/
 	}
-	//BehaviorRootUpdate();
-	//BehaviorAttackUpdate();
-	if (worldTransform_.parent_) {
-		if (worldTransform_.translation_.y < 0.0f) {
-			worldTransform_.translation_.y = 0.0f;
+	else {
+		if (models_[0].worldTransform_.rotation_.x > -3.14f/2.0f) {
+			models_[0].worldTransform_.rotation_.x -= 0.05f;
 		}
-
 	}
-	
-
-	switch (behavior_) {
-	case Player::Behavior::kRoot:
-		BehaviorRootUpdate();
-		break;
-	case Player::Behavior::kAttack:
-		BehaviorAttackUpdate();
-		break;
-	case Player::Behavior::kDash:
-		BehaviorDashUpdate();
-		break;
-	case Player::Behavior::kJump:
-		BehaviorJumpUpdate();
-		break;
-	}
-	/*
-	if (worldTransform_.translation_.y < -10.0f) {
-		//ReStart();
-	}*/
-
 	// 行列更新
 	//worldTransform_.UpdateMatrix();
 	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
@@ -356,6 +375,7 @@ void Player::BehaviorAttackUpdate()
 			bullet->SetModel(modelBullet_);
 			Vector3 velocity = Normalize(toTarget) * 1.5f;
 			bullet->SetVelocity(velocity);
+			bullet->SetParticle(particle_);
 			bullets_.push_back(std::move(bullet));
 			fire_();
 		}

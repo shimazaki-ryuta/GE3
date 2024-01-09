@@ -75,11 +75,12 @@ void Player2::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	worldTtansformOBB_.Initialize();*/
 	comboNum_ = 0;
 
-	emitter.count = 3;
+	emitter.count = 1;
 	emitter.frequency = 0.5f;
 	emitter.frequencyTime = 0.0f;
 	emitter.transform.translate = { 0,0,0 };
 	bullets_.clear();
+	isDead_ = false;
 }
 
 void Player2::ReStart() {
@@ -87,13 +88,24 @@ void Player2::ReStart() {
 	behaviorRequest_ = Behavior::kRoot;
 	worldTransform_.parent_ = nullptr;
 	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
-	worldTransform_.translation_ = {0.0f,0.0f,60.0f};
-	worldTransform_.Initialize();
-	direction_ = { 0,0,1.0f };
+	worldTransform_.translation_ = {0.0f,0.0f,40.0f};
+	//worldTransform_.Initialize();
+	direction_ = { 0,0,-1.0f };
 	directionMatrix_ = MakeIdentity4x4();
+	BehaviorRootInitialize();
+	//worldTransform_.UpdateMatrix();
+	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
+	if (worldTransform_.parent_) {
+		worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
+	}
+	models_[0].worldTransform_.rotation_ = { 0,0,0 };
+	for (HierarchicalAnimation& model : models_) {
+		model.worldTransform_.UpdateMatrix();
+	}
 	comboNum_ = 0;
 	weaponCollider_.SetIsCollision(false);
 	bullets_.clear();
+	isDead_ = false;
 }
 
 void Player2::BehaviorRootInitialize() {
@@ -147,6 +159,7 @@ void Player2::BehaviorJumpInitialize() {
 
 void Player2::Update() {
 	ApplyGlobalVariables();
+	if (!isDead_) {
 	bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
 		if (bullet->GetIsDead()) {
 			return true;
@@ -202,7 +215,12 @@ void Player2::Update() {
 	if (worldTransform_.translation_.y < -10.0f) {
 		//ReStart();
 	}*/
-
+	}
+	else {
+		if (models_[0].worldTransform_.rotation_.x > -3.14f / 2.0f) {
+			models_[0].worldTransform_.rotation_.x -= 0.05f;
+		}
+	}
 	// 行列更新
 	//worldTransform_.UpdateMatrix();
 	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
@@ -350,6 +368,7 @@ void Player2::BehaviorAttackUpdate()
 			bullet->SetModel(modelBullet_);
 			Vector3 velocity = Normalize(toTarget) * 1.5f;
 			bullet->SetVelocity(velocity);
+			bullet->SetParticle(particle_);
 			bullets_.push_back(std::move(bullet));
 		}
 		toTarget.y = 0;

@@ -7,7 +7,7 @@ void Skydome::Initialize(Model* model, const Vector3& position) {
 	worldTransform_.translation_ = position;
 	worldTransform_.scale_ = {10.0f,10.0f,10.0f};
 	worldTransform_.UpdateMatrix();
-	textureHandle_ = TextureManager::LoadTexture("2DReticle.png");
+	textureHandle_ = TextureManager::LoadTexture("sky2.png");
 }
 
 void Skydome::Update()

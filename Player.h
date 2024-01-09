@@ -75,6 +75,10 @@ public:
 	void SetModelBullet(Model* model) { modelBullet_ = model; };
 
 	void SetFire(std::function<void()> func) { fire_ = func; };
+
+	std::list<std::unique_ptr<Bullet>>& GetBulletList() { return bullets_; };
+	void SetIsDead(bool is) { isDead_ = is; };
+	bool GetIsDead() { return isDead_; };
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
@@ -146,4 +150,5 @@ private:
 	Model* modelBullet_;
 
 	std::function<void()> fire_;
+	bool isDead_;
 };

@@ -102,6 +102,7 @@ void FollowCamera::Update()
 
 void FollowCamera::Reset() {
 	rotateMatrix2_ = MakeIdentity4x4();
+	viewProjection_.rotation_ = {0,0,0};
 	if (target_)
 	{
 		Vector3 offset = { 0.0f,2.0f,-20.0f };

@@ -3,6 +3,7 @@
 #include "ViewProjection.h"
 #include "Model.h"
 #include "Colider/Sphere.h"
+#include "Particle.h"
 class Bullet
 {
 public:
@@ -16,6 +17,7 @@ public:
 	Sphere& GetSphere() { return sphere_; };
 	void SetModel(Model* model) { model_ = model; };
 	void SetPosition(const Vector3& pos) { worldTransform_.translation_ = pos; };
+	void SetParticle(Particle* particle) { particle_ = particle; };
 private:
 	WorldTransform worldTransform_;
 	Model* model_;
@@ -23,5 +25,6 @@ private:
 	Vector3 velocity_;
 	bool isDead_;
 	int aliveTime_;
+	Particle* particle_;
 };
 

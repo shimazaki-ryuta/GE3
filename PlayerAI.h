@@ -12,6 +12,7 @@ public:
 	void SetPlayer1(Player* p) { p1_ = p; };
 	void SetPlayer2(Player2* p) { p2_ = p; };
 	void Fire();
+	void Reset();
 private:
 	Player2::ReceveData data_;
 	Vector3 direction_;
