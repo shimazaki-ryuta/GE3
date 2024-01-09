@@ -16,6 +16,8 @@
 #include "CommonFiles/DirectXCommon.h"
 
 #include "Player.h"
+#include "Player2.h"
+#include "PlayerAI.h"
 #include "Enemy.h"
 #include "Skydome.h"
 #include "Ground.h"
@@ -70,16 +72,15 @@ private:
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
+
 	std::unique_ptr<Model> modelPlayerBody_;
 	std::unique_ptr<Model> modelPlayerHead_;
 	std::unique_ptr<Model> modelPlayerL_arm_;
 	std::unique_ptr<Model> modelPlayerR_arm_;
 	std::unique_ptr<Model> modelWepon_;
 
-	//敵
-	std::list<std::unique_ptr<Enemy>> enemies_;
-	std::unique_ptr<Model> modelEnemyBody_;
-	std::unique_ptr<Model> modelEnemyWheel_;
+	
+	std::unique_ptr<Player2> player2_;
 
 	bool isDebugCameraActive_ = false;
 	//DebugCamera* debugCamera_ = nullptr;
@@ -93,7 +94,7 @@ private:
 	std::array<std::unique_ptr<Flooar>,size_t(5)> flooars_;
 	//std::unique_ptr<Flooar> flooar_;
 
-	std::unique_ptr<Goal> goal_;
+	//std::unique_ptr<Goal> goal_;
 
 	std::unique_ptr<FollowCamera> followCamera_;
 	std::unique_ptr<LockOn> lockOn_;
@@ -102,5 +103,9 @@ private:
 	DirectionalLight* directinalLightData = nullptr;
 
 	std::unique_ptr<Particle> particle;
+
+	std::unique_ptr<Model> modelBullet_;
+
+	std::unique_ptr<PlayerAI> ai_;
 };
 

@@ -7,67 +7,44 @@ void LockOn::Initialize() {
 	isAutoLock_ = false;
 	textureHandle_ = TextureManager::LoadTexture("2DReticle.png");
 	AnchorSprite_.reset(Sprite::Create(textureHandle_, {0.0f,0.0f}, {30.0f,30.0f}, {1.0f,1.0f,1.0f,1.0f}));
+	notTargetWorldTransform_.Initialize();
 }
 
-void LockOn::Update(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection) {
-	XINPUT_STATE joyState;
-	Input::GetInstance()->GetJoystickState(0, joyState);
+void LockOn::Update(Player2* enemies, ViewProjection& viewProjection) {
+	
 
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) &&
-		!(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)) {
-		isAutoLock_ = !isAutoLock_;
-		if (isAutoLock_) {
-			Search(enemies, viewProjection);
-			if (isLockOn_) {
-				isAutoLock_ = true;
-			}
-			else {
-				isAutoLock_ = false;
-			}
-		}
-		else {
-			isLockOn_ = false;
-		}
-		
-	}
-
-	if(isAutoLock_){
+	//if(isAutoLock_){
 		Search(enemies, viewProjection);
 		isForcus_ = false;
-	}
-	else {
-		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
-			!(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)) {
-			isLockOn_ = !isLockOn_;
-			isForcus_ = isLockOn_;
-			if (isLockOn_) {
-				Search(enemies, viewProjection);
-			}
-		}
-
-		if (isLockOn_ && target_->GetHP() <= 0) {
-			//isLockOn_ = false;
-			Search(enemies, viewProjection);
-		}
-
-		if (isLockOn_) {
-			//右
-			if (float(joyState.Gamepad.sThumbRX) > SHRT_MAX/2 && float(preJoyState_.Gamepad.sThumbRX) <= SHRT_MAX / 2) {
-				LockChange(enemies, viewProjection,1);
-			}
-			//左
-			else if (float(joyState.Gamepad.sThumbRX) < -SHRT_MAX / 2 && float(preJoyState_.Gamepad.sThumbRX) >= -SHRT_MAX / 2) {
-				LockChange(enemies, viewProjection ,-1);
-			}
-		}
-	}
+	//}
+	
 	if (isLockOn_) {
-		Vector3 targetPos = target_->GetWorldTransform()->GetWorldPosition();
+		Vector3 targetPos = target_->GetWorldTransformBody()->GetWorldPosition();
 		targetPos = targetPos *viewProjection.matView * viewProjection.matProjection;
 		targetPos = targetPos * MakeViewportMatrix(0, 0, viewProjection.width, viewProjection.height, 0, 1);
 		AnchorSprite_->SetPosition({ targetPos.x ,targetPos.y });
 	}
-	preJoyState_ = joyState;
+	else {
+		Matrix4x4 cameraRotate = Inverse(viewProjection.matView);
+		//cameraRotate.m[3][0] = 0;
+		//cameraRotate.m[3][1] = 0;
+		//cameraRotate.m[3][2] = 0;
+		notTargetWorldTransform_.translation_ = Transform({0,0,200.0f},cameraRotate);
+		notTargetWorldTransform_.UpdateMatrix();
+		Vector3 targetPos = notTargetWorldTransform_.GetWorldPosition();
+		targetPos = targetPos * viewProjection.matView * viewProjection.matProjection;
+		targetPos = targetPos * MakeViewportMatrix(0, 0, viewProjection.width, viewProjection.height, 0, 1);
+		AnchorSprite_->SetPosition({ targetPos.x ,targetPos.y });
+	}
+}
+
+WorldTransform* LockOn::GetTarget() {
+	if (isLockOn_) {
+		return target_->GetWorldTransformBody();
+	}
+	else {
+		return &notTargetWorldTransform_;
+	}
 }
 
 bool LockOn::isInnerCamera(const Vector3& vector) {
@@ -77,80 +54,36 @@ bool LockOn::isInnerCamera(const Vector3& vector) {
 	return false;
 }
 
-void LockOn::Search(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection) {
+void LockOn::Search(Player2* enemy, ViewProjection& viewProjection) {
 	
 	
-	Enemy* target;
+	Player2* target;
 	isLockOn_ = false;
-	if (!enemies.empty()) {
-		std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies.begin();
-		target = (enemy)->get();
+	if (enemy) {
 	
 
-		for (enemy = enemies.begin(); enemy != enemies.end(); enemy++) {
-			Vector3 targetPosition = target->GetWorldTransform()->GetWorldPosition();
-			Vector3 newEnemyPosition = enemy->get()->GetWorldTransform()->GetWorldPosition();
+			//Vector3 targetPosition = target->GetWorldTransform()->GetWorldPosition();
+			Vector3 newEnemyPosition = enemy->GetWorldTransformBody()->GetWorldPosition();
 			Vector3 innerCameraPos = newEnemyPosition;
 			innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
-			Vector3 oldCameraPos = targetPosition;
-			oldCameraPos = oldCameraPos * viewProjection.matView * viewProjection.matProjection;
-
-			float oldLength = Length(targetPosition - viewProjection.translation_);
+			
+			//float oldLength = Length(targetPosition - viewProjection.translation_);
 			float newLength = Length(newEnemyPosition - viewProjection.translation_);
-			bool modeCheck;
-			if (isAutoLock_) {
-				modeCheck = ((oldLength  >= newLength) && isInnerCamera(innerCameraPos)) || !isInnerCamera(oldCameraPos);
-			}
-			else {
-				modeCheck = std::abs(innerCameraPos.x) <= std::abs(oldCameraPos.x);
-			}
+			bool modeCheck = true;
+			//modeCheck =  isInnerCamera(innerCameraPos)) || !isInnerCamera(oldCameraPos);
 			if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
-				modeCheck && enemy->get()->GetHP() > 0) {
-				target = enemy->get();
+				modeCheck) {
+				target = enemy;
 				target_ = target;
 				isLockOn_ = true;
 			}
-		}
+		
 	}
 	
 }
 
-void LockOn::LockChange(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection,int LR) {
-	Enemy* target;
-	Enemy* newTarget = target_;
-	//isLockOn_ = false;
-	if (!enemies.empty()) {
-		std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies.begin();
-		//target = (enemy)->get();
-		target = target_;
-
-		for (enemy = enemies.begin(); enemy != enemies.end(); enemy++) {
-			Vector3 targetPosition = target->GetWorldTransform()->GetWorldPosition();
-			Vector3 newEnemyPosition = enemy->get()->GetWorldTransform()->GetWorldPosition();
-			Vector3 innerCameraPos = newEnemyPosition;
-			innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
-			Vector3 oldCameraPos = targetPosition;
-			oldCameraPos = oldCameraPos * viewProjection.matView * viewProjection.matProjection;
-
-			float oldLength = Length(targetPosition - viewProjection.translation_);
-			float newLength = Length(newEnemyPosition - viewProjection.translation_);
-			bool modeCheck = true;
-			float min = (std::min)(float(LR),0.0f);
-			float max = (std::max)(float(LR), 0.0f);
-			modeCheck = std::abs(innerCameraPos.x) < std::abs(oldCameraPos.x) || !(min < (oldCameraPos.x) && (oldCameraPos.x) <= max) || !isInnerCamera(oldCameraPos) || target == target_;
-			if (min < (innerCameraPos.x) && (innerCameraPos.x) <= max && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
-				modeCheck && enemy->get()->GetHP() > 0 && target_ != enemy->get()) {
-				target = enemy->get();
-				newTarget = target;
-				isLockOn_ = true;
-			}
-		}
-		target_ = newTarget;
-	}
-}
-
 void LockOn::Draw() {
-	if (isLockOn_) {
+	//if (isLockOn_) {
 		AnchorSprite_->Draw();
-	}
+	//}
 }

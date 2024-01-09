@@ -11,7 +11,7 @@
 #include "input.h"
 #include "Particle.h"
 #include "Bullet.h"
-class Player : public BaseCharacter {
+class Player2 : public BaseCharacter {
 public:
 	enum class Behavior { 
 		kRoot,
@@ -24,6 +24,12 @@ public:
 		kPre,
 		kAttack,
 		kEnd,
+	};
+
+	struct ReceveData
+	{
+		Vector3 move;
+		Behavior behavior;
 	};
 
 	/// <summary>
@@ -72,9 +78,12 @@ public:
 	void ReStart();
 	void SetTarget(WorldTransform* target) { target_ = target; };
 	void SetParticle(Particle* particle) { particle_ = particle; };
+	void SetData(const ReceveData& d) {data_ = d;};
+	WorldTransform* GetWorldTransformBody() { return &models_[1].worldTransform_; };
+
+	Behavior GetBehavior() {return behavior_;};
 	void SetModelBullet(Model* model) { modelBullet_ = model; };
 
-	void SetFire(std::function<void()> func) { fire_ = func; };
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
@@ -85,8 +94,8 @@ private:
 	//Model* modelR_arm_ = nullptr;
 	//std::vector<Model*> models_;
 	//std::vector <HierarchicalAnimation> models_;
-	WorldTransform worldTransformWepon_;
-	Model* modelWepon_;
+	//WorldTransform worldTransformWepon_;
+	//Model* modelWepon_;
 
 	uint32_t textureHandle_ = 0u;
 
@@ -111,8 +120,8 @@ private:
 	Vector3 direction_;
 	Matrix4x4 directionMatrix_;
 
-	//OBB weaponOBB_;
-	//Collider weaponCollider_;
+	OBB weaponOBB_;
+	Collider weaponCollider_;
 
 	//ダッシュ用変数
 	//ダッシュ中の速度
@@ -125,11 +134,11 @@ private:
 	Vector3 acceleration_;
 	Vector3 kGravity;
 	Vector3 kJumpVelocity;
-
-	//std::unique_ptr<Model> obbModel_;
-	//bool isDrawOBB_=false;
-	//WorldTransform worldTtansformOBB_;
-
+	/*
+	std::unique_ptr<Model> obbModel_;
+	bool isDrawOBB_=false;
+	WorldTransform worldTtansformOBB_;
+	*/
 	XINPUT_STATE joyState_;
 	//1フレーム前の入力情報
 	XINPUT_STATE preJoyState_;
@@ -142,8 +151,9 @@ private:
 	Particle* particle_;
 	Particle::Emitter emitter;
 
+	ReceveData data_;
+
 	std::list<std::unique_ptr<Bullet>> bullets_;
 	Model* modelBullet_;
 
-	std::function<void()> fire_;
 };

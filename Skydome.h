@@ -26,4 +26,5 @@ public:
 private:
 	WorldTransform worldTransform_;
 	std::unique_ptr <Model> model_;
+	uint32_t textureHandle_;
 };

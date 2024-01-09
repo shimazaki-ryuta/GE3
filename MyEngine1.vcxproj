@@ -147,6 +147,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="BaseCharacter.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Colider\AABB.cpp" />
     <ClCompile Include="Colider\Collider.cpp" />
     <ClCompile Include="Colider\Collision.cpp" />
@@ -207,6 +208,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="MovingFlooar.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player2.cpp" />
+    <ClCompile Include="PlayerAI.cpp" />
     <ClCompile Include="Primitive3D.cpp" />
     <ClCompile Include="RailCamera.cpp" />
     <ClCompile Include="RandomEngine.cpp" />
@@ -222,6 +225,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="BaseCharacter.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Colider\AABB.h" />
     <ClInclude Include="Colider\Collider.h" />
     <ClInclude Include="Colider\Collision.h" />
@@ -266,6 +270,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="MovingFlooar.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Player2.h" />
+    <ClInclude Include="PlayerAI.h" />
     <ClInclude Include="Primitive3D.h" />
     <ClInclude Include="RailCamera.h" />
     <ClInclude Include="RandomEngine.h" />

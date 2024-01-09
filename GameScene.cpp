@@ -65,7 +65,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->InitializeFloatingGimmick();
 
 	modelWepon_.reset(Model::CreateFromOBJ("hammer"));
-	player_->SetWepon(modelWepon_.get());
+	//player_->SetWepon(modelWepon_.get());
+
+	player2_ = std::make_unique<Player2>();
+	player2_->Initialize(animationPlayer);
+	player2_->InitializeFloatingGimmick();
+	//player2_->SetWepon(modelWepon_.get());
+
+	modelBullet_.reset(Model::CreateFromOBJ("cube"));
+	player_->SetModelBullet(modelBullet_.get());
+	player2_->SetModelBullet(modelBullet_.get());
 
 	// 天球
 	modelSkydome_ = Model::CreateFromOBJ("skydome");
@@ -87,8 +96,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	}*/
 	flooars_[0].reset(new Flooar);
 	flooars_[0]->Initialize();
-	flooars_[0]->SetOffset({ 0.0f,0.0f,24.0f });
-	flooars_[0]->SetSize({ 60.0f,0.0f,60.0f });
+	flooars_[0]->SetOffset({ 0.0f,0.0f,0.0f });
+	flooars_[0]->SetSize({ 165.0f,0.0f,165.0f });
 
 	/*
 	flooars_[1].reset(new MovingFlooar);
@@ -101,7 +110,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	flooars_[2]->Initialize();
 	flooars_[2]->SetOffset({ 0.0f,0.0f,44.0f });
 	flooars_[2]->SetSize({10.0f,0.0f,10.0f});
-	*/
+	
 	flooars_[1].reset(new MovingFlooar);
 	flooars_[1]->Initialize();
 	flooars_[1]->SetOffset({ 0.0f,0.0f,96.0f });
@@ -110,10 +119,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	flooars_[2].reset(new Flooar);
 	flooars_[2]->Initialize();
 	flooars_[2]->SetOffset({ 0.0f,0.0f,110.0f });
-
+	*/
 	//ゴール
-	goal_.reset(new Goal);
-	goal_->Initialize();
+	//goal_.reset(new Goal);
+	//goal_->Initialize();
 
 	// カメラ生成
 	followCamera_ = std::make_unique<FollowCamera>();
@@ -122,7 +131,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	followCamera_->Reset();
 
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
-
+	/*
 	// 敵
 	modelEnemyBody_.reset(Model::CreateFromOBJ("Enemy_Body"));
 	modelEnemyWheel_.reset(Model::CreateFromOBJ("Enemy_Wheel"));
@@ -146,10 +155,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 		enemy->get()->SetOffset({-4.0f + (index++)*20.0f,0.0f,44.0f});
 		enemy->get()->setTarget(player_->GetWorldTransform());
 		enemy->get()->SetCamera(followCamera_.get());
-	}
+	}*/
 	lockOn_.reset(new LockOn);
 	lockOn_->Initialize();
-
+	
 	//DirectionalLight用のリソース
 	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
 	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
@@ -160,6 +169,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	particle.reset(Particle::Create(500));
 	particle->UseBillboard(true);
 	player_->SetParticle(particle.get());
+	player2_->SetParticle(particle.get());
+
+	ai_.reset(new PlayerAI);
+	ai_->Initialize();
+	ai_->SetPlayer1(player_.get());
+	ai_->SetPlayer2(player2_.get());
+	player_->SetFire(std::bind(&PlayerAI::Fire,ai_.get()));
 }
 
 void GameScene::Update() {
@@ -169,26 +185,36 @@ void GameScene::Update() {
 		}
 		return false;
 		});*/
-	for (int index = 0; index < 3; index++) {
+	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
 	}
 	//flooar_->Update();
 	player_->Update();
 	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
 		player_->ReStart();
-		for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+		/*for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
 			enemy->get()->ReStart();
-		}
+		}*/
 	}
-	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+
+	ai_->Update();
+
+	player2_->SetData(ai_->GetData());
+	player2_->Update();
+	if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player2_->ReStart();
+		
+	}
+
+	/*for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
 		enemy->get()->Update();
-	}
-	goal_->Update();
+	}*/
+	//goal_->Update();
 	//debugCamera_->Update();
 	followCamera_->Update();
 	
 	bool isCollision = false;
-	for (int index = 0; index < 3; index++) {
+	for (int index = 0; index < 1; index++) {
 		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
 		{
 			player_->OnCollision(flooars_[index]->GetWorldTransform());
@@ -198,7 +224,20 @@ void GameScene::Update() {
 	if (!isCollision) {
 		player_->OutCollision();
 	}
-	if (IsCollision(player_->GetOBB(),goal_->GetOBB())) {
+
+	isCollision = false;
+	for (int index = 0; index < 1; index++) {
+		if (IsCollision(player2_->GetOBB(), flooars_[index]->GetOBB()))
+		{
+			player2_->OnCollision(flooars_[index]->GetWorldTransform());
+			isCollision = true;
+		}
+	}
+	if (!isCollision) {
+		player2_->OutCollision();
+	}
+
+	/*if (IsCollision(player_->GetOBB(), goal_->GetOBB())) {
 		player_->ReStart();
 		for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
 			enemy->get()->ReStart();
@@ -211,7 +250,7 @@ void GameScene::Update() {
 				enemy->get()->ReStart();
 			}
 		}
-	}
+	}*/
 	
 
 	CollisionManager::GetInstance()->CheckAllCollisions();
@@ -228,20 +267,10 @@ void GameScene::Update() {
 		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
 		//viewProjection_.TransferMatrix();
 	}
-	lockOn_->Update(enemies_,viewProjection_);
-	if (lockOn_->IsLockOn()) {
-		if (lockOn_->IsForcus()) {
-			followCamera_->SetLockOnTarget(lockOn_->GetTarget());
-		}
-		else {
-			followCamera_->SetLockOnTarget(nullptr);
-		}
-		player_->SetTarget(lockOn_->GetTarget());
-	}
-	else {
-		followCamera_->SetLockOnTarget(nullptr);
-		player_->SetTarget(nullptr);
-	}
+	lockOn_->Update(player2_.get(), viewProjection_);
+	followCamera_->SetLockOnTarget(nullptr);
+	player_->SetTarget(lockOn_->GetTarget());
+	player2_->SetTarget(player_->GetWorldTransform());
 	particle->Updade();
 }
 
@@ -257,14 +286,15 @@ void GameScene::Draw3D() {
 	skydome_->Draw(viewProjection_);
 	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
-	for (int index = 0; index < 3; index++) {
+	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
-	for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
+	player2_->Draw(viewProjection_);
+	/*for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
 		enemy->get()->Draw(viewProjection_);
-	}
-	goal_->Draw(viewProjection_);
+	}*/
+	//goal_->Draw(viewProjection_);
 	Model::PostDraw();
 
 	Particle::PreDraw(dxCommon_->GetCommandList());
