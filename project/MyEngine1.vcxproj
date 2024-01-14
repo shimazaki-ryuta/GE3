@@ -58,13 +58,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)\externals\nlohmann;$(ProjectDir)\Colider;$(ProjectDir)\Math;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)\externals\nlohmann;$(ProjectDir)\Colider;$(ProjectDir)\Math;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
-    <IncludePath>$(ProjectDir)\externals\nlohmann;$(ProjectDir)\Colider;$(ProjectDir)\Math;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -76,6 +76,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,6 +103,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <TreatWarningAsError>true</TreatWarningAsError>
       <Optimization>MaxSpeed</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,6 +131,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,143 +147,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="BaseCharacter.cpp" />
-    <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Colider\AABB.cpp" />
-    <ClCompile Include="Colider\Collider.cpp" />
-    <ClCompile Include="Colider\Collision.cpp" />
-    <ClCompile Include="Colider\CollisionManager.cpp" />
-    <ClCompile Include="Colider\OBB.cpp" />
-    <ClCompile Include="Colider\Plane.cpp" />
-    <ClCompile Include="Colider\Sphere.cpp" />
-    <ClCompile Include="CommonFiles\DirectXCommon.cpp" />
-    <ClCompile Include="CommonFiles\WinApp.cpp" />
-    <ClCompile Include="ConvertString.cpp" />
-    <ClCompile Include="Curve.cpp" />
-    <ClCompile Include="D3DResourceLeakChacker.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="DeltaTime.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="externals\imgui\imgui.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_demo.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_draw.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_tables.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="externals\imgui\imgui_widgets.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">MinSpace</Optimization>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
-    </ClCompile>
-    <ClCompile Include="FixFPS.cpp" />
-    <ClCompile Include="flooar.cpp" />
-    <ClCompile Include="FollowCamera.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="GetDescriptorHandle.cpp" />
-    <ClCompile Include="GlobalVariables.cpp" />
-    <ClCompile Include="Goal.cpp" />
-    <ClCompile Include="Ground.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="LoadModel.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Math\MatrixFunction.cpp" />
-    <ClCompile Include="Math\VectorFunction.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="MovingFlooar.cpp" />
-    <ClCompile Include="Particle.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Primitive3D.cpp" />
-    <ClCompile Include="RailCamera.cpp" />
-    <ClCompile Include="RandomEngine.cpp" />
-    <ClCompile Include="ShaderCompiler.cpp" />
-    <ClCompile Include="Skydome.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="TimedCall.cpp" />
-    <ClCompile Include="ViewProjection.cpp" />
-    <ClCompile Include="WIndowProcedure.cpp" />
-    <ClCompile Include="WorldTransform.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="BaseCharacter.h" />
-    <ClInclude Include="Board.h" />
-    <ClInclude Include="Colider\AABB.h" />
-    <ClInclude Include="Colider\Collider.h" />
-    <ClInclude Include="Colider\Collision.h" />
-    <ClInclude Include="Colider\CollisionConfig.h" />
-    <ClInclude Include="Colider\CollisionManager.h" />
-    <ClInclude Include="Colider\OBB.h" />
-    <ClInclude Include="Colider\Plane.h" />
-    <ClInclude Include="Colider\Sphere.h" />
-    <ClInclude Include="CommonFiles\DirectXCommon.h" />
-    <ClInclude Include="CommonFiles\WinApp.h" />
-    <ClInclude Include="ConvertString.h" />
-    <ClInclude Include="Curve.h" />
-    <ClInclude Include="D3DResourceLeakChacker.h" />
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="DeltaTime.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="externals\imgui\imconfig.h" />
-    <ClInclude Include="externals\imgui\imgui.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
-    <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="externals\imgui\imgui_internal.h" />
-    <ClInclude Include="externals\imgui\imstb_rectpack.h" />
-    <ClInclude Include="externals\imgui\imstb_textedit.h" />
-    <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="FixFPS.h" />
-    <ClInclude Include="flooar.h" />
-    <ClInclude Include="FollowCamera.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="GetDescriptorHandle.h" />
-    <ClInclude Include="GlobalVariables.h" />
-    <ClInclude Include="Goal.h" />
-    <ClInclude Include="Ground.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="LoadModel.h" />
-    <ClInclude Include="Math\Matrix.h" />
-    <ClInclude Include="Math\MatrixFunction.h" />
-    <ClInclude Include="Math\Vector2.h" />
-    <ClInclude Include="Math\Vector3.h" />
-    <ClInclude Include="Math\Vector4.h" />
-    <ClInclude Include="Math\VectorFunction.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="MovingFlooar.h" />
-    <ClInclude Include="Particle.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Primitive3D.h" />
-    <ClInclude Include="RailCamera.h" />
-    <ClInclude Include="RandomEngine.h" />
-    <ClInclude Include="ShaderCompiler.h" />
-    <ClInclude Include="Skydome.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="TimedCall.h" />
-    <ClInclude Include="ViewProjection.h" />
-    <ClInclude Include="WindowProcedure.h" />
-    <ClInclude Include="WorldTransform.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="externals\imgui\LICENSE.txt" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
@@ -349,6 +215,116 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Test|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Application\BaseCharacter.cpp" />
+    <ClCompile Include="Application\Board.cpp" />
+    <ClCompile Include="Application\Curve.cpp" />
+    <ClCompile Include="Application\flooar.cpp" />
+    <ClCompile Include="Application\FollowCamera.cpp" />
+    <ClCompile Include="Application\Goal.cpp" />
+    <ClCompile Include="Application\Ground.cpp" />
+    <ClCompile Include="Application\MovingFlooar.cpp" />
+    <ClCompile Include="Application\Skydome.cpp" />
+    <ClCompile Include="Application\TimedCall.cpp" />
+    <ClCompile Include="Engine\Colider\AABB.cpp" />
+    <ClCompile Include="Engine\Colider\Collider.cpp" />
+    <ClCompile Include="Engine\Colider\Collision.cpp" />
+    <ClCompile Include="Engine\Colider\CollisionManager.cpp" />
+    <ClCompile Include="Engine\Colider\OBB.cpp" />
+    <ClCompile Include="Engine\Colider\Plane.cpp" />
+    <ClCompile Include="Engine\Colider\Sphere.cpp" />
+    <ClCompile Include="Engine\CommonFiles\DirectXCommon.cpp" />
+    <ClCompile Include="Engine\CommonFiles\WinApp.cpp" />
+    <ClCompile Include="Engine\ConvertString.cpp" />
+    <ClCompile Include="Engine\D3DResourceLeakChacker.cpp" />
+    <ClCompile Include="Engine\DebugCamera.cpp" />
+    <ClCompile Include="Engine\DeltaTime.cpp" />
+    <ClCompile Include="Engine\FixFPS.cpp" />
+    <ClCompile Include="Engine\GetDescriptorHandle.cpp" />
+    <ClCompile Include="Engine\GlobalVariables.cpp" />
+    <ClCompile Include="Engine\Input.cpp" />
+    <ClCompile Include="Engine\LoadModel.cpp" />
+    <ClCompile Include="Engine\Math\MatrixFunction.cpp" />
+    <ClCompile Include="Engine\Math\VectorFunction.cpp" />
+    <ClCompile Include="Engine\Model.cpp" />
+    <ClCompile Include="Engine\Particle.cpp" />
+    <ClCompile Include="Engine\Primitive3D.cpp" />
+    <ClCompile Include="Engine\RandomEngine.cpp" />
+    <ClCompile Include="Engine\ShaderCompiler.cpp" />
+    <ClCompile Include="Engine\Sprite.cpp" />
+    <ClCompile Include="Engine\TextureManager.cpp" />
+    <ClCompile Include="Engine\ViewProjection.cpp" />
+    <ClCompile Include="Engine\WIndowProcedure.cpp" />
+    <ClCompile Include="Engine\WorldTransform.cpp" />
+    <ClCompile Include="externals\imgui\imgui.cpp" />
+    <ClCompile Include="externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application\BaseCharacter.h" />
+    <ClInclude Include="Application\Board.h" />
+    <ClInclude Include="Application\Curve.h" />
+    <ClInclude Include="Application\flooar.h" />
+    <ClInclude Include="Application\FollowCamera.h" />
+    <ClInclude Include="Application\Goal.h" />
+    <ClInclude Include="Application\Ground.h" />
+    <ClInclude Include="Application\MovingFlooar.h" />
+    <ClInclude Include="Application\Skydome.h" />
+    <ClInclude Include="Application\TimedCall.h" />
+    <ClInclude Include="Engine\Colider\AABB.h" />
+    <ClInclude Include="Engine\Colider\Collider.h" />
+    <ClInclude Include="Engine\Colider\Collision.h" />
+    <ClInclude Include="Engine\Colider\CollisionConfig.h" />
+    <ClInclude Include="Engine\Colider\CollisionManager.h" />
+    <ClInclude Include="Engine\Colider\OBB.h" />
+    <ClInclude Include="Engine\Colider\Plane.h" />
+    <ClInclude Include="Engine\Colider\Sphere.h" />
+    <ClInclude Include="Engine\CommonFiles\DirectXCommon.h" />
+    <ClInclude Include="Engine\CommonFiles\WinApp.h" />
+    <ClInclude Include="Engine\ConvertString.h" />
+    <ClInclude Include="Engine\D3DResourceLeakChacker.h" />
+    <ClInclude Include="Engine\DebugCamera.h" />
+    <ClInclude Include="Engine\DeltaTime.h" />
+    <ClInclude Include="Engine\FixFPS.h" />
+    <ClInclude Include="Engine\GetDescriptorHandle.h" />
+    <ClInclude Include="Engine\GlobalVariables.h" />
+    <ClInclude Include="Engine\Input.h" />
+    <ClInclude Include="Engine\LoadModel.h" />
+    <ClInclude Include="Engine\Math\Matrix.h" />
+    <ClInclude Include="Engine\Math\MatrixFunction.h" />
+    <ClInclude Include="Engine\Math\Vector2.h" />
+    <ClInclude Include="Engine\Math\Vector3.h" />
+    <ClInclude Include="Engine\Math\Vector4.h" />
+    <ClInclude Include="Engine\Math\VectorFunction.h" />
+    <ClInclude Include="Engine\Model.h" />
+    <ClInclude Include="Engine\Particle.h" />
+    <ClInclude Include="Engine\Primitive3D.h" />
+    <ClInclude Include="Engine\RandomEngine.h" />
+    <ClInclude Include="Engine\ShaderCompiler.h" />
+    <ClInclude Include="Engine\Sprite.h" />
+    <ClInclude Include="Engine\TextureManager.h" />
+    <ClInclude Include="Engine\ViewProjection.h" />
+    <ClInclude Include="Engine\WindowProcedure.h" />
+    <ClInclude Include="Engine\WorldTransform.h" />
+    <ClInclude Include="externals\imgui\imconfig.h" />
+    <ClInclude Include="externals\imgui\imgui.h" />
+    <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="externals\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="externals\imgui\imgui_internal.h" />
+    <ClInclude Include="externals\imgui\imstb_rectpack.h" />
+    <ClInclude Include="externals\imgui\imstb_textedit.h" />
+    <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="GameScene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="externals\imgui\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,9 +1,9 @@
 #include "GlobalVariables.h"
 //#include "ImGuiManager.h"
 //ImGui
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
+#include "../externals/imgui/imgui.h"
+#include "../externals/imgui/imgui_impl_dx12.h"
+#include "../externals/imgui/imgui_impl_win32.h"
 #include "CommonFiles/WinApp.h"
 #include <cassert>
 #include <json.hpp>
