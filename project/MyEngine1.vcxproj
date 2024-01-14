@@ -59,12 +59,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <IncludePath>$(ProjectDir)externals\nlohmann;$(ProjectDir)Engine\Colider;$(ProjectDir)Engine\Math;$(ProjectDir)Application;$(ProjectDir)Engine;$(ProjectDir)Engine\CommonFiles;$(ProjectDir)externals\imgui;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)..\Generated\Outputs\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\Generated\Obj\$(ProjectName)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
