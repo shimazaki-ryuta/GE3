@@ -93,6 +93,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	sphere_->SetEnableLighting(2);
 	worldTransformSphere_.Initialize();
 	shininess_ = 40.0f;
+	lineColor_.w = 1.0f;
 }
 
 void GameScene::Update() {
@@ -138,8 +139,11 @@ void GameScene::Update() {
 	ImGui::DragFloat3("rotate", &worldTransformSphere_.rotation_.x, 1.0f);
 	ImGui::DragFloat3("position", &worldTransformSphere_.translation_.x, 1.0f);
 	ImGui::DragFloat("Shininess", &shininess_, 1.0f, 0.0f, 200.0f);
+	ImGui::DragFloat3("lineWidth",&lineWidth_.x,0.001f);
+	ImGui::ColorEdit4("Color", &lineColor_.x);
 	ImGui::End();
-
+	sphere_->SetOutLineColor(lineColor_);
+	sphere_->SetOutLineWidth(lineWidth_);
 	worldTransformSphere_.UpdateMatrix();
 
 	ImGui::Begin("Sprite");
@@ -154,8 +158,9 @@ void GameScene::Update() {
 	sprite_->SetRotate(rotate_);
 	sprite_->SetRange(leftTop,rightDown);
 	
+
 #endif // _DEBUG
-	
+	//sphere_->SetOutLineColor(Vector4{RandomEngine::GetRandom(0,1.0f),RandomEngine::GetRandom(0,1.0f) ,RandomEngine::GetRandom(0,1.0f) ,1.0f});
 	
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
@@ -189,6 +194,9 @@ void GameScene::Draw3D() {
 	ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
+	Model::PreDrawOutLine(dxCommon_->GetCommandList());
+	sphere_->DrawOutLine(worldTransformSphere_, viewProjection_);
+	ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
 	Particle::PostDraw();

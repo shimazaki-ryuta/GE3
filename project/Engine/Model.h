@@ -36,6 +36,11 @@ public:
 		float shininess;
 	};
 
+	struct OutLineData {
+		Vector4 color;
+		Matrix4x4 scale;
+	};
+
 	struct TransformationMatrix
 	{
 		Matrix4x4 WVP;
@@ -77,12 +82,19 @@ public:
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
 
+	// ルートシグネチャ
+	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignatureOutLine;
+	// パイプラインステートオブジェクト
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateOutLine;
+
+
 	static void StaticInitialize(
 		ID3D12Device* device, int window_width, int window_height,
 		const std::wstring& directoryPath = L"Resources/");
-
+	static void StaticInitializeOutLine(
+		ID3D12Device* device, int window_width, int window_height);
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-	
+	static void PreDrawOutLine(ID3D12GraphicsCommandList* cmdList);
 	static void PostDraw();
 
 	void Create(const  std::string& directoryPath, const std::string& filename);
@@ -92,19 +104,25 @@ public:
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
 
+	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection);
+
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
+	void SetOutLineColor(const Vector4& color) { outlineData_->color = color; };
+	void SetOutLineWidth(const Vector3& wid) { outlineData_->scale = MakeScaleMatrix(wid); };
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
-	//Microsoft::WRL::ComPtr<ID3D12Resource> transformResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	VertexData* vertexData_ = nullptr;
 	//uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
+	OutLineData* outlineData_ = nullptr;
 	CameraForGpu* cameraData_ = nullptr;
 	//TransformationMatrix* transformationMatrixData = nullptr;
 	WorldTransform worldTransform;

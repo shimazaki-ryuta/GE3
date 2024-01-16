@@ -13,3 +13,6 @@ void Ground::Update() {}
 void Ground::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection);
 }
+void Ground::DrawOutLine(const ViewProjection& viewProjection) {
+	model_->DrawOutLine(worldTransform_, viewProjection);
+}

@@ -37,6 +37,7 @@
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="Resources\Shaders\Primitive3D.hlsli" />
     <None Include="Resources\Shaders\Sprite.hlsli" />
+    <None Include="Resources\Shaders\outline.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Object3d.PS.hlsl" />
@@ -47,6 +48,8 @@
     <FxCompile Include="Resources\Shaders\Primitive3DVS.hlsl" />
     <FxCompile Include="Resources\Shaders\SpritePS.hlsl" />
     <FxCompile Include="Resources\Shaders\SpriteVS.hlsl" />
+    <FxCompile Include="Resources\Shaders\outlineVS.hlsl" />
+    <FxCompile Include="Resources\Shaders\outlinePS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

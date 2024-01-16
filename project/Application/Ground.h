@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(const ViewProjection& viewProjection);
-
+	void DrawOutLine(const ViewProjection& viewProjection);
 private:
 	WorldTransform worldTransform_;
 	std::unique_ptr<Model> model_;
