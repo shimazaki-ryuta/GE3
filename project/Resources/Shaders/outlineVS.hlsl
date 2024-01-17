@@ -24,6 +24,7 @@ struct VertexShaderInput {
 VertexShaderOutput main(VertexShaderInput input) {
 	VertexShaderOutput output;
 	float32_t4x4 wvp = mul(gOutLineData.Scale,gTransformationMatrix.WVP);
+	//float32_t4x4 wvp = gTransformationMatrix.WVP;
 	float32_t4 interporationPosition;
 	interporationPosition = input.position - input.center;
 	interporationPosition.w = 1.0f;
