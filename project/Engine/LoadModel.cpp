@@ -90,8 +90,8 @@ LoadModel::ModelData LoadModel::LoadObjFile(const std::string& directoryPath, co
 			castB = { triangle[1].position.x,triangle[1].position.y ,triangle[1].position.z };
 			castC = { triangle[0].position.x,triangle[0].position.y ,triangle[0].position.z };
 			Vector3 center = castA + castB + castC;
-			Vector4 center2{center.x,center.y ,center.z ,1.0f};
-			center *=(1.0f/3.0f);
+			Vector4 center2{center.x/3.0f,center.y/3.0f ,center.z /3.0f,1.0f};
+			//center *=(1.0f/3.0f);
 			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
 				triangle[faceVertex].triangleCenter = center2;
 			}

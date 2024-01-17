@@ -89,7 +89,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	spotLightData->decay = 2.0f;
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
-	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
+	sphere_.reset(Model::CreateFromOBJ("Enemy_Body"));
 	sphere_->SetEnableLighting(2);
 	worldTransformSphere_.Initialize();
 	shininess_ = 40.0f;
@@ -191,12 +191,12 @@ void GameScene::Draw3D() {
 
 	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
 	//skydome_->Draw(viewProjection_);
-	//ground_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	sphere_->DrawOutLine(worldTransformSphere_, viewProjection_);
-	//ground_->DrawOutLine(viewProjection_);
+	ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
 	Particle::PostDraw();

@@ -23,17 +23,17 @@ struct VertexShaderInput {
 
 VertexShaderOutput main(VertexShaderInput input) {
 	VertexShaderOutput output;
-	//float32_t4x4 wvp = mul(,gTransformationMatrix.WVP);
+	float32_t4x4 wvp = mul(gOutLineData.Scale,gTransformationMatrix.WVP);
 	float32_t4 interporationPosition;
 	interporationPosition = input.position - input.center;
 	interporationPosition.w = 1.0f;
-	//interporationPosition = mul(interporationPosition, gOutLineData.Scale);
-	interporationPosition.x *= 0.5f;
-	interporationPosition.y *= 0.5f;
-	interporationPosition.z *= 0.5f;
+	interporationPosition = mul(interporationPosition, gOutLineData.Scale);
+	//interporationPosition.x *= 0.5f;
+	//interporationPosition.y *= 0.5f;
+	//interporationPosition.z *= 0.5f;
 	interporationPosition += input.center;
 	interporationPosition.w = 1.0f;
-	output.position = mul(interporationPosition, gTransformationMatrix.WVP);
+	output.position = mul(interporationPosition, wvp);
 	output.texcoord = input.texcoord;
 	output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
 	output.color = gOutLineData.Color;
