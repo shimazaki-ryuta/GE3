@@ -191,12 +191,12 @@ void GameScene::Draw3D() {
 
 	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
 	//skydome_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	sphere_->DrawOutLine(worldTransformSphere_, viewProjection_);
-	ground_->DrawOutLine(viewProjection_);
+	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
 	Particle::PostDraw();
