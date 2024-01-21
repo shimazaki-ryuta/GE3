@@ -31,6 +31,9 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{a552f40e-b567-4ca0-8480-9cab5fe672ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{5f03a200-bacd-4531-8f49-7aa723417406}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli" />
@@ -199,6 +202,9 @@
     <ClCompile Include="Engine\Math\VectorFunction.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Audio\AudioManager.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameScene.h">
@@ -362,6 +368,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Math\VectorFunction.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Audio\AudioManager.h">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -139,5 +139,7 @@ private:
 
 	Vector4 lineColor_ = {0};
 	Vector3 lineWidth_ = {1.05f,1.05f,1.05f };
+
+	uint32_t audioHandle_;
 };
 

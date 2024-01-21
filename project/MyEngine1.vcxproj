@@ -254,6 +254,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\MovingFlooar.cpp" />
     <ClCompile Include="Application\Skydome.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
+    <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Colider\AABB.cpp" />
     <ClCompile Include="Engine\Colider\Collider.cpp" />
     <ClCompile Include="Engine\Colider\Collision.cpp" />
@@ -305,6 +306,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\MovingFlooar.h" />
     <ClInclude Include="Application\Skydome.h" />
     <ClInclude Include="Application\TimedCall.h" />
+    <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Colider\AABB.h" />
     <ClInclude Include="Engine\Colider\Collider.h" />
     <ClInclude Include="Engine\Colider\Collision.h" />

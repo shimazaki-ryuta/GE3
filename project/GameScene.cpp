@@ -17,6 +17,7 @@
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 #include "RandomEngine.h"
+#include "Engine/Audio/AudioManager.h"
 GameScene::GameScene() {
 
 }
@@ -55,6 +56,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	rotate_ = 0;
 	leftTop = { 0,0 };
 	rightDown = { 720.0f,360.0f };
+
+	audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
+	AudioManager::GetInstance()->PlayWave(audioHandle_);
 #ifdef _DEBUG
 	isDebugCameraActive_ = true;
 	debugCamera_->SetUses(isDebugCameraActive_);

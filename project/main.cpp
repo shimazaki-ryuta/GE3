@@ -38,6 +38,9 @@ LeackChecker leackChecker;
 
 #include "WorldTransform.h"
 
+//音
+#include "Engine/Audio/AudioManager.h"
+
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
 const std::string kTitle = "";
@@ -98,6 +101,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//DeltaTime::GetInstance();
 
+	//音関係初期化
+	AudioManager::GetInstance()->Initialize();
+
 	const uint32_t descriptorSizeSRV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	dxCommon->SetDescriptorSizeSRV(descriptorSizeSRV);
 	const uint32_t descriptorSizeRTV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -115,6 +121,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
 	directinalLightData->intensity = 1.0f;
+
 
 	///メインループ
 	MSG msg{};
