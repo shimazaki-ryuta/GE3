@@ -433,13 +433,14 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
-
+	cameraData_->worldPosition = viewProjection.translation_;
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//Lighting用のリソースの場所を設定
 	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-
+	//camera用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);

@@ -63,7 +63,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	isDebugCameraActive_ = true;
 	debugCamera_->SetUses(isDebugCameraActive_);
 	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
-	debugCamera_->SetPosition({0.0f, 1.7f, -10.0f});
+	debugCamera_->SetPosition({0.0f, 4.3f, -17.0f});
 #endif // _DEBUG
 	
 	//DirectionalLight用のリソース
@@ -93,9 +93,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	spotLightData->decay = 2.0f;
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
-	sphere_.reset(Model::CreateFromOBJ("cube"));
-	sphere_->SetEnableLighting(2);
+	sphere_.reset(Model::CreateFromOBJ("hammer"));
+	sphere_->SetEnableLighting(0);
 	worldTransformSphere_.Initialize();
+	worldTransformSphere_.rotation_.y = 3.14f / 2.0f;
 	shininess_ = 40.0f;
 	lineColor_.w = 1.0f;
 }
@@ -193,7 +194,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 
-	sphere_->Draw(worldTransformSphere_, viewProjection_,monsterTextureHandle_);
+	sphere_->Draw(worldTransformSphere_, viewProjection_);
 
 	//skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
