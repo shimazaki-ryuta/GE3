@@ -94,11 +94,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
 	sphere_.reset(Model::CreateFromOBJ("hammer"));
-	sphere_->SetEnableLighting(0);
+	sphere_->SetEnableLighting(2);
 	worldTransformSphere_.Initialize();
 	worldTransformSphere_.rotation_.y = 3.14f / 2.0f;
 	shininess_ = 40.0f;
 	lineColor_.w = 1.0f;
+	lineWidth_ = {0.05f,0.05f,0.05f};
 }
 
 void GameScene::Update() {
@@ -145,10 +146,12 @@ void GameScene::Update() {
 	ImGui::DragFloat3("position", &worldTransformSphere_.translation_.x, 1.0f);
 	ImGui::DragFloat("Shininess", &shininess_, 1.0f, 0.0f, 200.0f);
 	ImGui::DragFloat3("lineWidth",&lineWidth_.x,0.001f);
+	ImGui::SliderInt("ShadingType",&(shadeType_),0,1);
 	ImGui::ColorEdit4("Color", &lineColor_.x);
 	ImGui::End();
 	sphere_->SetOutLineColor(lineColor_);
 	sphere_->SetOutLineWidth(lineWidth_);
+	sphere_->SetShadingType(shadeType_);
 	worldTransformSphere_.UpdateMatrix();
 
 	ImGui::Begin("Sprite");
@@ -197,12 +200,12 @@ void GameScene::Draw3D() {
 	sphere_->Draw(worldTransformSphere_, viewProjection_);
 
 	//skydome_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 	//flooar_->Draw(viewProjection_);
 	
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	sphere_->DrawOutLine(worldTransformSphere_, viewProjection_);
-	ground_->DrawOutLine(viewProjection_);
+	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	Particle::PreDraw(dxCommon_->GetCommandList());
 	Particle::PostDraw();

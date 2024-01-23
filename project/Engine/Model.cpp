@@ -367,6 +367,7 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 100.0f;
+	materialData_->shadingType = 0;
 	//ライティング用のカメラリソース
 	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));

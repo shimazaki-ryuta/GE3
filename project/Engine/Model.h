@@ -35,6 +35,7 @@ public:
 		float padding[3];
 		Matrix4x4 uvTransform;
 		float shininess;
+		int32_t shadingType;
 	};
 
 	struct OutLineData {
@@ -111,7 +112,8 @@ public:
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
 	void SetOutLineColor(const Vector4& color) { outlineData_->color = color; };
 	void SetOutLineWidth(const Vector3& wid) { outlineData_->scale = MakeScaleMatrix(wid); };
-
+	//シェーディングタイプ 0:通常 1:2値化 
+	void SetShadingType(int32_t num) { materialData_->shadingType = num; };
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

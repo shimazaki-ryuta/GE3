@@ -8,6 +8,7 @@ struct Material {
 	int32_t enableLighting;
 	float32_t4x4 uvTransform;
 	float32_t shininess;
+	int32_t shadingType;
 };
 struct Camera {
 	float32_t3 worldPosition;
@@ -37,6 +38,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 	float32_t3 specularPointLight;
 	float32_t3 diffuseSpotLight;
 	float32_t3 specularSpotLight;
+	float32_t3 diffuseBrightness=0;
 	PixelShaderOutput output;
 	output.color.a = gMaterial.color.a * textureColor.a;
 	if (textureColor.a <= 0.0)
@@ -48,7 +50,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		float NdotL = dot(normalize(input.normal),-gDirectionalLight.direction);
 		float cos = pow(NdotL * 0.5f + 0.5f,2.0f);
 		diffuseDirectionalLight = gMaterial.color.xyz * textureColor.xyz * gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
-		
+		diffuseBrightness += gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
 		specularDirectionalLight = gMaterial.color.rgb * gDirectionalLight.intensity * specularPow * gDirectionalLight.color.xyz;
 		
 		float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight.position);
@@ -60,6 +62,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		NDotH = dot(normalize(input.normal), halfVector);
 		specularPow = pow(saturate(NDotH), gMaterial.shininess);
 		diffusePointLight = gMaterial.color.rgb * textureColor.xyz * gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
+		diffuseBrightness += gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
 		specularPointLight = gMaterial.color.rgb * gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
 
 
@@ -76,10 +79,27 @@ PixelShaderOutput main(VertexShaderOutput input){
 		float32_t falloffFactor = saturate((cosAngle - gSpotLight.cosAngle)/(1.0f - gSpotLight.cosAngle));
 
 		diffuseSpotLight = gMaterial.color.rgb * textureColor.xyz * gSpotLight.color.rgb * gSpotLight.intensity * factor2 * falloffFactor;
+		diffuseBrightness += gSpotLight.color.rgb * gSpotLight.intensity * factor2 * falloffFactor;
 		specularSpotLight = gMaterial.color.rgb * gSpotLight.intensity * specularPow * gSpotLight.color.xyz * factor2 * falloffFactor;
 
 
-		output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
+		if (gMaterial.shadingType == 0) {
+			output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
+		}
+		else if(gMaterial.shadingType == 1){
+			output.color.rgb = diffuseDirectionalLight + diffusePointLight + diffuseSpotLight;
+			float brightness = sqrt(pow(diffuseBrightness.r, 2) + pow(diffuseBrightness.g, 2) + pow(diffuseBrightness.b, 2));
+			if (brightness <= 0.5f) {
+				output.color.rgb = normalize(output.color.rgb) * 0.3f;
+			}
+			else {
+				output.color.rgb = normalize(output.color.rgb) * 0.7f;
+			}
+			if (gMaterial.shininess >= 1.0f) {
+				output.color.rgb += specularDirectionalLight + specularPointLight + specularSpotLight;
+			}
+		}
+	
 	}else if(gMaterial.enableLighting == 1){
 		float cos = saturate(dot(normalize(input.normal),-gDirectionalLight.direction));
 		output.color.xyz = gMaterial.color.xyz * textureColor.xyz * gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
