@@ -100,6 +100,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	shininess_ = 40.0f;
 	lineColor_.w = 1.0f;
 	lineWidth_ = {0.05f,0.05f,0.05f};
+	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png");
+	sphere_->SetToonShadowTextureHandle(toonShadowTextureHandle_);
 }
 
 void GameScene::Update() {
@@ -168,7 +170,7 @@ void GameScene::Update() {
 	
 
 #endif // _DEBUG
-	//sphere_->SetOutLineColor(Vector4{RandomEngine::GetRandom(0,1.0f),RandomEngine::GetRandom(0,1.0f) ,RandomEngine::GetRandom(0,1.0f) ,1.0f});
+	sphere_->SetOutLineColor(Vector4{RandomEngine::GetRandom(0,1.0f),RandomEngine::GetRandom(0,1.0f) ,RandomEngine::GetRandom(0,1.0f) ,1.0f});
 	
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;

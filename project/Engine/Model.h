@@ -114,6 +114,7 @@ public:
 	void SetOutLineWidth(const Vector3& wid) { outlineData_->scale = MakeScaleMatrix(wid); };
 	//シェーディングタイプ 0:通常 1:2値化 
 	void SetShadingType(int32_t num) { materialData_->shadingType = num; };
+	void SetToonShadowTextureHandle(uint32_t handle) { toonShadowTextureHandle_ = handle; };
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -133,7 +134,7 @@ private:
 	Vector2 size_;
 	Vector4 color_;
 	uint32_t textureHandle_;
-
+	uint32_t toonShadowTextureHandle_ = 1;
 	Matrix4x4 uvTransform_;
 
 	Matrix4x4 wvp_;

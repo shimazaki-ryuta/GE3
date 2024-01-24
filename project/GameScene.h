@@ -142,5 +142,6 @@ private:
 
 	uint32_t audioHandle_;
 	int32_t shadeType_=0;
+	uint32_t toonShadowTextureHandle_;
 };
 
