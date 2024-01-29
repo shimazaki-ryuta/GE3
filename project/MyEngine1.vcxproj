@@ -246,12 +246,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\BaseCharacter.cpp" />
     <ClCompile Include="Application\Board.cpp" />
+    <ClCompile Include="Application\Bullet.cpp" />
     <ClCompile Include="Application\Curve.cpp" />
     <ClCompile Include="Application\flooar.cpp" />
     <ClCompile Include="Application\FollowCamera.cpp" />
     <ClCompile Include="Application\Goal.cpp" />
     <ClCompile Include="Application\Ground.cpp" />
+    <ClCompile Include="Application\LockOn.cpp" />
     <ClCompile Include="Application\MovingFlooar.cpp" />
+    <ClCompile Include="Application\Player.cpp" />
+    <ClCompile Include="Application\Player2.cpp" />
+    <ClCompile Include="Application\PlayerAI.cpp" />
     <ClCompile Include="Application\Skydome.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
@@ -298,12 +303,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Application\BaseCharacter.h" />
     <ClInclude Include="Application\Board.h" />
+    <ClInclude Include="Application\Bullet.h" />
     <ClInclude Include="Application\Curve.h" />
     <ClInclude Include="Application\flooar.h" />
     <ClInclude Include="Application\FollowCamera.h" />
     <ClInclude Include="Application\Goal.h" />
     <ClInclude Include="Application\Ground.h" />
+    <ClInclude Include="Application\LockOn.h" />
     <ClInclude Include="Application\MovingFlooar.h" />
+    <ClInclude Include="Application\Player.h" />
+    <ClInclude Include="Application\Player2.h" />
+    <ClInclude Include="Application\PlayerAI.h" />
     <ClInclude Include="Application\Skydome.h" />
     <ClInclude Include="Application\TimedCall.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />

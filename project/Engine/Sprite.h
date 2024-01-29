@@ -101,6 +101,8 @@ public:
 	//テクスチャの範囲切り出し
 	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
 
+	void SetTextureHandle(uint32_t handle) { textureHandle_ = handle; };
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

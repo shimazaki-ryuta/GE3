@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Player2.h"
 //#include "ImGuiManager.h"
 //ImGui
 #include "../externals/imgui/imgui.h"
@@ -22,22 +22,21 @@ static int rigidityFrame = 30;
 static int attackFrame = 15;
 
 
-void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
+void Player2::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	GlobalVariables* grovalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	grovalVariables->CreateGroup(groupName);
 	//grovalVariables->AddItem(groupName, "Test3", Vector3{1.0f,2.0f,3.0f});
 
-
 	//assert(model);
 	BaseCharacter::Initialize(models);
-	worldTransform_.translation_.z = -60.0f;
+	worldTransform_.translation_.z = 60;
 	obb_.center = worldTransform_.translation_;
 	obb_.size = {1.0f,1.0f,1.0f};
 	obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	input_ = Input::GetInstance();
-	direction_ = {0,0,1.0f};
+	direction_ = {0,0,-1.0f};
 	directionMatrix_ = MakeIdentity4x4();
 
 	for (HierarchicalAnimation& model_ : models_) {
@@ -50,8 +49,8 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	     childlen != models_.end(); childlen++) {
 		childlen->worldTransform_.parent_ = &(body->worldTransform_);
 	}
-	worldTransformWepon_.Initialize();
-	worldTransformWepon_.parent_ = &worldTransform_;
+	//worldTransformWepon_.Initialize();
+	//worldTransformWepon_.parent_ = &worldTransform_;
 
 	grovalVariables->AddItem(groupName, "Head Translation", models_[1].worldTransform_.translation_);
 	grovalVariables->AddItem(
@@ -65,7 +64,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(groupName, "JumpVelocity", kJumpVelocity);
 	grovalVariables->AddItem(groupName, "Gravity", kGravity);
 
-/*
+	/*
 	weaponOBB_.center = worldTransformWepon_.translation_;
 	weaponOBB_.size = {1.0f,3.0f,1.0f};
 	weaponCollider_.SetOBB(weaponOBB_);
@@ -80,17 +79,19 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	emitter.frequency = 0.5f;
 	emitter.frequencyTime = 0.0f;
 	emitter.transform.translate = { 0,0,0 };
-
 	bullets_.clear();
 	isDead_ = false;
 }
 
-void Player::ReStart() {
+void Player2::ReStart() {
 	target_ = nullptr;
 	behaviorRequest_ = Behavior::kRoot;
 	worldTransform_.parent_ = nullptr;
 	worldTransform_.rotation_ = {0.0f,0.0f,0.0f};
-	worldTransform_.translation_ = {0.0f,0.0f,-40.0f};
+	worldTransform_.translation_ = {0.0f,0.0f,40.0f};
+	//worldTransform_.Initialize();
+	direction_ = { 0,0,-1.0f };
+	directionMatrix_ = MakeIdentity4x4();
 	BehaviorRootInitialize();
 	//worldTransform_.UpdateMatrix();
 	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
@@ -101,15 +102,13 @@ void Player::ReStart() {
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
 	}
-	direction_ = { 0,0,1.0f };
-	directionMatrix_ = MakeIdentity4x4();
 	comboNum_ = 0;
-	//weaponCollider_.SetIsCollision(false);
+	weaponCollider_.SetIsCollision(false);
 	bullets_.clear();
 	isDead_ = false;
 }
 
-void Player::BehaviorRootInitialize() {
+void Player2::BehaviorRootInitialize() {
 	InitializeFloatingGimmick();
 	models_[2].worldTransform_.parent_ = &models_[0].worldTransform_;
 	models_[3].worldTransform_.parent_ = &models_[0].worldTransform_;
@@ -127,11 +126,7 @@ void Player::BehaviorRootInitialize() {
 	comboNum_ = 0;
 }
 
-void Player::BehaviorAttackInitialize() {
-
-	worldTransformWepon_.translation_.y = 1.0f;
-	worldTransformWepon_.rotation_.x = 0.0f;
-	worldTransformWepon_.rotation_.z = -1.57f;
+void Player2::BehaviorAttackInitialize() {
 
 	models_[2].worldTransform_.translation_.x = 0.009f;
 	models_[2].worldTransform_.translation_.y = 2.528f;
@@ -146,84 +141,83 @@ void Player::BehaviorAttackInitialize() {
 	models_[3].worldTransform_.rotation_.y = -0.600f;
 
 	//models_[3].worldTransform_.rotation_.x = -float(std::numbers::pi);
+	
 	attackBehavior_ = AttackBehavior::kPre;
-	//weaponCollider_.SetIsCollision(true);
+	weaponCollider_.SetIsCollision(true);
 	velocity_ = { 0,0,0 };
 	isCoenectCombo_ = false;
 }
 
-void Player::BehaviorDashInitialize() {
+void Player2::BehaviorDashInitialize() {
 	velocity_ = { 0,0,0 };
 }
 
-void Player::BehaviorJumpInitialize() {
+void Player2::BehaviorJumpInitialize() {
 	velocity_ = {0,0,0};
 	acceleration_ = {0,0,0};
 }
 
-void Player::Update() {
+void Player2::Update() {
 	ApplyGlobalVariables();
 	if (!isDead_) {
-
-
-		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
-			if (bullet->GetIsDead()) {
-				return true;
-			}
-			return false;
-			});
-		Input::GetInstance()->GetJoystickState(0, joyState_);
-		if (behaviorRequest_) {
-			behavior_ = behaviorRequest_.value();
-			frameCount_ = 0;
-			switch (behavior_) {
-			case Player::Behavior::kRoot:
-			default:
-				BehaviorRootInitialize();
-				break;
-			case Player::Behavior::kAttack:
-				BehaviorAttackInitialize();
-				break;
-			case Player::Behavior::kDash:
-				BehaviorDashInitialize();
-				break;
-			case Player::Behavior::kJump:
-				BehaviorJumpInitialize();
-				break;
-			}
-			behaviorRequest_ = std::nullopt;
+	bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
+		if (bullet->GetIsDead()) {
+			return true;
 		}
-		//BehaviorRootUpdate();
-		//BehaviorAttackUpdate();
-		if (worldTransform_.parent_) {
-			if (worldTransform_.translation_.y < 0.0f) {
-				worldTransform_.translation_.y = 0.0f;
-			}
-
-		}
-
-
+		return false;
+		});
+	Input::GetInstance()->GetJoystickState(0, joyState_);
+	if (behaviorRequest_) {
+		behavior_ = behaviorRequest_.value();
+		frameCount_ = 0;
 		switch (behavior_) {
-		case Player::Behavior::kRoot:
-			BehaviorRootUpdate();
+		case Player2::Behavior::kRoot:
+		default:
+			BehaviorRootInitialize();
 			break;
-		case Player::Behavior::kAttack:
-			BehaviorAttackUpdate();
+		case Player2::Behavior::kAttack:
+			BehaviorAttackInitialize();
 			break;
-		case Player::Behavior::kDash:
-			BehaviorDashUpdate();
+		case Player2::Behavior::kDash:
+			BehaviorDashInitialize();
 			break;
-		case Player::Behavior::kJump:
-			BehaviorJumpUpdate();
+		case Player2::Behavior::kJump:
+			BehaviorJumpInitialize();
 			break;
 		}
-		/*
-		if (worldTransform_.translation_.y < -10.0f) {
-			//ReStart();
-		}*/
+		behaviorRequest_ = std::nullopt;
+	}
+	//BehaviorRootUpdate();
+	//BehaviorAttackUpdate();
+	if (worldTransform_.parent_) {
+		if (worldTransform_.translation_.y < 0.0f) {
+			worldTransform_.translation_.y = 0.0f;
+		}
+
+	}
+	
+
+	switch (behavior_) {
+	case Player2::Behavior::kRoot:
+		BehaviorRootUpdate();
+		break;
+	case Player2::Behavior::kAttack:
+		BehaviorAttackUpdate();
+		break;
+	case Player2::Behavior::kDash:
+		BehaviorDashUpdate();
+		break;
+	case Player2::Behavior::kJump:
+		BehaviorJumpUpdate();
+		break;
+	}
+	/*
+	if (worldTransform_.translation_.y < -10.0f) {
+		//ReStart();
+	}*/
 	}
 	else {
-		if (models_[0].worldTransform_.rotation_.x > -3.14f/2.0f) {
+		if (models_[0].worldTransform_.rotation_.x > -3.14f / 2.0f) {
 			models_[0].worldTransform_.rotation_.x -= 0.05f;
 		}
 	}
@@ -239,7 +233,7 @@ void Player::Update() {
 	    &worldTransform_.translation_.z};
 	/*
 #ifdef _DEBUG
-	ImGui::Begin("Player");
+	ImGui::Begin("Player2");
 	ImGui::SliderFloat3("", *slider3, -100.0f, 100.0f);
 	ImGui::SliderInt("Attack", &attackFrame, 1, 240);
 	ImGui::SliderInt("Rigd", &rigidityFrame, 1, 240);
@@ -264,40 +258,39 @@ void Player::Update() {
 	preJoyState_ = joyState_;
 }
 
-void Player::BehaviorRootUpdate()
+void Player2::BehaviorRootUpdate()
 {
 	// ゲームパッドの状態をえる
-	XINPUT_STATE joyState;
+	/*XINPUT_STATE joyState;
 	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
 		return;
-	}
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) 
+	}*/
+	if (data_.behavior == Behavior::kAttack)
 	{
 		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kAttack;
 	}
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X))
+	if (data_.behavior == Behavior::kDash)
 	{
 		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kDash;
 	}
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) && 
+	if ((data_.behavior == Behavior::kJump) &&
 		worldTransform_.parent_)
 	{
 		behaviorRequest_ = Behavior::kJump;
 	}
+	
+	if (1) {
 
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		const float kCharacterSpeed = 0.1f;
 
-		const float kCharacterSpeed = 0.3f;
+		Vector3 move = data_.move;
 
-		Vector3 move = {
-		    float(joyState.Gamepad.sThumbLX) / SHRT_MAX, 0,
-		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
 		//Matrix4x4 newrotation = DirectionToDIrection({0,0.0f,1.0f}, {0, 0.0f, -1.0f});
 		move = Normalize(move) * kCharacterSpeed;
 		//Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->matView.m[1][0] * viewProjection_->matView.m[1][0]* viewProjection_->matView.m[1][2], 0.0f};
-		Matrix4x4 cameraRotateY = Inverse(viewProjection_->matView);
+		/*Matrix4x4 cameraRotateY = Inverse(viewProjection_->matView);
 		//cameraRotateY.m[0][0] = 1;
 		cameraRotateY.m[0][1] = 0;
 		//cameraRotateY.m[0][2] = 0;
@@ -315,8 +308,8 @@ void Player::BehaviorRootUpdate()
 		cameraRotateY.m[3][1] = 0;
 		cameraRotateY.m[3][2] = 0;
 		//cameraRotateY = Inverse(cameraRotateY);
-		move = Transform(move, cameraRotateY);
-		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
+		move = Transform(move, cameraRotateY);*/
+		if (1) {
 			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 			Matrix4x4 newDirection = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(move));
 			directionMatrix_ = newDirection;
@@ -351,19 +344,19 @@ void Player::BehaviorRootUpdate()
 	UpdateFloatingGimmick();
 }
 
-void Player::BehaviorAttackUpdate()
+void Player2::BehaviorAttackUpdate()
 {
 	static float weponRotateEnd = 3.14f;
 
 	static float frontLength = 5.0f;
 	
-	
 	if (frameCount_ == endFrame) {
 		// behavior_ = Behavior::kRoot;
-		//weaponCollider_.SetIsCollision(false);
-		behaviorRequest_ = Behavior::kRoot;
+		weaponCollider_.SetIsCollision(false);
+		
+			behaviorRequest_ = Behavior::kRoot;
+		
 	}
-	
 	if (target_) {
 		Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
 		if (frameCount_ == 0) {
@@ -377,16 +370,16 @@ void Player::BehaviorAttackUpdate()
 			bullet->SetVelocity(velocity);
 			bullet->SetParticle(particle_);
 			bullets_.push_back(std::move(bullet));
-			fire_();
 		}
 		toTarget.y = 0;
 		directionMatrix_ = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 	}
 
+	
 	frameCount_++;
 }
 
-void Player::BehaviorDashUpdate() {
+void Player2::BehaviorDashUpdate() {
 	//const float kCharacterSpeed = 0.3f;
 
 	Vector3 move = {0,0,dashSpeed_};
@@ -405,12 +398,12 @@ void Player::BehaviorDashUpdate() {
 	frameCount_++;
 }
 
-void Player::BehaviorJumpUpdate() {
+void Player2::BehaviorJumpUpdate() {
 	velocity_ = kJumpVelocity * directionMatrix_;
 	behaviorRequest_ = Behavior::kRoot;
 }
 
-void Player::Draw(const ViewProjection& viewProjection) {
+void Player2::Draw(const ViewProjection& viewProjection) {
 	//model_->Draw(worldTransform_, viewProjection);
 	for (HierarchicalAnimation& model : models_)
 	{
@@ -422,20 +415,20 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	}
 }
 
-void Player::DrawOutLine(const ViewProjection& viewProjection)
+void Player2::DrawOutLine(const ViewProjection& viewProjection)
 {
 	for (HierarchicalAnimation& model : models_) {
 		model.model_->DrawOutLine(model.worldTransform_, viewProjection);
 	}
 }
 
-void Player::InitializeFloatingGimmick() {
+void Player2::InitializeFloatingGimmick() {
 
 	floatingParameter_ = 0.0f;
 }
 
 
-void Player::UpdateFloatingGimmick()
+void Player2::UpdateFloatingGimmick()
 {
 	static uint16_t period = 120;
 	const float step = 2.0f * float(std::numbers::pi) / float(period);
@@ -451,7 +444,7 @@ void Player::UpdateFloatingGimmick()
 
 	/*
 	#ifdef _DEBUG
-	ImGui::Begin("Player");
+	ImGui::Begin("Player2");
 	ImGui::SliderFloat3("Head Transform", &models_[1].worldTransform_.translation_.x,-10.0f,10.0f);
 	ImGui::SliderFloat3(
 	    "ArmL Transform", &models_[2].worldTransform_.translation_.x, -10.0f, 10.0f);
@@ -464,7 +457,7 @@ void Player::UpdateFloatingGimmick()
 */
 }
 
-void Player::ApplyGlobalVariables()
+void Player2::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
@@ -479,7 +472,7 @@ void Player::ApplyGlobalVariables()
 	kGravity = globalVariables->GetVector3Value(groupName, "Gravity");
 }
 
-void Player::OnCollision(WorldTransform& parent)
+void Player2::OnCollision(WorldTransform& parent)
 {
 	if (worldTransform_.parent_ != &parent) {
 		Matrix4x4 rocal = worldTransform_.matWorld_ * (Inverse(parent.matWorld_));
@@ -493,7 +486,7 @@ void Player::OnCollision(WorldTransform& parent)
 	}
 }
 
-void Player::OutCollision() {
+void Player2::OutCollision() {
 	if (worldTransform_.parent_) {
 		worldTransform_.parent_ = nullptr;
 		Matrix4x4 world = worldTransform_.matWorld_;

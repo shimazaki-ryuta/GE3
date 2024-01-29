@@ -26,10 +26,11 @@ public:
 	/// 描画
 	/// </summary>
 	virtual void Draw(const ViewProjection& viewProjection);
-
+	//void DrawOutLine(const ViewProjection& viewProjection);
 	inline WorldTransform* GetWorldTransform() { return &worldTransform_; };
 
-
+	void SetShadowTexture(uint32_t handle);
+	void SetOutLineData(float width,const Vector4& color);
 protected:
 	WorldTransform worldTransform_;
 	std::vector<HierarchicalAnimation> models_;
