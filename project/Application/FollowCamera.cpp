@@ -23,7 +23,7 @@ void FollowCamera::Update()
 	if (Input::GetJoystickState(0, joyState))
 	{
 
-		const float rotateSpeed = 0.1f;
+		const float rotateSpeed = 0.05f;
 
 		viewProjection_.rotation_.y += float(joyState.Gamepad.sThumbRX) / SHRT_MAX * rotateSpeed;
 		viewProjection_.rotation_.x -= float(joyState.Gamepad.sThumbRY) / SHRT_MAX * rotateSpeed;

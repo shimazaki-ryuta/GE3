@@ -79,7 +79,7 @@ public:
 	void Update();
 	void Draw3D();
 	void Draw2D();
-
+	void transitionFade();
 	
 
 private:
