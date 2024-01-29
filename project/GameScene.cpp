@@ -102,6 +102,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	lineWidth_ = {0.05f,0.05f,0.05f};
 	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png");
 	sphere_->SetToonShadowTextureHandle(toonShadowTextureHandle_);
+	//sphere_->SetToonShadowTextureHandle(uvCheckerTextureHandle_);
 }
 
 void GameScene::Update() {

@@ -4,6 +4,8 @@ struct TransformationMatrix {
 	float32_t4x4 WVP;
 	float32_t4x4 World;
 	float32_t4x4 WorldInverseTranspose;
+	float32_t4x4 ScaleInverse;
+
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
@@ -30,8 +32,8 @@ VertexShaderOutput main(VertexShaderInput input) {
 	interporationPosition.w = 1.0f;
 	//interporationPosition = mul(interporationPosition, gOutLineData.Scale);
 	float32_t4 ln = 1;
-	output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
-	ln.xyz = input.normal;
+	output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.ScaleInverse));
+	ln.xyz = output.normal;
 	interporationPosition = mul(ln, gOutLineData.Scale);
 	//interporationPosition.x *= 0.5f;
 	//interporationPosition.y *= 0.5f;

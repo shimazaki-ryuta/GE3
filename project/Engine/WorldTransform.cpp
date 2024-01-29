@@ -14,6 +14,7 @@ void WorldTransform::Initialize()
 	transformResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
 	transformationMatrixData->WVP = MakeIdentity4x4();
 	transformationMatrixData->World = MakeIdentity4x4();
+	transformationMatrixData->ScaleInverse = MakeIdentity4x4();
 }
 void WorldTransform::UpdateMatrix()
 {
@@ -30,6 +31,7 @@ void WorldTransform::TransfarMatrix(const Matrix4x4& matrix)
 	transformationMatrixData->WVP = matWorld_ * matrix;
 	transformationMatrixData->World = matWorld_;
 	transformationMatrixData->WorldInverseTranspose = Transpose(Inverse(matWorld_));
+	transformationMatrixData->ScaleInverse = Inverse(MakeScaleMatrix(scale_));
 }
 
 Vector3 WorldTransform::GetWorldPosition() {

@@ -41,6 +41,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 	float32_t3 diffuseSpotLight;
 	float32_t3 specularSpotLight;
 	float32_t3 diffuseBrightness=0;
+	float32_t3 speculaBrightness = 0;
 	PixelShaderOutput output;
 	output.color.a = gMaterial.color.a * textureColor.a;
 	if (textureColor.a <= 0.0)
@@ -54,6 +55,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		diffuseDirectionalLight = gMaterial.color.xyz * textureColor.xyz * gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
 		diffuseBrightness += gDirectionalLight.color.xyz * cos * gDirectionalLight.intensity;
 		specularDirectionalLight = gMaterial.color.rgb * gDirectionalLight.intensity * specularPow * gDirectionalLight.color.xyz;
+		speculaBrightness += gDirectionalLight.intensity * specularPow * gDirectionalLight.color.xyz;
 		
 		float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight.position);
 		float NdotLPoint = dot(normalize(input.normal), -pointLightDirection);
@@ -66,7 +68,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		diffusePointLight = gMaterial.color.rgb * textureColor.xyz * gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
 		diffuseBrightness += gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
 		specularPointLight = gMaterial.color.rgb * gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
-
+		speculaBrightness += gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
 
 		float32_t3 spotLightDirection = normalize(input.worldPosition - gSpotLight.position);
 		float NdotLspot = dot(normalize(input.normal), -spotLightDirection);
@@ -83,14 +85,18 @@ PixelShaderOutput main(VertexShaderOutput input){
 		diffuseSpotLight = gMaterial.color.rgb * textureColor.xyz * gSpotLight.color.rgb * gSpotLight.intensity * factor2 * falloffFactor;
 		diffuseBrightness += gSpotLight.color.rgb * gSpotLight.intensity * factor2 * falloffFactor;
 		specularSpotLight = gMaterial.color.rgb * gSpotLight.intensity * specularPow * gSpotLight.color.xyz * factor2 * falloffFactor;
-
+		speculaBrightness += gSpotLight.intensity * specularPow * gSpotLight.color.xyz * factor2 * falloffFactor;
 
 		if (gMaterial.shadingType == 0) {
 			output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
 		}
 		else if (gMaterial.shadingType == 1) {
-			output.color.rgb = diffuseDirectionalLight + diffusePointLight + diffuseSpotLight;
-			float brightness = sqrt(pow(diffuseBrightness.r, 2) + pow(diffuseBrightness.g, 2) + pow(diffuseBrightness.b, 2));
+			output.color = gMaterial.color * textureColor;
+			//output.color.rgb = diffuseDirectionalLight + diffusePointLight + diffuseSpotLight;
+			//output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
+			//float32_t3 sumBrightness = diffuseBrightness + speculaBrightness;
+			float32_t3 sumBrightness = diffuseBrightness;
+			float brightness = sqrt(pow(sumBrightness.r, 2) + pow(sumBrightness.g, 2) + pow(sumBrightness.b, 2));
 			brightness = saturate(brightness);
 			float32_t3 color = gMaterial.color.xyz * textureColor.xyz;
 			float sub = color.r - color.g;
@@ -109,7 +115,13 @@ PixelShaderOutput main(VertexShaderOutput input){
 				//	output.color.rgb += specularDirectionalLight + specularPointLight + specularSpotLight;
 				}
 			}*/
-			output.color.rgb = normalize(output.color.rgb) * shadowColor.rgb;
+			//output.color.rgb = normalize(output.color.rgb) * shadowColor.rgb;
+			output.color.rgb = output.color.rgb * shadowColor.rgb;
+			/*if (shadowColor.r >= 0.999f && shadowColor.g >= 0.999f && shadowColor.b >= 0.999f) {
+				output.color.r = 1.0f;
+				output.color.g = 1.0f;
+				output.color.b = 1.0f;
+			}*/
 		}
 	
 	}else if(gMaterial.enableLighting == 1){
