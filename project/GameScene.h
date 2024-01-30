@@ -180,5 +180,7 @@ private:
 	float fadeAlpha_;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
 	uint32_t pointLightMax_=32;
+	int colorPhase_;
+	float color_;
 };
 

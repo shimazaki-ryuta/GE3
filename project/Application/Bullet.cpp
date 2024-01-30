@@ -19,8 +19,8 @@ void Bullet::Update() {
 		particleData.transform.rotate = { 0.0f,0.0f,0.0f };
 		particleData.transform.translate = worldTransform_.GetWorldPosition();
 		particleData.velocity = {0,0,0};
-		particleData.color = { RandomEngine::GetRandom(0.0f,1.0f),0,0,1.0f };
-		particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
+		particleData.color = { 1.0f,0.2f,0,1.0f };
+		particleData.lifeTime = RandomEngine::GetRandom(2.0f, 2.0f);
 		particleData.currentTime = 0;
 		particle_->MakeNewParticle(particleData);
 

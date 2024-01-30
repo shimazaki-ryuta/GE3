@@ -101,9 +101,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		}
 		else if (gMaterial.shadingType == 1) {
 			output.color = gMaterial.color * textureColor;
-			//output.color.rgb = diffuseDirectionalLight + diffusePointLight + diffuseSpotLight;
 			float32_t3 lightColor = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
-			//float32_t3 sumBrightness = diffuseBrightness + speculaBrightness;
 			float32_t3 sumBrightness = diffuseBrightness;
 			float brightness = sqrt(pow(sumBrightness.r, 2) + pow(sumBrightness.g, 2) + pow(sumBrightness.b, 2));
 			brightness = saturate(brightness);
@@ -113,24 +111,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 			float sub3 = color.g - color.b;
 			float32_t2 shadowTexcoord = {brightness,brightness };
 			float32_t4 shadowColor = gToonShadowTexture.Sample(gSampler2,shadowTexcoord);
-			/*if (!(color.r <= 0.15f && abs(sub) <= 0.25f && abs(sub2) <= 0.25f && abs(sub3) <= 0.25f)) {
-				if (brightness <= 0.5f) {
-					output.color.rgb = normalize(output.color.rgb) * 0.3f;
-				}
-				else {
-					output.color.rgb = normalize(output.color.rgb) * 0.7f;
-				}
-				if (gMaterial.shininess >= 1.0f) {
-				//	output.color.rgb += specularDirectionalLight + specularPointLight + specularSpotLight;
-				}
-			}*/
-			//output.color.rgb = normalize(output.color.rgb) * shadowColor.rgb;
 			output.color.rgb = output.color.rgb * normalize(lightColor) * shadowColor.rgb;
-			/*if (shadowColor.r >= 0.999f && shadowColor.g >= 0.999f && shadowColor.b >= 0.999f) {
-				output.color.r = 1.0f;
-				output.color.g = 1.0f;
-				output.color.b = 1.0f;
-			}*/
 		}
 	
 	}else if(gMaterial.enableLighting == 1){
@@ -140,7 +121,6 @@ PixelShaderOutput main(VertexShaderOutput input){
 	else{
 		output.color = gMaterial.color * textureColor;
 	}
-	//output.color = gMaterial.color * textureColor;
 	if (output.color.a == 0.0)
 	{
 		discard;

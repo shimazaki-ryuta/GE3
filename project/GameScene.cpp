@@ -35,7 +35,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	input_ = Input::GetInstance();
 
 	audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
-	AudioManager::GetInstance()->PlayWave(audioHandle_);
+	//AudioManager::GetInstance()->PlayWave(audioHandle_);
 #ifdef _DEBUG
 	
 #endif // _DEBUG
@@ -72,7 +72,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
 	directinalLightData->direction = Normalize(directinalLightData->direction);
-	directinalLightData->intensity = 0.2f;
+	directinalLightData->intensity = 2.6f;
 
 	//PointLight用のリソース
 	//pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
@@ -195,7 +195,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	lockOn_->Initialize();
 	//lockOn_->Update(player2_.get(), viewProjection_);
 
-	particle.reset(Particle::Create(500));
+	particle.reset(Particle::Create(800));
 	particle->UseBillboard(true);
 	player_->SetParticle(particle.get());
 	player2_->SetParticle(particle.get());
@@ -248,6 +248,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	lockOn_->Update(player2_.get(), viewProjection_);
 	CollisionManager::GetInstance();
+	colorPhase_ = 0;
+	color_ = 0.0f;
 }
 
 void GameScene::Update() {
@@ -256,6 +258,30 @@ void GameScene::Update() {
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
+	}
+
+	switch (colorPhase_)
+	{
+	case 0:
+		directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
+		break;
+	case 1:
+		directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
+		break;
+	case 2:
+		directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
+		break;
+	default:
+		break;
+	}
+
+	color_+=0.01f;
+	if (color_>1.0f) {
+		color_ = 0;
+		colorPhase_++;
+		if (colorPhase_>2) {
+			colorPhase_ = 0;
+		}
 	}
 
 	if (!isIngame_) {
@@ -417,7 +443,7 @@ void GameScene::Update() {
 		uint32_t count=0;
 		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
 			if (count<pointLightMax_) {
-				pointLightData[count].color = Vector4{ 1.0f, 0.2f, 0.2f, 1.0f };
+				pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
 				pointLightData[count].position = (*ite)->GetSphere().center;
 				pointLightData[count].intensity = 2.0f;
 				pointLightData[count].radius = 10.0f;
@@ -428,7 +454,7 @@ void GameScene::Update() {
 		}
 		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
 			if (count < pointLightMax_) {
-				pointLightData[count].color = Vector4{ 1.0f, 0.2f, 0.2f, 1.0f };
+				pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
 				pointLightData[count].position = (*ite)->GetSphere().center;
 				pointLightData[count].intensity = 2.0f;
 				pointLightData[count].radius = 10.0f;
@@ -459,6 +485,14 @@ void GameScene::Update() {
 		else {
 			fadeAlpha_ += 0.05f;
 			if (fadeAlpha_ > 1.0f) {
+				for (uint32_t index = 0; index < pointLightMax_; ++index) {
+					pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+					pointLightData[index].position = { 0.0f,1.0f,0.0f };
+					pointLightData[index].intensity = 0.0f;
+					pointLightData[index].radius = 10.0f;
+					pointLightData[index].decay = 0.0f;
+					pointLightData[index].isUse_ = 0;
+				}
 				fadeAlpha_ = 1.0f;
 				//isIngame_ = true;
 				isIngame_ = false;
