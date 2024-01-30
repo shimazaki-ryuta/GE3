@@ -18,6 +18,7 @@ struct PointLight
 	float intensity;
 	float radius;
 	float decay;
+	int32_t isUse;
 };
 
 struct SpotLight

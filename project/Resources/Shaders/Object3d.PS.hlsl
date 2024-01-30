@@ -17,7 +17,7 @@ struct Camera {
 ConstantBuffer<Material> gMaterial : register(b0);
 ConstantBuffer<DirectionalLight> gDirectionalLight : register(b1);
 ConstantBuffer<Camera> gCamera : register(b2);
-ConstantBuffer<PointLight> gPointLight : register(b3);
+StructuredBuffer<PointLight> gPointLight : register(t2);
 ConstantBuffer<SpotLight> gSpotLight : register(b4);
 
 struct PixelShaderOutput {
@@ -57,18 +57,27 @@ PixelShaderOutput main(VertexShaderOutput input){
 		specularDirectionalLight = gMaterial.color.rgb * gDirectionalLight.intensity * specularPow * gDirectionalLight.color.xyz;
 		speculaBrightness += gDirectionalLight.intensity * specularPow * gDirectionalLight.color.xyz;
 		
-		float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight.position);
-		float NdotLPoint = dot(normalize(input.normal), -pointLightDirection);
-		float cosPoint = pow(NdotLPoint * 0.5f + 0.5f, 2.0f);
-		float32_t distance = length(gPointLight.position - input.worldPosition);
-		float32_t factor = pow(saturate(-distance / gPointLight.radius+1.0f),gPointLight.decay);
-		halfVector = normalize(-pointLightDirection + toEye);
-		NDotH = dot(normalize(input.normal), halfVector);
-		specularPow = pow(saturate(NDotH), gMaterial.shininess);
-		diffusePointLight = gMaterial.color.rgb * textureColor.xyz * gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
-		diffuseBrightness += gPointLight.color.rgb * cosPoint * gPointLight.intensity * factor;
-		specularPointLight = gMaterial.color.rgb * gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
-		speculaBrightness += gPointLight.intensity * specularPow * gPointLight.color.xyz * factor;
+	
+		diffusePointLight = 0;
+		specularPointLight = 0;
+		for (int i = 0; i < 32;i++) {
+			if (gPointLight[i].isUse) {
+				float32_t3 pointLightDirection = normalize(input.worldPosition - gPointLight[i].position);
+				float NdotLPoint = dot(normalize(input.normal), -pointLightDirection);
+				float cosPoint = pow(NdotLPoint * 0.5f + 0.5f, 2.0f);
+				float32_t distance = length(gPointLight[i].position - input.worldPosition);
+				float32_t factor = pow(saturate(-distance / gPointLight[i].radius + 1.0f), gPointLight[i].decay);
+				halfVector = normalize(-pointLightDirection + toEye);
+				NDotH = dot(normalize(input.normal), halfVector);
+				specularPow = pow(saturate(NDotH), gMaterial.shininess);
+
+				diffusePointLight += gMaterial.color.rgb * textureColor.xyz * gPointLight[i].color.rgb * cosPoint * gPointLight[i].intensity * factor;
+				diffuseBrightness += gPointLight[i].color.rgb * cosPoint * gPointLight[i].intensity * factor;
+				specularPointLight += gMaterial.color.rgb * gPointLight[i].intensity * specularPow * gPointLight[i].color.xyz * factor;
+				speculaBrightness += gPointLight[i].intensity * specularPow * gPointLight[i].color.xyz * factor;
+			}
+		}
+		
 
 		float32_t3 spotLightDirection = normalize(input.worldPosition - gSpotLight.position);
 		float NdotLspot = dot(normalize(input.normal), -spotLightDirection);
@@ -93,7 +102,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 		else if (gMaterial.shadingType == 1) {
 			output.color = gMaterial.color * textureColor;
 			//output.color.rgb = diffuseDirectionalLight + diffusePointLight + diffuseSpotLight;
-			//output.color.rgb = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
+			float32_t3 lightColor = diffuseDirectionalLight + specularDirectionalLight + diffusePointLight + specularPointLight + diffuseSpotLight + specularSpotLight;
 			//float32_t3 sumBrightness = diffuseBrightness + speculaBrightness;
 			float32_t3 sumBrightness = diffuseBrightness;
 			float brightness = sqrt(pow(sumBrightness.r, 2) + pow(sumBrightness.g, 2) + pow(sumBrightness.b, 2));
@@ -116,7 +125,7 @@ PixelShaderOutput main(VertexShaderOutput input){
 				}
 			}*/
 			//output.color.rgb = normalize(output.color.rgb) * shadowColor.rgb;
-			output.color.rgb = output.color.rgb * shadowColor.rgb;
+			output.color.rgb = output.color.rgb * normalize(lightColor) * shadowColor.rgb;
 			/*if (shadowColor.r >= 0.999f && shadowColor.g >= 0.999f && shadowColor.b >= 0.999f) {
 				output.color.r = 1.0f;
 				output.color.g = 1.0f;

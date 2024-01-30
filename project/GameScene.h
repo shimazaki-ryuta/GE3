@@ -59,7 +59,8 @@ public:
 		float intensity;
 		float radius;
 		float decay;
-		float padding[2];
+		int32_t isUse_;
+		//float padding[2];
 	};
 	struct SpotLight
 	{
@@ -79,7 +80,7 @@ public:
 	void Update();
 	void Draw3D();
 	void Draw2D();
-	void transitionFade();
+	void TransitionFade();
 	
 
 private:
@@ -87,6 +88,7 @@ private:
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
 	PointLight* pointLightData = nullptr;
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
 	SpotLight* spotLightData = nullptr;
@@ -171,5 +173,12 @@ private:
 	uint32_t audioHandle_;
 	int32_t shadeType_=0;
 	uint32_t toonShadowTextureHandle_;
+
+	std::unique_ptr<Sprite> fadeSprite_;
+	bool isTransitionFade_;
+	bool isStart_;
+	float fadeAlpha_;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+	uint32_t pointLightMax_=32;
 };
 

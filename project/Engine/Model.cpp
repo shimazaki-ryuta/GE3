@@ -77,9 +77,19 @@ void Model::StaticInitialize(
 	rootParameters[4].Descriptor.ShaderRegister = 2;
 
 	//pointLightお試し
-	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//rootParameters[5].Descriptor.ShaderRegister = 3;
+	D3D12_DESCRIPTOR_RANGE descriptorRangePL[1] = {};
+	descriptorRangePL[0].BaseShaderRegister = 2;
+	descriptorRangePL[0].NumDescriptors = 1;
+	descriptorRangePL[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangePL[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	rootParameters[5].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	rootParameters[5].Descriptor.ShaderRegister = 3;
+	rootParameters[5].DescriptorTable.pDescriptorRanges = descriptorRangePL;
+	rootParameters[5].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangePL);
+
 
 	//spotLightお試し
 	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;

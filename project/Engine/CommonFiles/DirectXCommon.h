@@ -60,7 +60,7 @@ public:
 
 
 	// デスクリプターの数
-	static const size_t kNumSrvDescriptors = 512;
+	static const size_t kNumSrvDescriptors = 513;
 
 private:
 	Window* win_=nullptr;

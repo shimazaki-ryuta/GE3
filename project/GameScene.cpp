@@ -20,6 +20,7 @@
 #include "MatrixFunction.h"
 #include "RandomEngine.h"
 #include "Engine/Audio/AudioManager.h"
+#include "GetDescriptorHandle.h"
 GameScene::GameScene() {
 
 }
@@ -39,22 +40,48 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	
 #endif // _DEBUG
 	
+	//srvの作成
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = 32;
+	srvDesc.Buffer.StructureByteStride = sizeof(PointLight);
+
+	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(PointLight) * pointLightMax_);
+
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+	for (uint32_t index = 0; index < pointLightMax_; ++index) {
+		pointLightData[index].color = Vector4{1.0f, 1.0f, 1.0f, 1.0f};
+		pointLightData[index].position = { 0.0f,1.0f,0.0f };
+		pointLightData[index].intensity = 1.0f;
+		pointLightData[index].radius = 10.0f;
+		pointLightData[index].decay = 0.0f;
+		pointLightData[index].isUse_ = 0;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+	srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+
+	dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
+
 	//DirectionalLight用のリソース
 	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
 	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
 	directinalLightData->direction = Normalize(directinalLightData->direction);
-	directinalLightData->intensity = 1.0f;
+	directinalLightData->intensity = 0.2f;
 
 	//PointLight用のリソース
-	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
-	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	pointLightData->position = { 0.0f,1.0f,0.0f };
-	pointLightData->intensity = 1.0f;
-	pointLightData->radius = 35.0f;
-	pointLightData->decay = 1.0f;
+	//pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
+	//pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+//	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	//pointLightData->position = { 0.0f,1.0f,0.0f };
+	//pointLightData->intensity = 1.0f;
+	//pointLightData->radius = 35.0f;
+	//pointLightData->decay = 1.0f;
 
 	//PointLight用のリソース
 	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(SpotLight));
@@ -107,12 +134,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 
 	viewProjection_.Initialize();
-
+	viewProjection_.rotation_.x = 1.0f;
+	viewProjection_.UpdateMatrix();
 	//debugCamera_ = new DebugCamera(1280, 720);
-
-	//AxisIndicator::GetInstance()->SetVisible(true);
-	//AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
-	// player_ = new Player();
 	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png");
 	player_ = std::make_unique<Player>();
 	player_->Initialize(animationPlayer);
@@ -169,6 +193,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	lockOn_.reset(new LockOn);
 	lockOn_->Initialize();
+	//lockOn_->Update(player2_.get(), viewProjection_);
 
 	particle.reset(Particle::Create(500));
 	particle->UseBillboard(true);
@@ -213,6 +238,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	titleTextureHandle_ = TextureManager::LoadTexture("title.png");
 	titleSprite_.reset(Sprite::Create(titleTextureHandle_, { 640.0f,320.0f }, { 256.0f * 3.0f,32.0f * 3.0f }, { 1.0f,1.0f,1.0f,1.0f }));
 
+	fadeSprite_.reset(Sprite::Create(TextureManager::LoadTexture("white2x2.png"), { 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f,0.0f,0.5f }));
+	fadeSprite_->SetAnchorPoint({ 0.0f,0.0f });
+	fadeSprite_->SetColor({0,0,0,0.0f});
+	fadeSprite_->SetBlendMode(Sprite::BlendMode::Normal);
+	isTransitionFade_ = false;
+	isStart_ = false;
+	fadeAlpha_ = 1.0f;
+
+	lockOn_->Update(player2_.get(), viewProjection_);
+	CollisionManager::GetInstance();
 }
 
 void GameScene::Update() {
@@ -233,8 +268,24 @@ void GameScene::Update() {
 		//viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 		//viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
 		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
-			isIngame_ = true;
+			//isIngame_ = true;
+			isStart_ = true;
+			isTransitionFade_ = false;
 		}
+		if (!isStart_) {
+			fadeAlpha_ -= 0.05f;
+			if (fadeAlpha_ <0) {
+				fadeAlpha_ = 0;
+			}
+		}
+		else {
+			fadeAlpha_ += 0.05f;
+			if (fadeAlpha_ > 1.0f) {
+				fadeAlpha_ = 1.0f;
+				isIngame_ = true;
+			}
+		}
+
 	}
 	else {
 		//flooar_->Update();
@@ -338,14 +389,15 @@ void GameScene::Update() {
 			}
 			if (endCount_ == 120) {
 				if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
-					isIngame_ = false;
+					isTransitionFade_=true;
+					/*isIngame_ = false;
 					player_->ReStart();
 					player2_->ReStart();
 					followCamera_->Reset();
 					followCamera_->SetTarget(player_->GetWorldTransform());
 					ai_->Initialize();
 					endCount_ = 0;
-					isEnd_ = false;
+					isEnd_ = false;*/
 				}
 			}
 		}
@@ -353,11 +405,40 @@ void GameScene::Update() {
 
 		CollisionManager::GetInstance()->CheckAllCollisions();
 
-		/*if (isDebugCameraActive_) {
-			//viewProjection_.matView = debugCamera_->GetViewProjection().matView;
-			//viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
-			//viewProjection_.TransferMatrix();
-		}*/
+		//PointLight
+		for (uint32_t index = 0; index < pointLightMax_; ++index) {
+			pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+			pointLightData[index].position = { 0.0f,1.0f,0.0f };
+			pointLightData[index].intensity = 0.0f;
+			pointLightData[index].radius = 10.0f;
+			pointLightData[index].decay = 0.0f;
+			pointLightData[index].isUse_ = 0;
+		}
+		uint32_t count=0;
+		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
+			if (count<pointLightMax_) {
+				pointLightData[count].color = Vector4{ 1.0f, 0.2f, 0.2f, 1.0f };
+				pointLightData[count].position = (*ite)->GetSphere().center;
+				pointLightData[count].intensity = 2.0f;
+				pointLightData[count].radius = 10.0f;
+				pointLightData[count].decay = 0.8f;
+				pointLightData[count].isUse_ = 1;
+				count++;
+			}
+		}
+		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
+			if (count < pointLightMax_) {
+				pointLightData[count].color = Vector4{ 1.0f, 0.2f, 0.2f, 1.0f };
+				pointLightData[count].position = (*ite)->GetSphere().center;
+				pointLightData[count].intensity = 2.0f;
+				pointLightData[count].radius = 10.0f;
+				pointLightData[count].decay = 0.8f;
+				pointLightData[count].isUse_ = 1;
+				count++;
+			}
+		}
+
+
 		{
 			// viewProjection_.UpdateMatrix();
 			viewProjection_.matView = followCamera_->GetViewProjection().matView;
@@ -369,7 +450,28 @@ void GameScene::Update() {
 		followCamera_->SetLockOnTarget(nullptr);
 		player_->SetTarget(lockOn_->GetTarget());
 		player2_->SetTarget(player_->GetWorldTransform());
-
+		if (!isTransitionFade_) {
+			fadeAlpha_ -= 0.05f;
+			if (fadeAlpha_ < 0) {
+				fadeAlpha_ = 0;
+			}
+		}
+		else {
+			fadeAlpha_ += 0.05f;
+			if (fadeAlpha_ > 1.0f) {
+				fadeAlpha_ = 1.0f;
+				//isIngame_ = true;
+				isIngame_ = false;
+				isStart_ = false;
+				player_->ReStart();
+				player2_->ReStart();
+				followCamera_->Reset();
+				followCamera_->SetTarget(player_->GetWorldTransform());
+				ai_->Initialize();
+				endCount_ = 0;
+				isEnd_ = false;
+			}
+		}
 	}
 	particle->Updade();
 	preJoyState_ = joyState;
@@ -378,7 +480,7 @@ void GameScene::Update() {
 		buttonCount_ = 0;
 		isButtonDraw_ = !isButtonDraw_;
 	}
-	
+	fadeSprite_->SetColor({0,0,0,fadeAlpha_});
 }
 
 void GameScene::Draw2D() {
@@ -404,6 +506,7 @@ void GameScene::Draw2D() {
 			}
 		}
 	}
+	fadeSprite_->Draw();
 }
 
 void GameScene::Draw3D() {
@@ -411,7 +514,8 @@ void GameScene::Draw3D() {
 	//Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, srvHandleGPU);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
@@ -434,3 +538,6 @@ void GameScene::Draw3D() {
 	}
 }
 
+void GameScene::TransitionFade() {
+
+}
