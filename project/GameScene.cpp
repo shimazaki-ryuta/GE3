@@ -72,7 +72,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
 	directinalLightData->direction = Normalize(directinalLightData->direction);
-	directinalLightData->intensity = 2.6f;
+	directinalLightData->intensity = 0.6f;
 
 	//PointLight用のリソース
 	//pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
@@ -263,13 +263,13 @@ void GameScene::Update() {
 	switch (colorPhase_)
 	{
 	case 0:
-		directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
+		//directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
 		break;
 	case 1:
-		directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
+		//directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
 		break;
 	case 2:
-		directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
+		//directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
 		break;
 	default:
 		break;
