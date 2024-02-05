@@ -157,7 +157,7 @@ void DirectXCommon::PreDraw()
 
 void DirectXCommon::PostDraw()
 {
-#ifdef _DEBUG
+#ifdef _USEIMGUI
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif // _DEBUG
 	//描く処理終了、画面に移すため状態を遷移

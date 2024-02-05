@@ -61,22 +61,13 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\BaseCharacter.cpp">
-      <Filter>Application</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Board.cpp">
-      <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Curve.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\flooar.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\FollowCamera.cpp">
-      <Filter>Application</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Goal.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\Ground.cpp">
@@ -205,18 +196,6 @@
     <ClCompile Include="Engine\Audio\AudioManager.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Player2.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\PlayerAI.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Application\Bullet.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Application\LockOn.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -225,22 +204,13 @@
     <ClInclude Include="GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\BaseCharacter.h">
-      <Filter>Application</Filter>
-    </ClInclude>
     <ClInclude Include="Application\Board.h">
-      <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Curve.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\flooar.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\FollowCamera.h">
-      <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Goal.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\Ground.h">
@@ -386,18 +356,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Audio\AudioManager.h">
       <Filter>Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Player2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\PlayerAI.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Bullet.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Application\LockOn.h">
       <Filter>ヘッダー ファイル</Filter>

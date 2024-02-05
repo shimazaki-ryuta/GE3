@@ -267,6 +267,8 @@ void Sprite::Initialize()
 	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->uvTransform = uvTransform_;
 
+	isFlipX_ = false;
+	isFlipY_ = false;
 }
 
 void Sprite::SetRange(const Vector2& leftTop, const Vector2& rightDown) {
@@ -288,7 +290,10 @@ void Sprite::Draw()
 	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
 	vertexDataSprite_[3].position = { +size_.x * (1.0f - anchorPoint_.x), +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
 	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
-	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(Vector3{ 1.0f,1.0f,1.0f }, Vector3{ 0,0,rotate_ }, Vector3{ position_.x,position_.y,0.0f });
+	float x = 0,y=0;
+	if (isFlipX_) { y = 3.141592f; }
+	if (isFlipY_) { x = 3.141592f; }
+	Matrix4x4 worldMatrixSprite = MakeAffineMatrix(Vector3{ 1.0f,1.0f,1.0f }, Vector3{ x,y,rotate_ }, Vector3{ position_.x,position_.y,0.0f });
 	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 1.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));

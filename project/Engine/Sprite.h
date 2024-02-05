@@ -102,7 +102,8 @@ public:
 	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
 
 	void SetTextureHandle(uint32_t handle) { textureHandle_ = handle; };
-
+	void SetIsFlipX(bool is) { isFlipX_ = is; };
+	void SetIsFlipY(bool is) { isFlipY_ = is; };
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -128,5 +129,7 @@ private:
 	BlendMode blendMode_;
 
 	D3D12_RESOURCE_DESC resourceDesc_;
+	bool isFlipX_;
+	bool isFlipY_;
 };
 

@@ -80,8 +80,6 @@ public:
 	void Update();
 	void Draw3D();
 	void Draw2D();
-	void TransitionFade();
-	
 
 private:
 	
@@ -97,29 +95,16 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 
-
+	std::unique_ptr<DebugCamera> debugCamera_;
 	struct Transforms cameraTransform { {1.0f, 1.0f, 1.0f}, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f } };
 
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
 
-	// 自キャラ
-	std::unique_ptr<Player> player_;
 
-	std::unique_ptr<Model> modelPlayerBody_;
-	std::unique_ptr<Model> modelPlayerHead_;
-	std::unique_ptr<Model> modelPlayerL_arm_;
-	std::unique_ptr<Model> modelPlayerR_arm_;
+	uint32_t uvCheckerTextureHandle_;
+	uint32_t monsterTextureHandle_;
 
-	std::unique_ptr<Model> modelPlayerBody2_;
-	std::unique_ptr<Model> modelPlayerHead2_;
-	std::unique_ptr<Model> modelPlayerL_arm2_;
-	std::unique_ptr<Model> modelPlayerR_arm2_;
-
-	std::unique_ptr<Model> modelWepon_;
-
-
-	std::unique_ptr<Player2> player2_;
 
 	bool isDebugCameraActive_ = false;
 	//DebugCamera* debugCamera_ = nullptr;
@@ -130,57 +115,39 @@ private:
 	std::unique_ptr<Ground> ground_;
 	Model* modelGround_ = nullptr;
 
-	std::array<std::unique_ptr<Flooar>, size_t(5)> flooars_;
-	//std::unique_ptr<Flooar> flooar_;
+	std::unique_ptr<Model> sphere_;
 
-	//std::unique_ptr<Goal> goal_;
+	//std::unique_ptr<Primitive3D> sphere_;
 
-	std::unique_ptr<FollowCamera> followCamera_;
-	std::unique_ptr<LockOn> lockOn_;
+	std::unique_ptr<Particle> particle;
+
+	std::unique_ptr<Sprite> sprite_;
+
+	Vector2 spritePosition_;
+	Vector2 ancorPoint_;
+	float rotate_;
+	Vector2 leftTop;
+	Vector2 rightDown;
+
+	bool usebillboard;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
 	DirectionalLight* directinalLightData = nullptr;
 
-	std::unique_ptr<Particle> particle;
+	WorldTransform worldTransformSphere_;
+	float shininess_;
 
-	std::unique_ptr<Model> modelBullet_;
-
-	std::unique_ptr<PlayerAI> ai_;
-
-	uint32_t backTextureHandle_;
-	std::unique_ptr<Sprite> backSprite_;
-	bool isEnd_;
-	uint32_t endTextureHandle_[2];
-	std::unique_ptr<Sprite> endSprite_;
-
-	bool isIngame_;
-	//1フレーム前の入力情報
-	XINPUT_STATE preJoyState_;
-	uint32_t pressATextureHandle_;
-	std::unique_ptr<Sprite> pressASprite_;
-	int32_t endCount_;
-	bool isButtonDraw_;
-	int32_t buttonCount_;
-	uint32_t shotTextureHandle_;
-	uint32_t dashTextureHandle_;
-	uint32_t jumpTextureHandle_;
-	std::unique_ptr<Sprite> shotSprite_;
-	std::unique_ptr<Sprite> dashSprite_;
-	std::unique_ptr<Sprite> jumpSprite_;
-	uint32_t titleTextureHandle_;
-	std::unique_ptr<Sprite> titleSprite_;
+	Vector4 lineColor_ = { 0 };
+	Vector3 lineWidth_ = { 1.05f,1.05f,1.05f };
 
 	uint32_t audioHandle_;
-	int32_t shadeType_=0;
+	int32_t shadeType_ = 0;
 	uint32_t toonShadowTextureHandle_;
 
-	std::unique_ptr<Sprite> fadeSprite_;
-	bool isTransitionFade_;
-	bool isStart_;
-	float fadeAlpha_;
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
-	uint32_t pointLightMax_=32;
-	int colorPhase_;
-	float color_;
+	uint32_t pointLightMax_ = 32;
+	bool isFlipX_=false, isFlipY_ = false;
+	Vector3 cameraTransform_;
+	Vector3 cameraRotate_;
 };
 
