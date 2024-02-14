@@ -131,7 +131,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	cameraTransform_ = { 0.0f, 1.3f, -17.0f };
 	cameraRotate_ = {0.0f,0.0f,0.0f};
 #endif // _DEBUG
-	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
+	sphere_.reset(Model::CreateFromOBJ("hammer"));
 	sphere_->SetEnableLighting(2);
 	worldTransformSphere_.Initialize();
 	//worldTransformSphere_.rotation_.y = 3.14f / 2.0f;
@@ -306,7 +306,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, srvHandleGPU);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 
-	sphere_->Draw(worldTransformSphere_, viewProjection_, monsterTextureHandle_);
+	sphere_->Draw(worldTransformSphere_, viewProjection_);
 
 	//skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
