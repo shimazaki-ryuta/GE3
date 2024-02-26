@@ -28,6 +28,7 @@ public:
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
+	void End3DSorceDraw();
 	/// <summary>
 	/// 描画後処理
 	/// </summary>

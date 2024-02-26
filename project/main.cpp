@@ -117,7 +117,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	const uint32_t descriptorSizeDSV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	dxCommon->SetDescriptorSizeDSV(descriptorSizeDSV);
 	
-	GameScene* gameScene = new GameScene();
+	GameScene* gameScene= new GameScene;
+	//gameScene.reset(new GameScene);
 	gameScene->Initialize(dxCommon);
 	
 	//グローバル変数の読み込み
@@ -150,10 +151,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			
 			gameScene->Draw3D();
 		
+			dxCommon->End3DSorceDraw();
 
-			//Sprite::PreDraw(dxCommon->GetCommandList());
-			//gameScene->Draw2D();
-			//Sprite::PostDraw();
+			Sprite::PreDraw(dxCommon->GetCommandList());
+			gameScene->Draw2D();
+			Sprite::PostDraw();
 
 			dxCommon->PostDraw();
 		}
@@ -165,6 +167,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+	delete gameScene;
 
 	//解放処理
 	delete dxCommon;

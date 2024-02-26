@@ -172,10 +172,7 @@ void DirectXCommon::PreDraw()
 
 
 }
-
-void DirectXCommon::PostDraw()
-{
-
+void DirectXCommon::End3DSorceDraw() {
 	//posteffect
 	barrier_.Transition.pResource = renderTargetResource_[kSorce3D].Get();
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -197,10 +194,10 @@ void DirectXCommon::PostDraw()
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
-	
+
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	dsvHandle.ptr+= device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dsvHandle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//RGBA
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
@@ -232,6 +229,11 @@ void DirectXCommon::PostDraw()
 	PostEffect::PreDraw(commandList_.Get());
 	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kBlume]);
 	PostEffect::PostDraw();
+}
+void DirectXCommon::PostDraw()
+{
+	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	
 #ifdef _DEBUG
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif // _DEBUG
@@ -354,11 +356,13 @@ void DirectXCommon::CreateCommand()
 	//コマンドキューの生成
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	HRESULT hr = device_->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
+	commandQueue_->SetName(L"CommandQueue");
 	//コマンドキューの生成に失敗
 	assert(SUCCEEDED(hr));
 
 	//コマンドアロケータの生成
 	hr = device_->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
+	commandAllocator_->SetName(L"CommandAllocator");
 	//コマンドアロケータの生成に失敗
 	assert(SUCCEEDED(hr));
 
@@ -586,6 +590,7 @@ ID3D12Resource* DirectXCommon::CreateBufferResource(ID3D12Device* device, size_t
 	ID3D12Resource* resourse = nullptr;
 	HRESULT hr = device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resourse));
 	assert(SUCCEEDED(hr));
+	resourse->SetName(L"Buffer");
 	return resourse;
 }
 
