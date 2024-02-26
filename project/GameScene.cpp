@@ -167,6 +167,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	// 地面
 	modelGround_ = Model::CreateFromOBJ("Ground");
+	modelGround_->SetGrowStrength(1.0f);
 	ground_.reset(new Ground);
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 

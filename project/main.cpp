@@ -120,14 +120,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	GameScene* gameScene = new GameScene();
 	gameScene->Initialize(dxCommon);
 	
-	//DirectionalLight用のリソース
-	ID3D12Resource* directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
-	DirectionalLight* directinalLightData = nullptr;
-	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
-	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	directinalLightData->direction = { 0.0f,-1.0f,0.0f };
-	directinalLightData->intensity = 1.0f;
-
 	//グローバル変数の読み込み
 	GlobalVariables::GetInstance()->LoadFiles();
 
@@ -151,13 +143,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			ImGui::NewFrame();			
 			GlobalVariables::GetInstance()->Update();
 			gameScene->Update();
-
+			
 			//描画
 			dxCommon->PreDraw();
 		
-			//Lighting用のリソースの場所を設定
-			//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-
+			
 			gameScene->Draw3D();
 		
 

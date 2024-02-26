@@ -26,7 +26,7 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 			float4 targetUV = transformedUV;
 			targetUV.x += float(x) * (1.0f / 1280.0f);
 			targetUV.y += float(y) * (1.0f / 720.0f);
-			output.color += gGrowMap.Sample(gSampler, targetUV.xy) * gGrowMap.Sample(gSampler, targetUV.xy).a / (11.0f*11.0f);
+			output.color += gGrowMap.Sample(gSampler, targetUV.xy) / (11.0f*11.0f);
 		}
 	}
 	output.color.a = gMaterial.color.a;
