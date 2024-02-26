@@ -143,3 +143,11 @@ const D3D12_RESOURCE_DESC TextureManager::GetResoureDesc(uint32_t textureHandle)
 	Texture& texture = textures_.at(textureHandle);
 	return texture.resource->GetDesc();
 }
+
+ID3D12Resource* TextureManager::GetResoure(uint32_t textureHandle)
+{
+	assert(textureHandle < textures_.size());
+	Texture& texture = textures_.at(textureHandle);
+	return texture.resource.Get();
+}
+

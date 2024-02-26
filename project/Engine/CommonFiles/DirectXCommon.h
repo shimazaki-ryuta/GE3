@@ -10,9 +10,9 @@
 
 #include "../externals/DirectXTex/DirectXTex.h"
 #include "../externals/DirectXTex/d3dx12.h"
-
+#include <memory>
 //#include <list>
-
+class PostEffect;
 class DirectXCommon
 {
 public:
@@ -60,8 +60,17 @@ public:
 
 
 	// デスクリプターの数
-	static const size_t kNumSrvDescriptors = 513;
-
+	static const size_t kNumSrvDescriptors = 768;
+	static const size_t srvPostEffectStart = 513;
+	size_t srvPostEffectHandle=0;
+	/// <summary>
+	/// RTV生成
+	/// </summary>
+	void CreateRenderTargetView();
+	void SetRenderTarget(int handles[]);
+	void CreatePostEffectSprite();
+	PostEffect* postEffect;
+	void DeletePostEffect();
 private:
 	Window* win_=nullptr;
 
@@ -82,13 +91,26 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 
+	enum RenderTargetName
+	{
+		kSwap0,
+		kSwap1,
+		kSorce3D,
+		kSorce2D,
+		kPost3D,
+		kBlume,
+		kCountOfRenderTarget
+	};
+
 
 	//RenderTarget
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[kCountOfRenderTarget];
+	D3D12_GPU_DESCRIPTOR_HANDLE renderSrvHandles_[kCountOfRenderTarget] = {0};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
+	Microsoft::WRL::ComPtr<ID3D12Resource> renderTargetResource_[kCountOfRenderTarget];
 	//DepthBuffer
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_  = nullptr;
-
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource2_ = nullptr;
 	//Fence
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	HANDLE fenceEvent_;
@@ -127,10 +149,7 @@ private:
 	/// スワップチェーン生成
 	/// </summary>
 	void CreateSwapChain();
-	/// <summary>
-	/// RTV生成
-	/// </summary>
-	void CreateRenderTargetView();
+	
 	
 	/// <summary>
 	/// SRV生成
@@ -147,6 +166,8 @@ private:
 	/// Fence生成
 	/// </summary>
 	void CreateFence();
+
+public:
 
 	/// <summary>
 	/// ImGui初期化

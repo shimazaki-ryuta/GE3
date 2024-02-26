@@ -30,7 +30,7 @@ public:
 
 	void SetGraphicsRootDescriptorTable(UINT rootParamIndex, uint32_t textureHandle);
 	const D3D12_RESOURCE_DESC GetResoureDesc(uint32_t textureHandle);
-
+	ID3D12Resource* GetResoure(uint32_t textureHandle);
 
 	static uint32_t LoadTexture(const std::string&);
 

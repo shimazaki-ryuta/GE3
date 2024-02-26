@@ -194,8 +194,9 @@ void Model::StaticInitialize(
 	graphicsPipelineStateDesc.BlendState = blendDesc;
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
+	graphicsPipelineStateDesc.NumRenderTargets = 2;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDesc.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	//利用するトポロジのタイプ、三角形
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	//どのように画面に色を打ち込むかの設定
@@ -394,6 +395,7 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 100.0f;
+	materialData_->growStrength = 0;
 	materialData_->shadingType = 0;
 	//ライティング用のカメラリソース
 	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));

@@ -28,6 +28,7 @@ public:
 	{
 		Vector4 color;
 		Matrix4x4 uvTransform;
+		float growStrength;
 	};
 
 	struct ParticleForGPU

@@ -35,6 +35,7 @@ public:
 		float padding[3];
 		Matrix4x4 uvTransform;
 		float shininess;
+		float growStrength;
 		int32_t shadingType;
 	};
 
@@ -115,6 +116,7 @@ public:
 	//シェーディングタイプ 0:通常 1:2値化 
 	void SetShadingType(int32_t num) { materialData_->shadingType = num; };
 	void SetToonShadowTextureHandle(uint32_t handle) { toonShadowTextureHandle_ = handle; };
+	void SetGrowStrength(float strength) { materialData_->growStrength = strength; };
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

@@ -282,6 +282,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Math\VectorFunction.cpp" />
     <ClCompile Include="Engine\Model.cpp" />
     <ClCompile Include="Engine\Particle.cpp" />
+    <ClCompile Include="Engine\PostEffect.cpp" />
     <ClCompile Include="Engine\Primitive3D.cpp" />
     <ClCompile Include="Engine\RandomEngine.cpp" />
     <ClCompile Include="Engine\ShaderCompiler.cpp" />
@@ -358,6 +359,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\VectorFunction.h" />
     <ClInclude Include="Engine\Model.h" />
     <ClInclude Include="Engine\Particle.h" />
+    <ClInclude Include="Engine\PostEffect.h" />
     <ClInclude Include="Engine\Primitive3D.h" />
     <ClInclude Include="Engine\RandomEngine.h" />
     <ClInclude Include="Engine\ShaderCompiler.h" />

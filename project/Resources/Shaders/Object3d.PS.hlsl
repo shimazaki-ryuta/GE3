@@ -9,6 +9,7 @@ struct Material {
 	int32_t enableLighting;
 	float32_t4x4 uvTransform;
 	float32_t shininess;
+	float32_t growStrength;
 	int32_t shadingType;
 };
 struct Camera {
@@ -22,6 +23,7 @@ ConstantBuffer<SpotLight> gSpotLight : register(b4);
 
 struct PixelShaderOutput {
 	float32_t4 color : SV_TARGET0;
+	float32_t4 grow : SV_TARGET1;
 };
 
 PixelShaderOutput main(VertexShaderOutput input){
@@ -125,5 +127,6 @@ PixelShaderOutput main(VertexShaderOutput input){
 	{
 		discard;
 	}
+	output.grow = gMaterial.color * textureColor * gMaterial.growStrength;
 	return output;
 }

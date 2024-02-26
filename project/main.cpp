@@ -12,7 +12,7 @@ LeackChecker leackChecker;
 #include <vector>
 #include <memory>
 #include"ConvertString.h"
-
+#include "Engine/PostEffect.h"
 //static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 
 //window関係
@@ -90,13 +90,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	textureManager->Initialize(dxCommon->GetDevice());
 	textureManager->SetDirectXCommon(dxCommon);
 	textureManager->SetsrvDescriptorHeap(dxCommon->GetsrvDescriptorHeap());
+	dxCommon->CreateRenderTargetView();
+	dxCommon->InitializeImGui();
 
 	//worldTransformの初期化
 	WorldTransform::SetDevice(dxCommon->GetDevice());
 
 	//Spriteの初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(),mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
-
+	PostEffect::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
+	dxCommon->CreatePostEffectSprite();
 	//Modelの初期化
 	Model::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
@@ -158,14 +161,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			gameScene->Draw3D();
 		
 
-			Sprite::PreDraw(dxCommon->GetCommandList());
-			gameScene->Draw2D();
-			Sprite::PostDraw();
+			//Sprite::PreDraw(dxCommon->GetCommandList());
+			//gameScene->Draw2D();
+			//Sprite::PostDraw();
 
 			dxCommon->PostDraw();
 		}
 	}
-
+	dxCommon->DeletePostEffect();
 	Log(ConvertString(std::format(L"WSTRING:{}\n",msg.message)));
 
 	ImGui_ImplDX12_Shutdown();

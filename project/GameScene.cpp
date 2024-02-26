@@ -156,6 +156,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	modelBullet_.reset(Model::CreateFromOBJ("bullet"));
 	//modelBullet_->SetShiniess(40.0f);
 	modelBullet_->SetEnableLighting(0);
+	modelBullet_->SetGrowStrength(1.0f);
 	player_->SetModelBullet(modelBullet_.get());
 	player2_->SetModelBullet(modelBullet_.get());
 
@@ -293,7 +294,7 @@ void GameScene::Update() {
 		//viewProjection_.matView = followCamera_->GetViewProjection().matView;
 		//viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 		//viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
-		if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
+		if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
 			//isIngame_ = true;
 			isStart_ = true;
 			isTransitionFade_ = false;
@@ -414,7 +415,7 @@ void GameScene::Update() {
 				endCount_ = 120;
 			}
 			if (endCount_ == 120) {
-				if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
+				if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
 					isTransitionFade_=true;
 					/*isIngame_ = false;
 					player_->ReStart();
@@ -562,8 +563,8 @@ void GameScene::Draw3D() {
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
-	player_->DrawOutLine(viewProjection_);
-	player2_->DrawOutLine(viewProjection_);
+	//player_->DrawOutLine(viewProjection_);
+	//player2_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());
