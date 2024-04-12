@@ -1,7 +1,7 @@
 # Blender 3.5.0
 # www.blender.org
 mtllib float_Body.mtl
-o 立方体
+o cube
 v 0.000000 0.505258 0.000000
 v 0.000000 1.409482 0.000000
 v 0.237538 0.957370 -0.237538

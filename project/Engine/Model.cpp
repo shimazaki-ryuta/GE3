@@ -5,6 +5,11 @@
 #include "LoadModel.h"
 #include <fstream>
 #include <sstream>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 //std::shared_ptr<D3DResourceLeakChacker>Model::leakchecker;
 ID3D12Device* Model::sDevice = nullptr;
 UINT Model::sDescriptorHandleIncrementSize;
@@ -372,6 +377,9 @@ void Model::StaticInitializeOutLine(
 void Model::Create(const  std::string& directoryPath, const std::string& filename)
 {
 	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directoryPath, filename);
+
+	//std::string filePath = directoryPath + "/" + filename;
+
 	vertexNum = modelData.vertexNum;
 	textureHandle_ = modelData.meshs.material.textureHandle;
 	//頂点リソース

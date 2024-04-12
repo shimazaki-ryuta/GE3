@@ -4,6 +4,12 @@
 #include "VectorFunction.h"
 #include <fstream>
 #include <sstream>
+
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 LoadModel::MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
 {
 	LoadModel::MaterialData materialData;
@@ -28,7 +34,8 @@ LoadModel::MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& 
 LoadModel::ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;
-	std::vector<LoadModel::MeshData*> meshs;
+	std::string filePath = directoryPath + "/" + filename;
+	/*std::vector<LoadModel::MeshData*> meshs;
 	MeshData mesh;
 	std::vector<Vector4> positions;
 	std::vector<Vector3> normals;
@@ -105,13 +112,55 @@ LoadModel::ModelData LoadModel::LoadObjFile(const std::string& directoryPath, co
 			mesh.material = LoadModel::LoadMaterialTemplateFile(directoryPath, materialFirename);
 		}
 	}
-	/*for (Model::MeshData* meshData : meshs)
-	{
-		modelData.meshs.push_back(*meshData);
-		delete meshData;
-	}*/
+	
 	modelData.meshs = mesh;
 	//meshs.clear();
 	modelData.vertexNum = vertexNum;
+	*/
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	assert(scene->HasMeshes());
+	MeshData meshd;
+	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes;++meshIndex) {
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		assert(mesh->HasNormals());//法線要求
+		assert(mesh->HasTextureCoords(0));//texcoord要求
+
+		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
+			aiFace& face = mesh->mFaces[faceIndex];
+			assert(face.mNumIndices == 3);
+			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
+				uint32_t vertexIndex = face.mIndices[element];
+				aiVector3D& position = mesh->mVertices[vertexIndex];
+				aiVector3D& normal = mesh->mNormals[vertexIndex];
+				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+				VertexData vertex;
+				vertex.position = { position.x,position.y,position.z,1.0f };
+				vertex.normal = { normal.x,normal.y, normal.z };
+				vertex.texcoord = { texcoord.x,texcoord.y };
+				vertex.position.x *= -1.0f;
+				vertex.normal.x *= -1.0f;
+				vertex.triangleCenter = {1.0f,1.0f,1.0f,1.0f};
+				meshd.vertices.push_back(vertex);
+				//meshs.push_back(mesh);
+				//modelData.meshs.vertices.push_back(vertex);
+			}
+		}
+		//modelData.vertexNum = 1;
+		
+	}
+	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+		aiMaterial* material = scene->mMaterials[materialIndex];
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+			aiString textureFilePath;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
+			std::string materialFirename = textureFilePath.C_Str();
+			//meshd.material = LoadModel::LoadMaterialTemplateFile(directoryPath,materialFirename);
+			meshd.material.textureFilePath = /*directoryPath + "/" + */ materialFirename;
+			meshd.material.textureHandle = TextureManager::LoadTexture(meshd.material.textureFilePath);
+		}
+	}
+	modelData.meshs = meshd;
+	modelData.vertexNum = modelData.meshs.vertices.size();
 	return modelData;
 }
