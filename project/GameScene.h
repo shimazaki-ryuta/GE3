@@ -182,5 +182,7 @@ private:
 	uint32_t pointLightMax_=32;
 	int colorPhase_;
 	float color_;
+
+	float grayScaleValue_;//グレースケールの強さ
 };
 

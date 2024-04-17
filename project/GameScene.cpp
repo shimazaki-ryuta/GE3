@@ -256,7 +256,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	colorPhase_ = 0;
 	color_ = 0.0f;
 
-	dxCommon_->SetGraiScaleStrength(1.0f);
+	grayScaleValue_ = 0.0f;
+	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 }
 
 void GameScene::Update() {
@@ -270,13 +271,13 @@ void GameScene::Update() {
 	switch (colorPhase_)
 	{
 	case 0:
-		//directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
+		directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
 		break;
 	case 1:
-		//directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
+		directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
 		break;
 	case 2:
-		//directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
+		directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
 		break;
 	default:
 		break;
@@ -292,6 +293,7 @@ void GameScene::Update() {
 	}
 
 	if (!isIngame_) {
+		grayScaleValue_ = 0.0f;
 		Vector3 offset = { 0.0f,8.0f,-20.0f };
 		viewProjection_.translation_ = Transform(offset, MakeRotateMatrix(viewProjection_.rotation_));
 		viewProjection_.rotation_.y += 0.01f;
@@ -414,6 +416,13 @@ void GameScene::Update() {
 			}
 		}
 		if (isEnd_) {
+			//grayscale
+			if (player_->GetIsDead()) {
+				grayScaleValue_ += 0.01f;
+				if (grayScaleValue_ > 1.0f) {
+					grayScaleValue_ = 1.0f;
+				}
+			}
 			float alpha = float(endCount_) / 120.0f;
 			endSprite_->SetColor({ 1.0f,1.0f,1.0f,alpha });
 			endCount_++;
@@ -522,6 +531,7 @@ void GameScene::Update() {
 		isButtonDraw_ = !isButtonDraw_;
 	}
 	fadeSprite_->SetColor({0,0,0,fadeAlpha_});
+	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 }
 
 void GameScene::Draw2D() {
