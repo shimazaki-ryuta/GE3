@@ -86,7 +86,7 @@ DirectXCommon::~DirectXCommon()
 	//useAdapter_->Release();
 	//dxgiFactory_->Release();
 }
-void DirectXCommon::DeletePostEffect() { delete postEffect; };
+void DirectXCommon::DeletePostEffect() { delete postEffect; delete postEffect2; };
 void DirectXCommon::Initialize(Window* win)
 {
 	win_ = win;
@@ -185,6 +185,27 @@ void DirectXCommon::End3DSorceDraw() {
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 
+	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//TransitionBarrierを張る
+	commandList_->ResourceBarrier(1, &barrier_);
+
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGrayScale], false, nullptr);
+	float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
+	commandList_->ClearRenderTargetView(rtvHandles_[kGrayScale], clearColor2, 0, nullptr);
+
+	//バックバッファに書き込む
+	postEffect->PreDraw(commandList_.Get());
+	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kBlume]);
+	postEffect->PostDraw();
+
+	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//TransitionBarrierを張る
+	commandList_->ResourceBarrier(1, &barrier_);
+
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
@@ -226,9 +247,13 @@ void DirectXCommon::End3DSorceDraw() {
 	//commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
 	//バックバッファに書き込む
-	postEffect->PreDraw(commandList_.Get());
-	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kBlume]);
-	postEffect->PostDraw();
+	postEffect2->PreDraw(commandList_.Get());
+	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kGrayScale], renderSrvHandles_[kGrayScale]);
+	postEffect2->PostDraw();
+
+
+
+
 }
 void DirectXCommon::PostDraw()
 {
@@ -281,6 +306,11 @@ void DirectXCommon::CreatePostEffectSprite() {
 	postEffect->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/BlumePS.hlsl");
 	postEffect->SetAnchorPoint({ 0.0f,0.0f });
 	postEffect->SetBlendMode(PostEffect::BlendMode::None);
+
+	postEffect2 = PostEffect::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 1.0f,1.0f,1.0f,1.0f });
+	postEffect2->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/GrayScalePS.hlsl");
+	postEffect2->SetAnchorPoint({ 0.0f,0.0f });
+	postEffect2->SetBlendMode(PostEffect::BlendMode::None);
 }
 
 void DirectXCommon::InitializeDXGIDevice()
@@ -471,6 +501,15 @@ void DirectXCommon::CreateRenderTargetView()
 	renderSrvHandles_[kBlume] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
 	device_->CreateShaderResourceView(renderTargetResource_[kBlume].Get(), &srvDesc, srvHandleCPU);
 	device_->CreateRenderTargetView(renderTargetResource_[kBlume].Get(), &rtvDesc_, rtvHandles_[kBlume]);
+
+	srvPostEffectHandle++;
+
+	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
+	renderTargetResource_[kGrayScale] = resourse;
+	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
+	renderSrvHandles_[kGrayScale] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
+	device_->CreateShaderResourceView(renderTargetResource_[kGrayScale].Get(), &srvDesc, srvHandleCPU);
+	device_->CreateRenderTargetView(renderTargetResource_[kGrayScale].Get(), &rtvDesc_, rtvHandles_[kGrayScale]);
 }
 
 void DirectXCommon::CreateShaderResourceView()
@@ -719,3 +758,5 @@ int32_t DirectXCommon::LoadTexture(const std::string& filePath)
 	
 }
 */
+
+void DirectXCommon::SetGraiScaleStrength(float strength) { postEffect2->SetColor({ 1.0f,1.0f,1.0f,strength }); };

@@ -255,6 +255,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	CollisionManager::GetInstance();
 	colorPhase_ = 0;
 	color_ = 0.0f;
+
+	dxCommon_->SetGraiScaleStrength(1.0f);
 }
 
 void GameScene::Update() {

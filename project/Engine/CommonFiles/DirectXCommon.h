@@ -71,7 +71,10 @@ public:
 	void SetRenderTarget(int handles[]);
 	void CreatePostEffectSprite();
 	PostEffect* postEffect;
+	PostEffect* postEffect2;
 	void DeletePostEffect();
+
+	void SetGraiScaleStrength(float strength) ;
 private:
 	Window* win_=nullptr;
 

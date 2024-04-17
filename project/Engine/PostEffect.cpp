@@ -64,7 +64,7 @@ void PostEffect::StaticInitialize(int window_width, int window_height ,const std
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 
-	//growMap用
+	//第二テクスチャ用
 	D3D12_DESCRIPTOR_RANGE descriptorRange2[1] = {};
 	descriptorRange2[0].BaseShaderRegister = 1;
 	descriptorRange2[0].NumDescriptors = 1;
