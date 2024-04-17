@@ -36,6 +36,7 @@ public:
 		size_t vertexNum;
 	};
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	static ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 	static MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename);
 };
 

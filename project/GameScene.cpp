@@ -98,6 +98,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
+	//Model* model = new Model;
+	//model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
+	//modelPlayerHead_.reset(model);
 	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm"));
@@ -564,8 +567,8 @@ void GameScene::Draw3D() {
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
-	//player_->DrawOutLine(viewProjection_);
-	//player2_->DrawOutLine(viewProjection_);
+	player_->DrawOutLine(viewProjection_);
+	player2_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());
