@@ -449,7 +449,14 @@ void DirectXCommon::CreateRenderTargetView()
 
 	//リソースを作る
 	ID3D12Resource* resourse = nullptr;
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, nullptr, IID_PPV_ARGS(&resourse));
+	const float clearColor[4] = {0.0f,0.0f,0.0f,0.0f};
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	clearValue.Color[0] = clearColor[0];
+	clearValue.Color[1] = clearColor[1];
+	clearValue.Color[2] = clearColor[2];
+	clearValue.Color[3] = clearColor[3];
+	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kSorce3D] = resourse;
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
 	renderSrvHandles_[kSorce3D] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
@@ -457,7 +464,7 @@ void DirectXCommon::CreateRenderTargetView()
 	device_->CreateRenderTargetView(renderTargetResource_[kSorce3D].Get(), &rtvDesc_, rtvHandles_[2]);
 	srvPostEffectHandle++;
 
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, nullptr, IID_PPV_ARGS(&resourse));
+	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kBlume] = resourse;
 	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
 	renderSrvHandles_[kBlume] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
