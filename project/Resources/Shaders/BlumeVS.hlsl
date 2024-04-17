@@ -1,19 +1,21 @@
 #include "Blume.hlsli"
 
-struct TransformationMatrix {
-	float32_t4x4 WVP;
-	float32_t4x4 World;
+static const uint32_t kNumVertex = 3;
+static const float32_t4 kPositions[kNumVertex] = {
+	{-1.0f,1.0f,0.0f,1.0f},
+	{3.0f,1.0f,0.0f,1.0f},
+	{-1.0f,-3.0f,0.0f,1.0f},
 };
-ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
-
-struct SpriteVertexShaderInput {
-	float32_t4 position : POSITION0;
-	float32_t2 texcoord : TEXCOORD0;
+static const float32_t2 kTexcoords[kNumVertex] = {
+	{0.0f,0.0f},
+	{2.0f,0.0f},
+	{0.0f,2.0f},
 };
 
-SpriteVertexShaderOutput main(SpriteVertexShaderInput input) {
+
+SpriteVertexShaderOutput main(uint32_t vertexId : SV_VertexID) {
 	SpriteVertexShaderOutput output;
-	output.position = mul(input.position, gTransformationMatrix.WVP);
-	output.texcoord = input.texcoord;
+	output.position = kPositions[vertexId];
+	output.texcoord = kTexcoords[vertexId];
 	return output;
 }

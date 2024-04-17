@@ -104,22 +104,10 @@ void PostEffect::StaticInitialize(
 	hr = sDevice->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&sRootSignature));
 	assert(SUCCEEDED(hr));
 
-	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[2] = {};
-	inputElementDescs[0].SemanticName = "POSITION";
-	inputElementDescs[0].SemanticIndex = 0;
-	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	//02_04追加分
-	inputElementDescs[1].SemanticName = "TEXCOORD";
-	inputElementDescs[1].SemanticIndex = 0;
-	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-
+	
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+	inputLayoutDesc.pInputElementDescs = nullptr;
+	inputLayoutDesc.NumElements = 0;
 
 	//BlendDtateの設定
 	D3D12_BLEND_DESC blendDesc[size_t(BlendMode::CountofBlendMode)]{};
@@ -239,14 +227,14 @@ void PostEffect::Initialize()
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite_));
 	//1枚目
-	vertexDataSprite_[0].position = { -size_.x * anchorPoint_.x, -size_.y * anchorPoint_.y,0.0f,1.0f };
+	vertexDataSprite_[0].position = { -1.0f,1.0f,0.0f,1.0f };
 	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
-	vertexDataSprite_[1].position = { +size_.x * (1.0f - anchorPoint_.x), -size_.y * anchorPoint_.y,0.0f,1.0f };
-	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
-	vertexDataSprite_[2].position = { -size_.x * anchorPoint_.x, +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
-	vertexDataSprite_[2].texcoord = { 0.0f,1.0f };
-	vertexDataSprite_[3].position = { +size_.x * (1.0f - anchorPoint_.x), +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
-	vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
+	vertexDataSprite_[1].position = { 3.0f, 1.0f,0.0f,1.0f };
+	vertexDataSprite_[1].texcoord = { 2.0f,0.0f };
+	vertexDataSprite_[2].position = { -1.0f,-3.0f,0.0f,1.0f };
+	vertexDataSprite_[2].texcoord = { 0.0f,2.0f };
+	//vertexDataSprite_[3].position = { +size_.x * (1.0f - anchorPoint_.x), +size_.y * (1.0f - anchorPoint_.y),0.0f,1.0f };
+	//vertexDataSprite_[3].texcoord = { 1.0f,1.0f };
 
 	//インデックス
 	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * 6);
@@ -313,8 +301,8 @@ void PostEffect::Draw(ID3D12DescriptorHeap* srvDescriptorHeap, D3D12_GPU_DESCRIP
 	sCommandList->SetGraphicsRootDescriptorTable(2, srvHandleGPU);
 	sCommandList->SetGraphicsRootDescriptorTable(3, srvHandleGPU2);
 
-	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	//sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
-	sCommandList->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
-	sCommandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	//sCommandList->SetGraphicsRootConstantBufferView(1, transformResource_->GetGPUVirtualAddress());
+	sCommandList->DrawIndexedInstanced(3, 1, 0, 0, 0);
 }
