@@ -10,6 +10,7 @@
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+#include <array>
 
 class PostEffect
 {
@@ -59,23 +60,25 @@ public:
 	// コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList;
 	// ルートシグネチャ
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
+	 Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature;
 	// パイプラインステートオブジェクト
 	//static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
 
-	static std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::CountofBlendMode)> sPipelineStates;
+	 std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::CountofBlendMode)> sPipelineStates;
 
-	static void StaticInitialize(
-		ID3D12Device* device, int window_width, int window_height,
-		const std::wstring& directoryPath = L"Resources/");
+	 static void SetDevice(ID3D12Device* device);
 
-	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	void StaticInitialize(
+		int window_width, int window_height,
+		const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath);
+
+	void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	void Draw(ID3D12DescriptorHeap* srvDescriptorHeap, D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU, D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU2);
-	static void PostDraw();
+	void PostDraw();
 
 	static PostEffect* Create(Vector2 position, Vector2 size, Vector4 color = { 1, 1, 1, 1 });
 
-	void Initialize();
+	void Initialize(const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath);
 
 	//座標指定(スクリーン座標)
 	inline void SetPosition(const Vector2& pos) { position_ = pos; };

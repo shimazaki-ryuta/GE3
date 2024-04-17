@@ -6,15 +6,18 @@
 ID3D12Device* PostEffect::sDevice = nullptr;
 UINT PostEffect::sDescriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* PostEffect::sCommandList = nullptr;
-Microsoft::WRL::ComPtr<ID3D12RootSignature> PostEffect::sRootSignature;
+//Microsoft::WRL::ComPtr<ID3D12RootSignature> PostEffect::sRootSignature;
 //Microsoft::WRL::ComPtr<ID3D12PipelineState> PostEffect::sPipelineState;
-std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(PostEffect::BlendMode::CountofBlendMode)> PostEffect::sPipelineStates;
+//std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(PostEffect::BlendMode::CountofBlendMode)> PostEffect::sPipelineStates;
 
-void PostEffect::StaticInitialize(
-	ID3D12Device* device, int window_width, int window_height, const std::wstring& directoryPath)
+void PostEffect::SetDevice(ID3D12Device* device) {
+	sDevice = device;
+}
+
+void PostEffect::StaticInitialize(int window_width, int window_height ,const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
-	sDevice = device;
+	//sDevice = device;
 	sDescriptorHandleIncrementSize =
 		sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -33,9 +36,9 @@ void PostEffect::StaticInitialize(
 	assert(SUCCEEDED(hr));
 
 	//Shaderのコンパイル
-	IDxcBlob* vertexShaderBlob = CompileShader(L"Resources/Shaders/BlumeVS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* vertexShaderBlob = CompileShader(vertexShaderPath, L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(vertexShaderBlob != nullptr);
-	IDxcBlob* pixelShaderBlob = CompileShader(L"Resources/Shaders/BlumePS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
+	IDxcBlob* pixelShaderBlob = CompileShader(pixelShaderPath, L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -205,14 +208,16 @@ PostEffect* PostEffect::Create(Vector2 position, Vector2 size, Vector4 color)
 	postEffect->anchorPoint_ = { 0.5f,0.5f };
 	postEffect->blendMode_ = BlendMode::Screen;
 	postEffect->rotate_ = 0;
-	postEffect->Initialize();
+	//postEffect->Initialize();
 
 	return postEffect;
 }
 
-void PostEffect::Initialize()
+void PostEffect::Initialize(const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath)
 {
 //	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
+
+	StaticInitialize(1280,720,vertexShaderPath,pixelShaderPath);
 
 	//Sprite用のリソースを作る
 	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 4);
@@ -277,7 +282,7 @@ void PostEffect::Draw(ID3D12DescriptorHeap* srvDescriptorHeap, D3D12_GPU_DESCRIP
 	sCommandList->SetPipelineState(sPipelineStates[size_t(blendMode_)].Get());
 
 	//1枚目
-	vertexDataSprite_[0].position = { -size_.x * anchorPoint_.x, -size_.y * anchorPoint_.y,0.0f,1.0f };
+	/*vertexDataSprite_[0].position = {-size_.x * anchorPoint_.x, -size_.y * anchorPoint_.y,0.0f,1.0f};
 	vertexDataSprite_[0].texcoord = { 0.0f,0.0f };
 	vertexDataSprite_[1].position = { +size_.x * (1.0f - anchorPoint_.x), -size_.y * anchorPoint_.y,0.0f,1.0f };
 	vertexDataSprite_[1].texcoord = { 1.0f,0.0f };
@@ -289,7 +294,7 @@ void PostEffect::Draw(ID3D12DescriptorHeap* srvDescriptorHeap, D3D12_GPU_DESCRIP
 	Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
 	Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(1280), float(720), 0.0f, 1.0f);
 	Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;*/
 	materialData_->uvTransform = uvTransform_;
 
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());

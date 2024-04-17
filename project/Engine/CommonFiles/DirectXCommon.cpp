@@ -226,9 +226,9 @@ void DirectXCommon::End3DSorceDraw() {
 	//commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
 	//バックバッファに書き込む
-	PostEffect::PreDraw(commandList_.Get());
+	postEffect->PreDraw(commandList_.Get());
 	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kBlume]);
-	PostEffect::PostDraw();
+	postEffect->PostDraw();
 }
 void DirectXCommon::PostDraw()
 {
@@ -278,6 +278,7 @@ void DirectXCommon::PostDraw()
 
 void DirectXCommon::CreatePostEffectSprite() {
 	postEffect=PostEffect::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 1.0f,1.0f,1.0f,1.0f });
+	postEffect->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/BlumePS.hlsl");
 	postEffect->SetAnchorPoint({ 0.0f,0.0f });
 	postEffect->SetBlendMode(PostEffect::BlendMode::None);
 }
@@ -418,7 +419,7 @@ void DirectXCommon::CreateRenderTargetView()
 	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
+	rtvHandles_[6].ptr = rtvHandles_[5].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;

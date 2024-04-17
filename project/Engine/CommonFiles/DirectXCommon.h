@@ -100,6 +100,7 @@ private:
 		kSorce2D,
 		kPost3D,
 		kBlume,
+		kGrayScale,
 		kCountOfRenderTarget
 	};
 
