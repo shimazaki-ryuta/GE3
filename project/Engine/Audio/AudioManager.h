@@ -5,6 +5,11 @@
 #include <wrl.h>
 #include <string>
 #include <vector>
+
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
+
 class AudioManager
 {
 public:
@@ -32,14 +37,13 @@ public:
 	};
 	static AudioManager* GetInstance();
 	void Initialize(std::string directoryPath = "Resources/Audio/");
-	void Finalize() {
-		xaudio2_.Reset();
-		UnLoadAll();
-	};
+	void Finalize();
 	uint32_t LoadWave(const std::string& fileName);
+	uint32_t LoadAudio(const std::string& fileName);
 	void SoundUnLoad(SoundData* soundData);
 	void UnLoadAll();
 	void PlayWave(uint32_t audioHandle);
+
 private:
 	AudioManager() = default;
 	~AudioManager() = default;

@@ -34,7 +34,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	input_ = Input::GetInstance();
 
-	audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
+	//audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
+	audioHandle_ = AudioManager::GetInstance()->LoadAudio("1.mp3");
 	//AudioManager::GetInstance()->PlayWave(audioHandle_);
 #ifdef _DEBUG
 	
@@ -371,6 +372,7 @@ void GameScene::Update() {
 		if (!isEnd_) {
 			for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
 				if (IsCollision(player2_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
+					AudioManager::GetInstance()->PlayWave(audioHandle_);
 					Particle::ParticleData particleData;
 					for (uint32_t count = 0; count < 20; count++) {
 						particleData.transform.scale = { 0.5f,0.5f,0.5f };
@@ -395,6 +397,7 @@ void GameScene::Update() {
 		if (!isEnd_) {
 			for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
 				if (IsCollision(player_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
+					AudioManager::GetInstance()->PlayWave(audioHandle_);
 					Particle::ParticleData particleData;
 					for (uint32_t count = 0; count < 20; count++) {
 						particleData.transform.scale = { 0.5f,0.5f,0.5f };

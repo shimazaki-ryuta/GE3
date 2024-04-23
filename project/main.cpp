@@ -58,7 +58,8 @@ struct DirectionalLight
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//D3DResourceLeakChacker leacCheck;// = D3DResourceLeakChacker::GetInstance();
-	assert(SUCCEEDED(CoInitializeEx(0,COINIT_MULTITHREADED)));
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+	//assert(SUCCEEDED());
 	//std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
