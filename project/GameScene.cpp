@@ -336,7 +336,7 @@ void GameScene::Update() {
 			}*/
 		}
 
-		//ai_->Update();
+		ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();

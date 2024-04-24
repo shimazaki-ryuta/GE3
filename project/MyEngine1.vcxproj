@@ -265,6 +265,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\PlayerAI.cpp" />
     <ClCompile Include="Application\Skydome.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
+    <ClCompile Include="Engine\Animation.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
     <ClCompile Include="Engine\Colider\AABB.cpp" />
     <ClCompile Include="Engine\Colider\Collider.cpp" />
@@ -285,6 +286,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Input.cpp" />
     <ClCompile Include="Engine\LoadModel.cpp" />
     <ClCompile Include="Engine\Math\MatrixFunction.cpp" />
+    <ClCompile Include="Engine\Math\QuaternionFunction.cpp" />
     <ClCompile Include="Engine\Math\VectorFunction.cpp" />
     <ClCompile Include="Engine\Model.cpp" />
     <ClCompile Include="Engine\Particle.cpp" />
@@ -360,6 +362,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\LoadModel.h" />
     <ClInclude Include="Engine\Math\Matrix.h" />
     <ClInclude Include="Engine\Math\MatrixFunction.h" />
+    <ClInclude Include="Engine\Math\Quaternion.h" />
+    <ClInclude Include="Engine\Math\QuaternionFunction.h" />
     <ClInclude Include="Engine\Math\Vector2.h" />
     <ClInclude Include="Engine\Math\Vector3.h" />
     <ClInclude Include="Engine\Math\Vector4.h" />

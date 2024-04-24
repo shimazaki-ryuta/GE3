@@ -91,6 +91,9 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+Matrix4x4 MakeCrossMatrix(const Vector3& vector);
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis,float angle);
+
 Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to);
 
 Matrix4x4 operator+(Matrix4x4 m1, Matrix4x4 m2);

@@ -544,11 +544,59 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m)
 	return transform;
 }
 
+Matrix4x4 MakeCrossMatrix(const Vector3& vector) {
+	Matrix4x4 matrix = { 0 };
+	matrix.m[0][0] = 0;
+	matrix.m[0][1] = -vector.z;
+	matrix.m[0][2] = vector.y;
+
+	matrix.m[1][0] = vector.z;
+	matrix.m[1][1] = 0;
+	matrix.m[1][2] = -vector.x;
+
+	matrix.m[2][0] = -vector.y;
+	matrix.m[2][1] = vector.x;
+	matrix.m[2][2] = 0;
+	return matrix;
+}
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
+	Matrix4x4 s = MakeIdentity4x4();
+	s.m[0][0] = std::cos(angle);
+	s.m[1][1] = std::cos(angle);
+	s.m[2][2] = std::cos(angle);
+	Matrix4x4 p = { 0 };
+	p.m[0][0] = axis.x * axis.x;
+	p.m[0][1] = axis.x * axis.y;
+	p.m[0][2] = axis.x * axis.z;
+
+	p.m[1][0] = axis.y * axis.x;
+	p.m[1][1] = axis.y * axis.y;
+	p.m[1][2] = axis.y * axis.z;
+
+	p.m[2][0] = axis.z * axis.x;
+	p.m[2][1] = axis.z * axis.y;
+	p.m[2][2] = axis.z * axis.z;
+
+	p = Scalar((1.0f - std::cos(angle)), p);
+	Matrix4x4 c = MakeCrossMatrix(axis);
+	c = Scalar(std::sin(angle), c);
+	return s + p - c;
+}
+
+
 Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to) {
 	Matrix4x4 result = MakeIdentity4x4();
 	Vector3 normal = Normalize(Cross(from,to));
-	if (normal.x == normal.y && normal.x == normal.z) {
-		normal.y = 1.0f;
+	if (normal.x == normal.y && normal.x == normal.z && normal.x == 0.0f) {
+		if (from.x!=0.0f ||from.y != 0) {
+			normal.z = 0.0f;
+			normal.x = from.y;
+			normal.y = -from.x;
+		}
+		else {
+			normal.y = 1.0f;
+		}
 	}
 	float cos = Dot(from,to);
 	float sin = Length(Cross(from,to));
