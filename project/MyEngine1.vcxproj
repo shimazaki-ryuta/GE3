@@ -337,6 +337,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\PlayerAI.h" />
     <ClInclude Include="Application\Skydome.h" />
     <ClInclude Include="Application\TimedCall.h" />
+    <ClInclude Include="Engine\Animation.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
     <ClInclude Include="Engine\Colider\AABB.h" />
     <ClInclude Include="Engine\Colider\Collider.h" />
@@ -364,6 +365,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Math\Vector4.h" />
     <ClInclude Include="Engine\Math\VectorFunction.h" />
     <ClInclude Include="Engine\Model.h" />
+    <ClInclude Include="Engine\ModelStruct.h" />
     <ClInclude Include="Engine\Particle.h" />
     <ClInclude Include="Engine\PostEffect.h" />
     <ClInclude Include="Engine\Primitive3D.h" />

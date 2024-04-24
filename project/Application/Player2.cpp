@@ -16,6 +16,8 @@
 #include "CollisionManager.h"
 #include "RandomEngine.h"
 
+#include "../Engine/TextureManager.h"
+
 static int startFrame = 0;
 static int endFrame = 40;
 static int rigidityFrame = 30;
@@ -407,7 +409,7 @@ void Player2::Draw(const ViewProjection& viewProjection) {
 	//model_->Draw(worldTransform_, viewProjection);
 	for (HierarchicalAnimation& model : models_)
 	{
-		model.model_->Draw(model.worldTransform_, viewProjection);
+		model.model_->Draw(model.worldTransform_, viewProjection,TextureManager::LoadTexture("uvChecker.png"));
 	}
 	for (std::list<std::unique_ptr<Bullet>>::iterator iterator = bullets_.begin();
 		iterator != bullets_.end(); iterator++) {

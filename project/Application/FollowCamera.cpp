@@ -34,7 +34,7 @@ void FollowCamera::Update()
 	rotateMatrix3_ = MakeIdentity4x4();
 	if (target_)
 	{
-		Vector3 offset = { 0.0f,3.0f,-20.0f };
+		Vector3 offset = { 0.0f,3.0f,-10.0f };
 
 
 		if (lockOnTarget_ != nullptr) {

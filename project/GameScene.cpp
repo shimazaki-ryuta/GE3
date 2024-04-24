@@ -99,10 +99,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
-	//Model* model = new Model;
-	//model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
-	//modelPlayerHead_.reset(model);
-	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
+	Model* model = new Model;
+	model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
+	modelPlayerHead_.reset(model);
+	//modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -126,7 +126,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	animationPlayer.push_back({ modelPlayerR_arm_.get(), worldTransformPlayerR_arm });
 
 	modelPlayerBody2_.reset(Model::CreateFromOBJ("float_Body"));
-	modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
+	Model* model2 = new Model;
+	model2->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
+	modelPlayerHead2_.reset(model2);
+	//modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm2_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm2_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -272,19 +275,19 @@ void GameScene::Update() {
 	switch (colorPhase_)
 	{
 	case 0:
-		directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
+		//directinalLightData->color = Vector4{ 1.0f-color_,color_, 0.0f, 1.0f };
 		break;
 	case 1:
-		directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
+		//directinalLightData->color = Vector4{0,1.0f-color_, color_, 1.0f };
 		break;
 	case 2:
-		directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
+		//directinalLightData->color = Vector4{color_,0, 1.0f-color_, 1.0f };
 		break;
 	default:
 		break;
 	}
 
-	color_+=0.01f;
+	color_+=0.06f;
 	if (color_>1.0f) {
 		color_ = 0;
 		colorPhase_++;
@@ -333,7 +336,7 @@ void GameScene::Update() {
 			}*/
 		}
 
-		ai_->Update();
+		//ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();

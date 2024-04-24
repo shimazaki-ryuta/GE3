@@ -13,6 +13,7 @@
 #include "ViewProjection.h"
 #include <memory>
 //#include <stdfloat>
+#include "ModelStruct.h"
 class Model
 {
 public:
@@ -20,13 +21,7 @@ public:
 	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
-	struct VertexData
-	{
-		Vector4 position;
-		Vector2 texcoord;
-		Vector3 normal;
-		Vector4 triangleCenter;
-	};
+	
 
 	struct Material
 	{
@@ -54,25 +49,6 @@ public:
 		Vector3 worldPosition;
 	};
 
-	struct MaterialData
-	{
-		std::string textureFilePath;
-		uint32_t textureHandle;
-	};
-
-	struct MeshData
-	{
-		std::vector<VertexData> vertices;
-		MaterialData material;
-	};
-
-	struct ModelData {
-		//std::vector<VertexData> vertices;
-		//MaterialData material;
-		//std::vector<MeshData> meshs;
-		MeshData meshs;
-		size_t vertexNum;
-	};
 
 	// デバイス
 	static ID3D12Device* sDevice;
@@ -130,7 +106,8 @@ private:
 	Material* materialData_ = nullptr;
 	OutLineData* outlineData_ = nullptr;
 	CameraForGpu* cameraData_ = nullptr;
-	//TransformationMatrix* transformationMatrixData = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> localMatrixResource_;
+	Matrix4x4* localMatrixData_ = nullptr;
 	WorldTransform worldTransform;
 	Vector2 position_;
 	Vector2 size_;
@@ -144,6 +121,6 @@ private:
 	D3D12_RESOURCE_DESC resourceDesc_;
 
 	size_t vertexNum = 0;
-	std::vector<Model::MeshData*> meshs_;
+	std::vector<MeshData*> meshs_;
 };
 

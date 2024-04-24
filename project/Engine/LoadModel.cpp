@@ -6,13 +6,9 @@
 #include <sstream>
 
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-LoadModel::MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
+MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
 {
-	LoadModel::MaterialData materialData;
+	MaterialData materialData;
 	std::string line;
 	std::ifstream file(directoryPath + "/" + filename);
 	assert(file.is_open());
@@ -31,7 +27,7 @@ LoadModel::MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& 
 	return materialData;
 }
 
-LoadModel::ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::string& filename)
+ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;
 	std::string filePath = directoryPath + "/" + filename;
@@ -84,7 +80,7 @@ LoadModel::ModelData LoadModel::LoadObjFile(const std::string& directoryPath, co
 	return modelData;
 }
 
-LoadModel::ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::string& filename)
+ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;
 	std::string filePath = directoryPath + "/" + filename;
@@ -134,5 +130,24 @@ LoadModel::ModelData LoadModel::LoadModelFile(const std::string& directoryPath, 
 	}
 	modelData.meshs = meshd;
 	modelData.vertexNum = modelData.meshs.vertices.size();
+	modelData.rootNode = ReadNode(scene->mRootNode);
 	return modelData;
+}
+
+Node LoadModel::ReadNode(aiNode* node) {
+	Node result;
+	aiMatrix4x4 aiLocalMatrix = node->mTransformation;
+	aiLocalMatrix.Transpose();
+	for (int y = 0; y < 4;y++) {
+		for (int x = 0; x < 4;x++) {
+			result.localMatrix.m[y][x] = aiLocalMatrix[y][x];
+		}
+	}
+	result.name = node->mName.C_Str();
+	result.children.resize(node->mNumChildren);
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren;++childIndex) {
+		result.children[childIndex] = ReadNode(node->mChildren[childIndex]);
+	}
+
+	return result;
 }

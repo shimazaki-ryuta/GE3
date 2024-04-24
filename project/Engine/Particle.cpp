@@ -198,7 +198,7 @@ void Particle::Initialize(uint32_t numInstance)
 	std::string directory = "Resources/Plane";
 	std::string filename = "Plane";
 	filename = filename + ".obj";
-	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directory, filename);
+	ModelData modelData = LoadModel::LoadObjFile(directory, filename);
 	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 6);
 	textureHandle_ = modelData.meshs.material.textureHandle;
 	//頂点バッファビューを作る

@@ -53,7 +53,7 @@ void Model::StaticInitialize(
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[8] = {};
+	D3D12_ROOT_PARAMETER rootParameters[9] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -110,6 +110,10 @@ void Model::StaticInitialize(
 	rootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[7].DescriptorTable.pDescriptorRanges = descriptorRange2;
 	rootParameters[7].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange2);
+
+	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	rootParameters[8].Descriptor.ShaderRegister = 8;
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -376,7 +380,7 @@ void Model::StaticInitializeOutLine(
 
 void Model::Create(const  std::string& directoryPath, const std::string& filename)
 {
-	LoadModel::ModelData modelData = LoadModel::LoadObjFile(directoryPath, filename);
+	ModelData modelData = LoadModel::LoadModelFile(directoryPath, filename);
 
 	//std::string filePath = directoryPath + "/" + filename;
 
@@ -416,6 +420,14 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
 	outlineData_->color = Vector4{ 0.0f, 0.0f, 0.0f, 1.0f };
 	outlineData_->scale = MakeScaleMatrix({1.05f,1.05f,1.05f});
+
+	//ローカル変換行列
+	localMatrixResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Matrix4x4));
+	localMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&localMatrixData_));
+	*localMatrixData_ = MakeIdentity4x4();
+	if (!modelData.rootNode.name.empty()) {
+		*localMatrixData_ = modelData.rootNode.localMatrix;
+	}
 }
 
 Model* Model::CreateFromOBJ(const  std::string& filename)
@@ -475,6 +487,8 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	//localMatrix用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(8, localMatrixResource_->GetGPUVirtualAddress());
 	//Lighting用のリソースの場所を設定
 	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
 	//camera用のリソース
@@ -505,6 +519,8 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	//localMatrix用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(8, localMatrixResource_->GetGPUVirtualAddress());
 	//Lighting用のリソースの場所を設定
 	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
 	//camera用のリソース
