@@ -376,6 +376,7 @@ void Player::BehaviorAttackUpdate()
 			Vector3 velocity = Normalize(toTarget) * 1.5f;
 			bullet->SetVelocity(velocity);
 			bullet->SetParticle(particle_);
+			bullet->SetAnimation(bulletAnimation_);
 			bullets_.push_back(std::move(bullet));
 			fire_();
 		}
@@ -414,7 +415,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	//model_->Draw(worldTransform_, viewProjection);
 	for (HierarchicalAnimation& model : models_)
 	{
-		model.model_->Draw(model.worldTransform_, viewProjection,TextureManager::LoadTexture("uvChecker.png"));
+		model.model_->Draw(model.worldTransform_, viewProjection);
 	}
 	for (std::list<std::unique_ptr<Bullet>>::iterator iterator = bullets_.begin();
 		iterator != bullets_.end(); iterator++) {

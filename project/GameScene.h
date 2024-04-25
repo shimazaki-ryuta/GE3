@@ -185,6 +185,6 @@ private:
 	float color_;
 
 	float grayScaleValue_;//グレースケールの強さ
-	
+	std::unique_ptr<Animation> bulletAnimation_;
 };
 

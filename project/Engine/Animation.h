@@ -29,27 +29,45 @@ struct AnimationData {
 class Animation
 {
 public:
+
+	//再生モード
+	enum PlayType {
+		LOOP,
+		ONE
+	};
+
 	void Initialize() {
 		isLoadingAnimation_ = false;
 		time = 0.0f;
+		playSpeed_ = 1.0f;
 	};
 	void LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
 
-	void Update() {
-		if (isLoadingAnimation_) {
-			time += 1.0f / 60.0f;
-			time = std::fmod(time, data->duration);
-		}
-	}
+	void Update();
+
+	void SetTime(float t) { time = t; };
 
 	//アニメーション適応行列を取得する
 	Matrix4x4 GetAnimationMatrix(const std::string& nodename);
 
+	std::shared_ptr<AnimationData> GetAnimationData() { return data_; };
+
+	//読み込み済みのアニメーションデータのポインタをセットする
+	void SetAnimationData(std::shared_ptr<AnimationData> data) { 
+		data_ = data;
+		isLoadingAnimation_ = true;
+	};
+
+	void SetPlayType(PlayType type) { playType_ = type; };
+
+	void SetPlaySpeed(float t) { playSpeed_ = t; };
+
 private:
-	std::unique_ptr<AnimationData> data;
+	std::shared_ptr<AnimationData> data_;
 	bool isLoadingAnimation_=false;
 	float time = 0.0f;
-	
+	float playSpeed_=1.0f;//再生速度
+	PlayType playType_ = LOOP;
 
 	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 	Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);

@@ -3,12 +3,20 @@
 #include "RandomEngine.h"
 void Bullet::Initialize() {
 	worldTransform_.Initialize();
-	//worldTransform_.scale_ = {0.8f,0.8f,0.8f};
+	worldTransform_.scale_ = {0.8f,0.8f,0.8f};
 	isDead_ = false;
 	aliveTime_ = 180;
+	animation_.reset(new Animation);
+	animation_->Initialize();
+	//animation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
+	animation_->SetPlaySpeed(2.0f);
 }
 
 void Bullet::Update() {
+
+	animation_->Update();
+	model_->SetLocalMatrix(animation_->GetAnimationMatrix("center"));
+	
 	worldTransform_.translation_ += velocity_;
 	worldTransform_.UpdateMatrix();
 	sphere_.center = worldTransform_.GetWorldPosition();

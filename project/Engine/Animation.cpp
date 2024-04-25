@@ -8,7 +8,7 @@
 #include <assimp/postprocess.h>
 #include <cassert>
 void Animation::LoadAnimationFile(const std::string& directoryPath, const std::string& filename) {
-	data.reset(new AnimationData);
+	data_.reset(new AnimationData);
 	//AnimationData animation;
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename;
@@ -16,11 +16,11 @@ void Animation::LoadAnimationFile(const std::string& directoryPath, const std::s
 	assert(scene->mNumAnimations != 0);
 
 	aiAnimation* animationAssimp = scene->mAnimations[0];
-	data->duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
+	data_->duration = float(animationAssimp->mDuration / animationAssimp->mTicksPerSecond);
 
 	for (uint32_t channelIndex = 0; channelIndex < animationAssimp->mNumChannels; ++channelIndex) {
 		aiNodeAnim* nodeAnimationAssimp = animationAssimp->mChannels[channelIndex];
-		NodeAnimation& nodeAnimation = data->nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
+		NodeAnimation& nodeAnimation = data_->nodeAnimations[nodeAnimationAssimp->mNodeName.C_Str()];
 		//position
 		for (uint32_t keyIndex = 0; keyIndex < nodeAnimationAssimp->mNumPositionKeys;++keyIndex) {
 			aiVectorKey& keyAssimp = nodeAnimationAssimp->mPositionKeys[keyIndex];
@@ -82,9 +82,27 @@ Quaternion Animation::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 }
 
 Matrix4x4 Animation::GetAnimationMatrix(const std::string& nodename) {
-	NodeAnimation& nodeAnimation = data->nodeAnimations[nodename];
+	NodeAnimation& nodeAnimation = data_->nodeAnimations[nodename];
 	Vector3 translate = CalculateValue(nodeAnimation.translate,time);
 	Quaternion rotate = CalculateValue(nodeAnimation.rotate, time);
 	Vector3 scale = CalculateValue(nodeAnimation.scale, time);
 	return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
+}
+
+void Animation::Update() {
+	if (isLoadingAnimation_) {
+		time += 1.0f / 60.0f * playSpeed_;
+		switch (playType_)
+		{
+		case LOOP:
+			time = std::fmod(time, data_->duration);
+			break;
+		case ONE:
+			time = std::min(time, data_->duration);
+			break;
+		default:
+			time = std::fmod(time, data_->duration);
+			break;
+		}
+	}
 }

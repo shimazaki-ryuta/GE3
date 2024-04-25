@@ -159,14 +159,21 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player2_->SetShadowTexture(toonShadowTextureHandle_);
 	player2_->SetOutLineData(0.05f, { 1.0f,0,0.0f,1.0f });
 	//player2_->SetWepon(modelWepon_.get());
-
-	modelBullet_.reset(Model::CreateFromOBJ("bullet"));
+	Model* model = new Model;
+	model->Create("Resources/bullet", "bullet.gltf");
+	modelBullet_.reset(model);
+	bulletAnimation_.reset(new Animation);
+	bulletAnimation_->Initialize();
+	bulletAnimation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
+	//bulletAnimation_->SetPlaySpeed(5.0f);
+	//modelBullet_.reset(Model::CreateFromOBJ("bullet"));
 	//modelBullet_->SetShiniess(40.0f);
 	modelBullet_->SetEnableLighting(0);
 	modelBullet_->SetGrowStrength(1.0f);
 	player_->SetModelBullet(modelBullet_.get());
 	player2_->SetModelBullet(modelBullet_.get());
-
+	player_->SetBulletAnimation(bulletAnimation_.get());
+	player2_->SetBulletAnimation(bulletAnimation_.get());
 	// 天球
 	modelSkydome_ = Model::CreateFromOBJ("skydome");
 	skydome_.reset(new Skydome);
@@ -175,11 +182,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	// 地面
 	//modelGround_ = Model::CreateFromOBJ("Ground");
 	//modelGround_->SetGrowStrength(1.0f);
-	Model* model = new Model;
-	model->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
+	
 	//modelPlayerHead_.reset(model);
-	ground_.reset(new Ground);
-	ground_->Initialize(model, Vector3(0.0f, 0.0f, 0.0f));
+	//ground_.reset(new Ground);
+	//ground_->Initialize(model, Vector3(0.0f, 0.0f, 0.0f));
 
 
 	//床
@@ -580,7 +586,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 	skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);

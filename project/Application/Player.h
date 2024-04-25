@@ -80,6 +80,7 @@ public:
 	std::list<std::unique_ptr<Bullet>>& GetBulletList() { return bullets_; };
 	void SetIsDead(bool is) { isDead_ = is; };
 	bool GetIsDead() { return isDead_; };
+	void SetBulletAnimation(Animation* animation) { bulletAnimation_ = animation; };
 private:
 	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
@@ -152,4 +153,5 @@ private:
 
 	std::function<void()> fire_;
 	bool isDead_;
+	Animation* bulletAnimation_;
 };
