@@ -6,11 +6,18 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	worldTransform_.translation_ = position;
 	model_->SetEnableLighting(2);
 	model_->SetShiniess(40.0f);
+	testAnimation_.reset(new Animation);
+	testAnimation_->Initialize();
+	testAnimation_->LoadAnimationFile("Resources/AnimatedCube", "AnimatedCube.gltf");
+
 }
 
-void Ground::Update() {}
+void Ground::Update() {
+}
 
 void Ground::Draw(const ViewProjection& viewProjection) {
+	testAnimation_->Update();
+	model_->SetLocalMatrix(testAnimation_->GetAnimationMatrix("AnimatedCube"));
 	model_->Draw(worldTransform_, viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {

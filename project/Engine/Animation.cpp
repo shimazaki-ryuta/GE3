@@ -1,4 +1,5 @@
 #include "Animation.h"
+#include "Math/MatrixFunction.h"
 #include "Math/VectorFunction.h"
 #include "Math/QuaternionFunction.h"
 
@@ -78,4 +79,12 @@ Quaternion Animation::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 		}
 	}
 	return (*keyframes.rbegin()).value;
+}
+
+Matrix4x4 Animation::GetAnimationMatrix(const std::string& nodename) {
+	NodeAnimation& nodeAnimation = data->nodeAnimations[nodename];
+	Vector3 translate = CalculateValue(nodeAnimation.translate,time);
+	Quaternion rotate = CalculateValue(nodeAnimation.rotate, time);
+	Vector3 scale = CalculateValue(nodeAnimation.scale, time);
+	return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
 }

@@ -3,7 +3,7 @@
 #include "WorldTransform.h"
 
 #include <memory>
-
+#include "../Engine/Animation.h"
 
 /// <summary>
 /// 地面
@@ -27,4 +27,6 @@ public:
 private:
 	WorldTransform worldTransform_;
 	std::unique_ptr<Model> model_;
+
+	std::unique_ptr<Animation> testAnimation_;
 };

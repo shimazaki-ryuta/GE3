@@ -43,7 +43,7 @@ public:
 	}
 
 	//アニメーション適応行列を取得する
-	//Matrix4x4 GetAnimationMatrix(const std::string& nodename);
+	Matrix4x4 GetAnimationMatrix(const std::string& nodename);
 
 private:
 	std::unique_ptr<AnimationData> data;

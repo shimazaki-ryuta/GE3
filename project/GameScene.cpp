@@ -99,10 +99,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
-	Model* model = new Model;
-	model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
-	modelPlayerHead_.reset(model);
-	//modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
+	//Model* model = new Model;
+	//model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
+	//modelPlayerHead_.reset(model);
+	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -126,10 +126,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	animationPlayer.push_back({ modelPlayerR_arm_.get(), worldTransformPlayerR_arm });
 
 	modelPlayerBody2_.reset(Model::CreateFromOBJ("float_Body"));
-	Model* model2 = new Model;
-	model2->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
-	modelPlayerHead2_.reset(model2);
-	//modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
+	//Model* model2 = new Model;
+	//model2->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
+	//modelPlayerHead2_.reset(model2);
+	modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm2_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm2_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -173,10 +173,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
 
 	// 地面
-	modelGround_ = Model::CreateFromOBJ("Ground");
-	modelGround_->SetGrowStrength(1.0f);
+	//modelGround_ = Model::CreateFromOBJ("Ground");
+	//modelGround_->SetGrowStrength(1.0f);
+	Model* model = new Model;
+	model->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
+	//modelPlayerHead_.reset(model);
 	ground_.reset(new Ground);
-	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
+	ground_->Initialize(model, Vector3(0.0f, 0.0f, 0.0f));
+
 
 	//床
 	//flooar_.reset(new MovingFlooar);
@@ -576,6 +580,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	ground_->Draw(viewProjection_);
 	skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);

@@ -93,6 +93,11 @@ public:
 	void SetShadingType(int32_t num) { materialData_->shadingType = num; };
 	void SetToonShadowTextureHandle(uint32_t handle) { toonShadowTextureHandle_ = handle; };
 	void SetGrowStrength(float strength) { materialData_->growStrength = strength; };
+
+	void SetLocalMatrix(const Matrix4x4& newMatrix) { *localMatrixData_ = newMatrix; };
+	
+
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

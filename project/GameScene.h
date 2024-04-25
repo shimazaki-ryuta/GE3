@@ -29,6 +29,7 @@
 #include <array>
 #include <memory>
 #include "LockOn.h"
+#include "Engine/Animation.h"
 class GameScene
 {
 public:
@@ -184,5 +185,6 @@ private:
 	float color_;
 
 	float grayScaleValue_;//グレースケールの強さ
+	
 };
 
