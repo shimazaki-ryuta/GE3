@@ -538,6 +538,38 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 
 }
 
+void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,ID3D12Resource* animationMatrixResource) {
+	// パイプラインステートの設定
+	sCommandList->SetPipelineState(sPipelineState.Get());
+	// ルートシグネチャの設定
+	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
+	//transformationMatrixData->World = worldTransform.matWorld_;
+	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
+	cameraData_->worldPosition = viewProjection.translation_;
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//wvp用のCBufferの場所を設定
+	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	//localMatrix用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(8, animationMatrixResource->GetGPUVirtualAddress());
+	//Lighting用のリソースの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	//camera用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+
+	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
+	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+
+}
+
 void Model::DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection) {
 	// パイプラインステートの設定
 	sCommandList->SetPipelineState(sPipelineStateOutLine.Get());

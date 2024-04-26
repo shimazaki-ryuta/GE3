@@ -9,13 +9,14 @@ void Bullet::Initialize() {
 	animation_.reset(new Animation);
 	animation_->Initialize();
 	//animation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
-	animation_->SetPlaySpeed(2.0f);
+	animation_->SetPlaySpeed(RandomEngine::GetRandom(0.5f,13.0f));
 }
 
 void Bullet::Update() {
 
 	animation_->Update();
-	model_->SetLocalMatrix(animation_->GetAnimationMatrix("center"));
+	animation_->GetAnimationMatrix("center");
+	//model_->SetLocalMatrix(animation_->GetAnimationMatrix("center"));
 	
 	worldTransform_.translation_ += velocity_;
 	worldTransform_.UpdateMatrix();
@@ -39,5 +40,5 @@ void Bullet::Update() {
 }
 
 void Bullet::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_,viewProjection);
+	model_->Draw(worldTransform_,viewProjection,animation_->GetMatrixResource());
 }

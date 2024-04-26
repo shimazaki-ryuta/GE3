@@ -83,6 +83,8 @@ public:
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
 
+	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, ID3D12Resource* animationMatrixResource);
+
 	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};

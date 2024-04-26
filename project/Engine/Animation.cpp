@@ -7,6 +7,24 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <cassert>
+
+#include "CommonFiles/DirectXCommon.h"
+ID3D12Device* Animation::sDevice = nullptr;
+void  Animation::SetDevice(ID3D12Device* device)
+{
+	sDevice = device;
+}
+
+void Animation::Initialize() {
+	isLoadingAnimation_ = false;
+	time = 0.0f;
+	playSpeed_ = 1.0f;
+	matrixResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Matrix4x4));
+
+	matrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&matrixData_));
+	*matrixData_ = MakeIdentity4x4();
+};
+
 void Animation::LoadAnimationFile(const std::string& directoryPath, const std::string& filename) {
 	data_.reset(new AnimationData);
 	//AnimationData animation;
@@ -86,6 +104,8 @@ Matrix4x4 Animation::GetAnimationMatrix(const std::string& nodename) {
 	Vector3 translate = CalculateValue(nodeAnimation.translate,time);
 	Quaternion rotate = CalculateValue(nodeAnimation.rotate, time);
 	Vector3 scale = CalculateValue(nodeAnimation.scale, time);
+	//return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
+	*matrixData_ = MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
 	return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
 }
 

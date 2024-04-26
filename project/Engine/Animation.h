@@ -6,6 +6,8 @@
 #include "Math/Vector3.h"
 #include "Math/Quaternion.h"
 #include "Math/Matrix.h"
+#include <d3d12.h>
+#include <wrl.h>
 template<typename tValue>
 struct Keyframe {
 	float time;
@@ -36,11 +38,7 @@ public:
 		ONE
 	};
 
-	void Initialize() {
-		isLoadingAnimation_ = false;
-		time = 0.0f;
-		playSpeed_ = 1.0f;
-	};
+	void Initialize();
 	void LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
 
 	void Update();
@@ -62,6 +60,13 @@ public:
 
 	void SetPlaySpeed(float t) { playSpeed_ = t; };
 
+	// デバイス
+	static ID3D12Device* sDevice;
+
+	static void SetDevice(ID3D12Device* device);
+
+	ID3D12Resource* GetMatrixResource() {return matrixResource_.Get(); };
+
 private:
 	std::shared_ptr<AnimationData> data_;
 	bool isLoadingAnimation_=false;
@@ -71,5 +76,8 @@ private:
 
 	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 	Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource_;
+	Matrix4x4* matrixData_ = nullptr;
 };
 

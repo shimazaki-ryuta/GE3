@@ -44,6 +44,8 @@
 //ファイル書き出し
 #include "GlobalVariables.h"
 
+#include "Engine/Animation.h"
+
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
 const std::string kTitle = "";
@@ -96,6 +98,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	//worldTransformの初期化
 	WorldTransform::SetDevice(dxCommon->GetDevice());
+	Animation::SetDevice(dxCommon->GetDevice());
+
 
 	//Spriteの初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(),mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
