@@ -1,5 +1,5 @@
 #include "FixFPS.h"
-
+#include "thread"
 void FixFPS::Initialize() {
 	reference_ = std::chrono::steady_clock::now();
 }

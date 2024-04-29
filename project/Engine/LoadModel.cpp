@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "MatrixFunction.h"
 #include "VectorFunction.h"
+#include "QuaternionFunction.h"
 #include <fstream>
 #include <sstream>
 
@@ -136,13 +137,14 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 
 Node LoadModel::ReadNode(aiNode* node) {
 	Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation;
-	aiLocalMatrix.Transpose();
-	for (int y = 0; y < 4;y++) {
-		for (int x = 0; x < 4;x++) {
-			result.localMatrix.m[y][x] = aiLocalMatrix[y][x];
-		}
-	}
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	node->mTransformation.Decompose(scale,rotate,translate);
+	result.transform.scale = {scale.x,scale.y,scale.z};
+	result.transform.rotate = {rotate.x,-rotate.y ,-rotate.z ,rotate.w};
+	result.transform.translate = {-translate.x,translate.y, translate.z};
+	result.localMatrix = MakeScaleMatrix(result.transform.scale) * MakeRotateMatrix(result.transform.rotate) * MakeTranslateMatrix(result.transform.translate);
+
 	result.name = node->mName.C_Str();
 	result.children.resize(node->mNumChildren);
 	for (uint32_t childIndex = 0; childIndex < node->mNumChildren;++childIndex) {
@@ -150,4 +152,33 @@ Node LoadModel::ReadNode(aiNode* node) {
 	}
 
 	return result;
+}
+
+SkeletonData LoadModel::CreateSkelton(const Node& rootNode) {
+	SkeletonData skeleton;
+	//skeleton.root = CreateJoint(rootNode, {},skeleton.joints);
+
+	for (const Joint& joint : skeleton.joints) {
+		skeleton.jointMap.emplace(joint.name,joint.index);
+	}
+
+	return skeleton;
+}
+
+int32_t LoadModel::CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints) {
+	Joint joint;
+	joint.name = node.name;
+	joint.localMatrix = node.localMatrix;
+	joint.skeltonSpaceMatrix = MakeIdentity4x4();
+	joint.transform = node.transform;
+	joint.index = int32_t(joints.size());
+	joint.parent = parent;
+	joints.push_back(joint);
+
+	for (const Node& child : node.children) {
+		int32_t childlenIndex = CreateJoint(child,joint.index,joints);
+		joints[joint.index].children.push_back(childlenIndex);
+	}
+
+	return joint.index;
 }

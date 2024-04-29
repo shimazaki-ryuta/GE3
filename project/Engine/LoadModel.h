@@ -20,5 +20,7 @@ public:
 	static ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 	static MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename);
 	static Node ReadNode(aiNode* node);
+	static SkeletonData CreateSkelton(const Node& rootNode);
+	static int32_t CreateJoint(const Node& node,const std::optional<int32_t>& parent,std::vector<Joint>& joints);
 };
 
