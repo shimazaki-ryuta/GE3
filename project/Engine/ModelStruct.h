@@ -39,6 +39,7 @@ struct MaterialData
 struct MeshData
 {
 	std::vector<VertexData> vertices;
+	std::vector<uint32_t> indices;
 	MaterialData material;
 };
 
@@ -54,6 +55,15 @@ struct ModelData {
 	size_t vertexNum;
 	Node rootNode;
 };
+
+template<typename tValue>
+struct Keyframe {
+	float time;
+	tValue value;
+};
+
+using KeyframeVector3 = Keyframe<Vector3>;
+using KeyframeQuaternion = Keyframe<Quaternion>;
 
 struct Joint {
 	QuaternionTransform transform;

@@ -2,7 +2,7 @@
 #include "Math/MatrixFunction.h"
 #include "Math/VectorFunction.h"
 #include "Math/QuaternionFunction.h"
-
+#include "LoadModel.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -66,7 +66,7 @@ void Animation::LoadAnimationFile(const std::string& directoryPath, const std::s
 	}
 	isLoadingAnimation_ = true;
 }
-
+/*
 Vector3 Animation::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
 	assert(!keyframes.empty());
 	if (keyframes.size() == 1 || time <= keyframes[0].time) {
@@ -98,12 +98,12 @@ Quaternion Animation::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 	}
 	return (*keyframes.rbegin()).value;
 }
-
+*/
 Matrix4x4 Animation::GetAnimationMatrix(const std::string& nodename) {
 	NodeAnimation& nodeAnimation = data_->nodeAnimations[nodename];
-	Vector3 translate = CalculateValue(nodeAnimation.translate,time);
-	Quaternion rotate = CalculateValue(nodeAnimation.rotate, time);
-	Vector3 scale = CalculateValue(nodeAnimation.scale, time);
+	Vector3 translate = LoadModel::CalculateValue(nodeAnimation.translate,time);
+	Quaternion rotate = LoadModel::CalculateValue(nodeAnimation.rotate, time);
+	Vector3 scale = LoadModel::CalculateValue(nodeAnimation.scale, time);
 	//return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
 	*matrixData_ = MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);
 	return MakeScaleMatrix(scale) * MakeRotateMatrix(rotate) * MakeTranslateMatrix(translate);

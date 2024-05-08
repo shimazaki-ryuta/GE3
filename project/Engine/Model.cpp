@@ -380,12 +380,12 @@ void Model::StaticInitializeOutLine(
 
 void Model::Create(const  std::string& directoryPath, const std::string& filename)
 {
-	ModelData modelData = LoadModel::LoadModelFile(directoryPath, filename);
+	modelData_ = LoadModel::LoadModelFile(directoryPath, filename);
 
 	//std::string filePath = directoryPath + "/" + filename;
 
-	vertexNum = modelData.vertexNum;
-	textureHandle_ = modelData.meshs.material.textureHandle;
+	vertexNum = modelData_.vertexNum;
+	textureHandle_ = modelData_.meshs.material.textureHandle;
 	//頂点リソース
 	 vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) *vertexNum);
 
@@ -397,8 +397,18 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 
 	//VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	std::memcpy(vertexData_, modelData.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
+	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
 	
+	//インデックスリソース
+	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
+	
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = uint32_t(sizeof(uint32_t) * modelData_.meshs.indices.size());
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
+	std::memcpy(indexData_,modelData_.meshs.indices.data(),sizeof(uint32_t)*modelData_.meshs.indices.size());
+
 	//マテリアル用のリソースを作成
 	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Material));
 	//Material* materialData = nullptr;
@@ -425,8 +435,8 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	localMatrixResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Matrix4x4));
 	localMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&localMatrixData_));
 	*localMatrixData_ = MakeIdentity4x4();
-	if (!modelData.rootNode.name.empty()) {
-		*localMatrixData_ = modelData.rootNode.localMatrix;
+	if (!modelData_.rootNode.name.empty()) {
+		*localMatrixData_ = modelData_.rootNode.localMatrix;
 	}
 }
 
@@ -499,11 +509,11 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	sCommandList->IASetIndexBuffer(&indexBufferView_);
 
 	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
-
+	//sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+	sCommandList->DrawIndexedInstanced(UINT(vertexNum), 1, 0, 0, 0);
 }
 
 void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle) {
@@ -531,10 +541,10 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	sCommandList->IASetIndexBuffer(&indexBufferView_);
 
 	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+	sCommandList->DrawIndexedInstanced(UINT(vertexNum), 1, 0, 0,0);
 
 }
 
@@ -563,10 +573,10 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	sCommandList->IASetIndexBuffer(&indexBufferView_);
 
 	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+	sCommandList->DrawIndexedInstanced(UINT(vertexNum), 1, 0, 0,0);
 
 }
 
@@ -584,9 +594,9 @@ void Model::DrawOutLine(WorldTransform& worldTransform, const ViewProjection& vi
 	
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	sCommandList->IASetIndexBuffer(&indexBufferView_);
 
 	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
-
+	//sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+	sCommandList->DrawIndexedInstanced(UINT(vertexNum), 1, 0, 0, 0);
 }

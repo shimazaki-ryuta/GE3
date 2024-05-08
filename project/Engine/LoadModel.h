@@ -22,5 +22,8 @@ public:
 	static Node ReadNode(aiNode* node);
 	static SkeletonData CreateSkelton(const Node& rootNode);
 	static int32_t CreateJoint(const Node& node,const std::optional<int32_t>& parent,std::vector<Joint>& joints);
+
+	static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
+	static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 };
 

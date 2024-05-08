@@ -8,14 +8,7 @@
 #include "Math/Matrix.h"
 #include <d3d12.h>
 #include <wrl.h>
-template<typename tValue>
-struct Keyframe {
-	float time;
-	tValue value;
-};
-
-using KeyframeVector3 = Keyframe<Vector3>;
-using KeyframeQuaternion = Keyframe<Quaternion>;
+#include "ModelStruct.h"
 
 struct NodeAnimation {
 	std::vector<KeyframeVector3> translate;
@@ -74,8 +67,8 @@ private:
 	float playSpeed_=1.0f;//再生速度
 	PlayType playType_ = LOOP;
 
-	Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
-	Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
+	//Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
+	//Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource_;
 	Matrix4x4* matrixData_ = nullptr;

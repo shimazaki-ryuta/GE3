@@ -5,7 +5,7 @@
 #include "QuaternionFunction.h"
 #include <fstream>
 #include <sstream>
-
+#include "Animation.h"
 
 MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
 {
@@ -94,25 +94,30 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 		assert(mesh->HasNormals());//法線要求
 		assert(mesh->HasTextureCoords(0));//texcoord要求
-
+		meshd.vertices.resize(mesh->mNumVertices);
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			//uint32_t vertexIndex = face.mIndices[element];
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
+			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+			VertexData vertex;
+			vertex.position = { position.x,position.y,position.z,1.0f };
+			vertex.normal = { normal.x,normal.y, normal.z };
+			vertex.texcoord = { texcoord.x,texcoord.y };
+			vertex.position.x *= -1.0f;
+			vertex.normal.x *= -1.0f;
+			vertex.triangleCenter = { 1.0f,1.0f,1.0f,1.0f };
+			//meshd.vertices.push_back(vertex);
+			meshd.vertices[vertexIndex] = vertex;
+			//meshs.push_back(mesh);
+			//modelData.meshs.vertices.push_back(vertex);
+		}
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = { position.x,position.y,position.z,1.0f };
-				vertex.normal = { normal.x,normal.y, normal.z };
-				vertex.texcoord = { texcoord.x,texcoord.y };
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-				vertex.triangleCenter = { 1.0f,1.0f,1.0f,1.0f };
-				meshd.vertices.push_back(vertex);
-				//meshs.push_back(mesh);
-				//modelData.meshs.vertices.push_back(vertex);
+				meshd.indices.push_back(vertexIndex);
 			}
 		}
 		//modelData.vertexNum = 1;
@@ -181,4 +186,36 @@ int32_t LoadModel::CreateJoint(const Node& node, const std::optional<int32_t>& p
 	}
 
 	return joint.index;
+}
+
+Vector3 LoadModel::CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time) {
+	assert(!keyframes.empty());
+	if (keyframes.size() == 1 || time <= keyframes[0].time) {
+		return keyframes[0].value;
+	}
+
+	for (size_t index = 0; index < keyframes.size() - 1; ++index) {
+		size_t nextIndex = index + 1;
+		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
+			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
+			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
+		}
+	}
+	return (*keyframes.rbegin()).value;
+}
+
+Quaternion LoadModel::CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time) {
+	assert(!keyframes.empty());
+	if (keyframes.size() == 1 || time <= keyframes[0].time) {
+		return keyframes[0].value;
+	}
+
+	for (size_t index = 0; index < keyframes.size() - 1; ++index) {
+		size_t nextIndex = index + 1;
+		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
+			float t = (time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time);
+			return Slerp(keyframes[index].value, keyframes[nextIndex].value, t);
+		}
+	}
+	return (*keyframes.rbegin()).value;
 }

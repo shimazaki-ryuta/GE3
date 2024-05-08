@@ -98,7 +98,7 @@ public:
 
 	void SetLocalMatrix(const Matrix4x4& newMatrix) { *localMatrixData_ = newMatrix; };
 	
-
+	Node& GetRootNode() { return modelData_.rootNode; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -109,7 +109,7 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	VertexData* vertexData_ = nullptr;
-	//uint32_t* indexData_ = nullptr;
+	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
 	OutLineData* outlineData_ = nullptr;
 	CameraForGpu* cameraData_ = nullptr;
@@ -129,5 +129,7 @@ private:
 
 	size_t vertexNum = 0;
 	std::vector<MeshData*> meshs_;
+
+	ModelData modelData_;
 };
 

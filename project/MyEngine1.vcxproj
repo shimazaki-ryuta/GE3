@@ -294,6 +294,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Primitive3D.cpp" />
     <ClCompile Include="Engine\RandomEngine.cpp" />
     <ClCompile Include="Engine\ShaderCompiler.cpp" />
+    <ClCompile Include="Engine\Skeleton.cpp" />
     <ClCompile Include="Engine\Sprite.cpp" />
     <ClCompile Include="Engine\TextureManager.cpp" />
     <ClCompile Include="Engine\ViewProjection.cpp" />
