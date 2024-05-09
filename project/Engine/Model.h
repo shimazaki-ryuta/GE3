@@ -66,6 +66,11 @@ public:
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateOutLine;
 
+	// ルートシグネチャ
+	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignatureSkinning;
+	// パイプラインステートオブジェクト
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateSkinning;
+
 
 	static void StaticInitialize(
 		ID3D12Device* device, int window_width, int window_height,
@@ -85,6 +90,8 @@ public:
 
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, ID3D12Resource* animationMatrixResource);
 
+	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, SkinCluster& skinCluster);
+
 	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection);
 
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};
@@ -99,6 +106,8 @@ public:
 	void SetLocalMatrix(const Matrix4x4& newMatrix) { *localMatrixData_ = newMatrix; };
 	
 	Node& GetRootNode() { return modelData_.rootNode; };
+
+	ModelData& GetModelData(){ return modelData_; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -131,5 +140,7 @@ private:
 	std::vector<MeshData*> meshs_;
 
 	ModelData modelData_;
+	static void CreateRootSignatureSkinning();
+
 };
 

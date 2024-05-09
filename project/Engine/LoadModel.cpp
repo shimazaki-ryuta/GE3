@@ -6,6 +6,15 @@
 #include <fstream>
 #include <sstream>
 #include "Animation.h"
+#include "GetDescriptorHandle.h"
+size_t LoadModel::srvSkinClusterHandle = 0;
+ID3D12Device* LoadModel::sDevice = nullptr;
+ID3D12DescriptorHeap* LoadModel::sSrvDescriptorHeap=nullptr;
+
+void LoadModel::SInitialize(ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap) {
+	sDevice = device;
+	sSrvDescriptorHeap = descriptorHeap;
+}
 
 MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
 {
@@ -112,6 +121,7 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 			//meshs.push_back(mesh);
 			//modelData.meshs.vertices.push_back(vertex);
 		}
+		//index解析
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
 			assert(face.mNumIndices == 3);
@@ -120,7 +130,23 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 				meshd.indices.push_back(vertexIndex);
 			}
 		}
-		//modelData.vertexNum = 1;
+		//skinCluster解析
+		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
+			aiBone* bone = mesh->mBones[boneIndex];
+			std::string jointName = bone->mName.C_Str();
+			JointWeightData& jointWeightData = meshd.skinClusterData[jointName];
+
+			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
+			aiVector3D scale, translate;
+			aiQuaternion rotate;
+			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
+			Matrix4x4 bindPoseMatrix = MakeScaleMatrix({ scale.x,scale.y,scale.z }) * MakeRotateMatrix({ rotate.x, -rotate.y,-rotate.z,rotate.w }) * MakeTranslateMatrix({-translate.x,translate.y,translate.z});
+			jointWeightData.inverseBindPoseMatrix = Inverse(bindPoseMatrix);
+			//weightの抽出
+			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights;++weightIndex) {
+				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight, bone->mWeights[weightIndex].mVertexId});
+			}
+		}
 
 	}
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
@@ -161,7 +187,7 @@ Node LoadModel::ReadNode(aiNode* node) {
 
 SkeletonData LoadModel::CreateSkelton(const Node& rootNode) {
 	SkeletonData skeleton;
-	//skeleton.root = CreateJoint(rootNode, {},skeleton.joints);
+	skeleton.root = CreateJoint(rootNode, {},skeleton.joints);
 
 	for (const Joint& joint : skeleton.joints) {
 		skeleton.jointMap.emplace(joint.name,joint.index);
@@ -218,4 +244,72 @@ Quaternion LoadModel::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 		}
 	}
 	return (*keyframes.rbegin()).value;
+}
+
+SkinCluster LoadModel::CreateSkinCluster(const SkeletonData& skeleton, const ModelData& modelData) {
+	SkinCluster skinCluster;
+	uint32_t descriptorSize = sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//palette
+	skinCluster.paletteResource = DirectXCommon::CreateBufferResource(sDevice,sizeof(WellForGPU) * skeleton.joints.size() );
+	WellForGPU* mappedPalette = nullptr;
+	skinCluster.paletteResource->Map(0,nullptr,reinterpret_cast<void**>(&mappedPalette));
+	skinCluster.mappedPalette = {mappedPalette,skeleton.joints.size()};
+	skinCluster.palleteSrvHandle.first = GetCPUDescriptorHandle(sSrvDescriptorHeap, descriptorSize, uint32_t(srvSkinClusterStart + srvSkinClusterHandle));
+	skinCluster.palleteSrvHandle.second = GetGPUDescriptorHandle(sSrvDescriptorHeap, descriptorSize, uint32_t(srvSkinClusterStart + srvSkinClusterHandle));
+	srvSkinClusterHandle++;
+	//srv
+	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
+	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	paletteSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	paletteSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	paletteSrvDesc.Buffer.FirstElement = 0;
+	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+	paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
+	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
+	sDevice->CreateShaderResourceView(skinCluster.paletteResource.Get(),&paletteSrvDesc,skinCluster.palleteSrvHandle.first);
+
+	//influence用resource
+	skinCluster.influenceResource = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexInfluence) * modelData.meshs.vertices.size());
+	VertexInfluence* mappedInfluence = nullptr;
+	skinCluster.influenceResource->Map(0,nullptr,reinterpret_cast<void**>(&mappedInfluence));
+	std::memset(mappedInfluence,0,sizeof(VertexInfluence)* modelData.meshs.vertices.size());
+	skinCluster.mappedInfluence = {mappedInfluence,modelData.meshs.vertices.size()};
+
+	//influence用vbv
+	skinCluster.influenceBufferView.BufferLocation = skinCluster.influenceResource->GetGPUVirtualAddress();
+	skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence)*modelData.meshs.vertices.size());
+	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
+
+	//inverseBindPoseの格納場所生成
+	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
+	std::generate(skinCluster.inverseBindPoseMatrices.begin(),skinCluster.inverseBindPoseMatrices.end(),MakeIdentity4x4);
+	
+	//influenceを埋める
+	for (const auto& jointWeight : modelData.meshs.skinClusterData){
+		auto it = skeleton.jointMap.find(jointWeight.first);
+		if (it == skeleton.jointMap.end()) {
+			continue;
+		}
+
+		skinCluster.inverseBindPoseMatrices[(*it).second] = jointWeight.second.inverseBindPoseMatrix;
+		for (const auto& vertexWeight : jointWeight.second.vertexWeights) {
+			auto& currentInfluence = skinCluster.mappedInfluence[vertexWeight.vertexIndex];
+			for (uint32_t index = 0; index < kNumMaxInfluence;++index) {
+				if (currentInfluence.weight[index] == 0.0f) {
+					currentInfluence.weight[index] = vertexWeight.weight;
+					currentInfluence.jointIndices[index] = (*it).second;
+				}
+			}
+		}
+
+	}
+	return skinCluster;
+}
+
+void LoadModel::UpdateSkinCluster(SkinCluster& skinCluster, const SkeletonData& skeleton) {
+	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size();++jointIndex) {
+		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeltonSpaceMatrix;
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Transpose(Inverse(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix));
+	}
 }

@@ -10,6 +10,11 @@
 #include <vector>
 #include <optional>
 #include <map>
+#include <span>
+#include <array>
+
+#include <wrl.h>
+#include <d3d12.h>
 
 struct EulerTransform {
 	Vector3 scale;
@@ -36,8 +41,20 @@ struct MaterialData
 	uint32_t textureHandle;
 };
 
+struct VertexWeightData {
+	float weight;
+	uint32_t vertexIndex;
+
+};
+
+struct JointWeightData {
+	Matrix4x4 inverseBindPoseMatrix;
+	std::vector<VertexWeightData> vertexWeights;
+};
+
 struct MeshData
 {
+	std::map<std::string, JointWeightData> skinClusterData;
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 	MaterialData material;
@@ -79,4 +96,26 @@ struct SkeletonData {
 	int32_t root;
 	std::map<std::string, int32_t> jointMap;
 	std::vector<Joint> joints;
+};
+
+const uint32_t kNumMaxInfluence = 4;
+struct VertexInfluence {
+	std::array<float, kNumMaxInfluence> weight;
+	std::array<int32_t, kNumMaxInfluence> jointIndices;
+};
+
+struct WellForGPU {
+	Matrix4x4 skeletonSpaceMatrix;//位置
+	Matrix4x4 skeletonSpaceInverseTransposeMatrix;//法線
+};
+
+struct SkinCluster {
+	std::vector<Matrix4x4> inverseBindPoseMatrices;
+	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
+	D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+	std::span<VertexInfluence> mappedInfluence;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
+	std::span <WellForGPU> mappedPalette;
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> palleteSrvHandle;
 };

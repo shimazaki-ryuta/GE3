@@ -61,7 +61,7 @@ public:
 
 
 	// デスクリプターの数
-	static const size_t kNumSrvDescriptors = 768;
+	static const size_t kNumSrvDescriptors = 1024;
 	static const size_t srvPostEffectStart = 513;
 	size_t srvPostEffectHandle=0;
 	/// <summary>

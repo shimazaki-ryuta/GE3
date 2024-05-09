@@ -180,12 +180,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
 
 	// 地面
-	//modelGround_ = Model::CreateFromOBJ("Ground");
+	modelGround_= new Model();
+	modelGround_->Create("Resources/human", "walk.gltf");
 	//modelGround_->SetGrowStrength(1.0f);
 	
 	//modelPlayerHead_.reset(model);
-	//ground_.reset(new Ground);
-	//ground_->Initialize(model, Vector3(0.0f, 0.0f, 0.0f));
+	ground_.reset(new Ground);
+	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 
 
 	//床
@@ -586,7 +587,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	//ground_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 	skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);

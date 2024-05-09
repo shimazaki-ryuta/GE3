@@ -38,6 +38,8 @@ public:
 
 	void SetTime(float t) { time = t; };
 
+	float GetTime() { return time; };
+
 	//アニメーション適応行列を取得する
 	Matrix4x4 GetAnimationMatrix(const std::string& nodename);
 

@@ -11,11 +11,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
+#include <d3d12.h>
 class LoadModel
 {
 public:
-	
+	static void SInitialize(ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap);
+
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 	static ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 	static MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename);
@@ -25,5 +26,16 @@ public:
 
 	static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
 	static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
+
+	static SkinCluster CreateSkinCluster(const SkeletonData& skeleton, const ModelData& modelData);
+
+	static void UpdateSkinCluster(SkinCluster& skinCluster,const SkeletonData& skeleton);
+
+	//static const size_t kNumSrvDescriptors = 768;
+	static const size_t srvSkinClusterStart = 768;
+	static size_t srvSkinClusterHandle;
+	// デバイス
+	static ID3D12Device* sDevice;
+	static ID3D12DescriptorHeap* sSrvDescriptorHeap;
 };
 

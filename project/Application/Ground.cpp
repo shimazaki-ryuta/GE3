@@ -1,5 +1,5 @@
 #include "Ground.h"
-
+#include "DirectXCommon.h"
 void Ground::Initialize(Model* model, const Vector3& position) {
 	model_.reset(model);
 	worldTransform_.Initialize();
@@ -8,8 +8,11 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	model_->SetShiniess(40.0f);
 	testAnimation_.reset(new Animation);
 	testAnimation_->Initialize();
-	testAnimation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
-	testAnimation_->SetPlaySpeed(5.0f);
+	testAnimation_->LoadAnimationFile("Resources/human", "walk.gltf");
+	testAnimation_->SetPlaySpeed(1.0f);
+	testSkeleton_.reset(new Skeleton);
+	testSkeleton_->Initialize(model->GetRootNode());
+	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(),model->GetModelData());
 }
 
 void Ground::Update() {
@@ -17,8 +20,11 @@ void Ground::Update() {
 
 void Ground::Draw(const ViewProjection& viewProjection) {
 	testAnimation_->Update();
-	model_->SetLocalMatrix(testAnimation_->GetAnimationMatrix("center"));
-	model_->Draw(worldTransform_, viewProjection);
+	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
+	testSkeleton_->Update();
+	LoadModel::UpdateSkinCluster(cluster_,testSkeleton_->GetSkeletonData());
+	//model_->SetLocalMatrix(testAnimation_->GetAnimationMatrix("center"));
+	model_->Draw(worldTransform_, viewProjection,cluster_);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {
 	model_->DrawOutLine(worldTransform_, viewProjection);

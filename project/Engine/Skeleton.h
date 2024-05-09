@@ -15,6 +15,7 @@ public:
 	void Initialize(Node &rootNode);
 	void Update();
 	void ApplyAnimation(const AnimationData& animation, float animationTime);
+	SkeletonData& GetSkeletonData() { return data_; };
 private:
 	SkeletonData data_;
 };

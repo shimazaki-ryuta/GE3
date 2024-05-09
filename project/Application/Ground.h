@@ -4,6 +4,7 @@
 
 #include <memory>
 #include "../Engine/Animation.h"
+#include "Skeleton.h"
 
 /// <summary>
 /// 地面
@@ -29,4 +30,6 @@ private:
 	std::unique_ptr<Model> model_;
 
 	std::unique_ptr<Animation> testAnimation_;
+	std::unique_ptr<Skeleton> testSkeleton_;
+	SkinCluster cluster_;
 };
