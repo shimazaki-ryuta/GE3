@@ -24,7 +24,7 @@ struct Well{
 	float32_t4x4 skeletonSpaceMatrix;
 	float32_t4x4 skeletonSpaceInverseTransposeMatrix;
 };
-StructuredBuffer<Well> gMatrixPalette : register(t0);
+StructuredBuffer<Well> gMatrixPalette : register(t4);
 
 struct Skinned{
 	float32_t4 position;

@@ -3,6 +3,12 @@
 #include "QuaternionFunction.h"
 void Skeleton::Initialize(Node& rootNode) {
 	data_ = LoadModel::CreateSkelton(rootNode);
+	for (Joint& joint : data_.joints) {
+		WorldTransform wt;
+		wt.Initialize();
+		jointTransforms_.push_back(wt);
+	}
+	sphere_.reset(Model::CreateFromOBJ("uvSphere"));
 }
 
 void Skeleton::Update() {
@@ -13,6 +19,10 @@ void Skeleton::Update() {
 		} else {
 			joint.skeltonSpaceMatrix = joint.localMatrix;
 		}
+	}
+	for (uint32_t index = 0; index < data_.joints.size(); index++) {
+		
+		jointTransforms_[index].matWorld_ = data_.joints[index].skeltonSpaceMatrix;
 	}
 }
 
@@ -25,5 +35,12 @@ void Skeleton::ApplyAnimation(const AnimationData& animation, float animationTim
 			joint.transform.rotate = LoadModel::CalculateValue(rootNodeAnimation.rotate, animationTime);
 			joint.transform.scale = LoadModel::CalculateValue(rootNodeAnimation.scale, animationTime);
 		}
+	}
+}
+
+void Skeleton::Draw(const WorldTransform& worldTransform,const ViewProjection& viewProjection) {
+	for (WorldTransform& wt : jointTransforms_) {
+		wt.matWorld_ = wt.matWorld_ * worldTransform.matWorld_;
+		sphere_->Draw(wt,viewProjection);
 	}
 }

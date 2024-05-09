@@ -298,7 +298,7 @@ void GameScene::Update() {
 		break;
 	}
 
-	color_+=0.06f;
+	color_+=0.03f;
 	if (color_>1.0f) {
 		color_ = 0;
 		colorPhase_++;
@@ -309,7 +309,7 @@ void GameScene::Update() {
 
 	if (!isIngame_) {
 		grayScaleValue_ = 0.0f;
-		Vector3 offset = { 0.0f,8.0f,-20.0f };
+		Vector3 offset = { 0.0f,2.0f,-15.0f };
 		viewProjection_.translation_ = Transform(offset, MakeRotateMatrix(viewProjection_.rotation_));
 		viewProjection_.rotation_.y += 0.01f;
 		viewProjection_.rotation_.x = 0.10f;
@@ -599,6 +599,7 @@ void GameScene::Draw3D() {
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	player_->DrawOutLine(viewProjection_);
 	player2_->DrawOutLine(viewProjection_);
+	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());

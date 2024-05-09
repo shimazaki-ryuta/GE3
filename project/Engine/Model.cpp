@@ -318,7 +318,7 @@ void Model::CreateRootSignatureSkinning() {
 	rootParameters[8].Descriptor.ShaderRegister = 8;
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange3[1] = {};
-	descriptorRange3[0].BaseShaderRegister = 0;
+	descriptorRange3[0].BaseShaderRegister = 4;
 	descriptorRange3[0].NumDescriptors = 1;
 	descriptorRange3[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	descriptorRange3[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;

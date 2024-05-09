@@ -298,6 +298,7 @@ SkinCluster LoadModel::CreateSkinCluster(const SkeletonData& skeleton, const Mod
 				if (currentInfluence.weight[index] == 0.0f) {
 					currentInfluence.weight[index] = vertexWeight.weight;
 					currentInfluence.jointIndices[index] = (*it).second;
+					break;
 				}
 			}
 		}
