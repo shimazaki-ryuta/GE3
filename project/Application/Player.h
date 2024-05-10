@@ -11,6 +11,8 @@
 #include "input.h"
 #include "Particle.h"
 #include "Bullet.h"
+#include "../Engine/Animation.h"
+#include "Skeleton.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -154,4 +156,8 @@ private:
 	std::function<void()> fire_;
 	bool isDead_;
 	Animation* bulletAnimation_;
+
+	std::unique_ptr<Animation> testAnimation_;
+	std::unique_ptr<Skeleton> testSkeleton_;
+	SkinCluster cluster_;
 };

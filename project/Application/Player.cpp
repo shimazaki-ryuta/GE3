@@ -83,6 +83,14 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 
 	bullets_.clear();
 	isDead_ = false;
+
+	testAnimation_.reset(new Animation);
+	testAnimation_->Initialize();
+	testAnimation_->LoadAnimationFile("Resources/Player", "player.gltf");
+	testAnimation_->SetPlaySpeed(1.0f);
+	testSkeleton_.reset(new Skeleton);
+	testSkeleton_->Initialize(models_[1].model_->GetRootNode());
+	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(), models_[1].model_->GetModelData());
 }
 
 void Player::ReStart() {
@@ -413,9 +421,23 @@ void Player::BehaviorJumpUpdate() {
 
 void Player::Draw(const ViewProjection& viewProjection) {
 	//model_->Draw(worldTransform_, viewProjection);
-	for (HierarchicalAnimation& model : models_)
+	if (!isDead_) {
+		testAnimation_->Update();
+	}
+	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
+	testSkeleton_->Update();
+	LoadModel::UpdateSkinCluster(cluster_, testSkeleton_->GetSkeletonData());
+	/*for (HierarchicalAnimation& model : models_)
 	{
 		model.model_->Draw(model.worldTransform_, viewProjection);
+	}*/
+	for (uint32_t index = 0; index < models_.size();index++) {
+		if (index == 1) {
+			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection,cluster_);
+		}
+		else {
+			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection);
+		}
 	}
 	for (std::list<std::unique_ptr<Bullet>>::iterator iterator = bullets_.begin();
 		iterator != bullets_.end(); iterator++) {

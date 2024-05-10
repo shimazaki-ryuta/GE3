@@ -99,10 +99,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
-	//Model* model = new Model;
-	//model->Create("Resources/AnimatedCube","AnimatedCube.gltf");
-	//modelPlayerHead_.reset(model);
-	modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
+	Model* modelpl1 = new Model;
+	modelpl1->Create("Resources/Player", "player.gltf");
+	modelPlayerHead_.reset(modelpl1);
+	//modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -126,10 +126,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	animationPlayer.push_back({ modelPlayerR_arm_.get(), worldTransformPlayerR_arm });
 
 	modelPlayerBody2_.reset(Model::CreateFromOBJ("float_Body"));
-	//Model* model2 = new Model;
-	//model2->Create("Resources/AnimatedCube", "AnimatedCube.gltf");
-	//modelPlayerHead2_.reset(model2);
-	modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
+	Model* modelpl2 = new Model;
+	modelpl2->Create("Resources/Player", "player.gltf");
+	modelPlayerHead2_.reset(modelpl2);
+	//modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm2_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerR_arm2_.reset(Model::CreateFromOBJ("float_R_arm"));
 	// std::vector<Model*> modelPlayers_;
@@ -181,7 +181,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	// 地面
 	modelGround_= new Model();
-	modelGround_->Create("Resources/human", "walk.gltf");
+	modelGround_->Create("Resources/Player", "player.gltf");
 	//modelGround_->SetGrowStrength(1.0f);
 	
 	//modelPlayerHead_.reset(model);
@@ -587,7 +587,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 	skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
@@ -597,8 +597,8 @@ void GameScene::Draw3D() {
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
-	player_->DrawOutLine(viewProjection_);
-	player2_->DrawOutLine(viewProjection_);
+	//player_->DrawOutLine(viewProjection_);
+	//player2_->DrawOutLine(viewProjection_);
 	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 	if (isIngame_) {
