@@ -439,6 +439,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection);
 		}
 	}
+	//testSkeleton_->Draw(worldTransform_, viewProjection);
 	for (std::list<std::unique_ptr<Bullet>>::iterator iterator = bullets_.begin();
 		iterator != bullets_.end(); iterator++) {
 		(*iterator)->Draw(viewProjection);
@@ -447,8 +448,16 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 void Player::DrawOutLine(const ViewProjection& viewProjection)
 {
-	for (HierarchicalAnimation& model : models_) {
+	/*for (HierarchicalAnimation& model : models_) {
 		model.model_->DrawOutLine(model.worldTransform_, viewProjection);
+	}*/
+	for (uint32_t index = 0; index < models_.size(); index++) {
+		if (index == 1) {
+			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection, cluster_);
+		}
+		else {
+			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection);
+		}
 	}
 }
 

@@ -71,6 +71,11 @@ public:
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateSkinning;
 
+	// ルートシグネチャ
+	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignatureSkinningOutLine;
+	// パイプラインステートオブジェクト
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateSkinningOutLine;
+
 
 	static void StaticInitialize(
 		ID3D12Device* device, int window_width, int window_height,
@@ -93,6 +98,7 @@ public:
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, SkinCluster& skinCluster);
 
 	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection);
+	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection, SkinCluster& skinCluster);
 
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
@@ -141,6 +147,6 @@ private:
 
 	ModelData modelData_;
 	static void CreateRootSignatureSkinning();
-
+	static void CreateRootSignatureSkinningOutLine();
 };
 

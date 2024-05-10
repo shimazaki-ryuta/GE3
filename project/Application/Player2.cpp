@@ -440,8 +440,13 @@ void Player2::Draw(const ViewProjection& viewProjection) {
 
 void Player2::DrawOutLine(const ViewProjection& viewProjection)
 {
-	for (HierarchicalAnimation& model : models_) {
-		model.model_->DrawOutLine(model.worldTransform_, viewProjection);
+	for (uint32_t index = 0; index < models_.size(); index++) {
+		if (index == 1) {
+			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection, cluster_);
+		}
+		else {
+			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection);
+		}
 	}
 }
 
