@@ -87,7 +87,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	testAnimation_.reset(new Animation);
 	testAnimation_->Initialize();
 	testAnimation_->LoadAnimationFile("Resources/Player", "player.gltf");
-	testAnimation_->SetPlaySpeed(1.0f);
+	testAnimation_->SetPlaySpeed(3.0f);
 	testSkeleton_.reset(new Skeleton);
 	testSkeleton_->Initialize(models_[1].model_->GetRootNode());
 	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(), models_[1].model_->GetModelData());

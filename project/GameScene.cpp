@@ -597,7 +597,7 @@ void GameScene::Draw3D() {
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
-	//player_->DrawOutLine(viewProjection_);
+	player_->DrawOutLine(viewProjection_);
 	//player2_->DrawOutLine(viewProjection_);
 	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
