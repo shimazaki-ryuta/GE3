@@ -32,4 +32,5 @@ private:
 	std::unique_ptr<Animation> testAnimation_;
 	std::unique_ptr<Skeleton> testSkeleton_;
 	SkinCluster cluster_;
+	float t = 1.0f;
 };

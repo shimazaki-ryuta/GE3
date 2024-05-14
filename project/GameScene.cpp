@@ -181,7 +181,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	// 地面
 	modelGround_= new Model();
-	modelGround_->Create("Resources/Player", "player.gltf");
+	modelGround_->Create("Resources/human", "walk.gltf");
 	//modelGround_->SetGrowStrength(1.0f);
 	
 	//modelPlayerHead_.reset(model);
@@ -549,6 +549,7 @@ void GameScene::Update() {
 	}
 	fadeSprite_->SetColor({0,0,0,fadeAlpha_});
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
+	ground_->Update();
 }
 
 void GameScene::Draw2D() {

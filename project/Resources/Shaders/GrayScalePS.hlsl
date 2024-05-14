@@ -28,5 +28,12 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 
 	output.color.a = gTexture.Sample(gSampler, transformedUV.xy).a;
 	
+	float32_t2 correct =  input.texcoord * (1.0f - input.texcoord.yx);
+	float vignette = correct.x * correct.y * 16.0f;
+	vignette = saturate(pow(vignette,0.6f));
+	float32_t3 vignettingColor;
+	vignettingColor.r = output.color.r * vignette + (1.0f - vignette)*0.1f;
+	vignettingColor.gb = output.color.gb * vignette;
+	output.color.rgb = (1.0f - t) * output.color.rgb + t* vignettingColor;
 	return output;
 }
