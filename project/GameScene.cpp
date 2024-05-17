@@ -175,9 +175,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->SetBulletAnimation(bulletAnimation_.get());
 	player2_->SetBulletAnimation(bulletAnimation_.get());
 	// 天球
-	modelSkydome_ = Model::CreateFromOBJ("skydome");
-	skydome_.reset(new Skydome);
-	skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
+	//modelSkydome_ = Model::CreateFromOBJ("skydome");
+	//skydome_.reset(new Skydome);
+	//skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
 
 	// 地面
 	modelGround_= new Model();
@@ -273,6 +273,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	grayScaleValue_ = 0.0f;
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
+
+	skyBox_.reset(new SkyBox);
+	skyBox_->Initialize(TextureManager::LoadTexture("rostock_laage_airport_4k.dds"));
+	worldTransformSkyBox_.Initialize();
+	worldTransformSkyBox_.scale_ = {1000.0f,1000.0f,1000.0f};
+	worldTransformSkyBox_.UpdateMatrix();
 }
 
 void GameScene::Update() {
@@ -589,9 +595,9 @@ void GameScene::Draw3D() {
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
 	//ground_->Draw(viewProjection_);
-	skydome_->Draw(viewProjection_);
+	//skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
-		flooars_[index]->Draw(viewProjection_);
+	//	flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
@@ -602,6 +608,10 @@ void GameScene::Draw3D() {
 	player2_->DrawOutLine(viewProjection_);
 	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
+
+	//skybox描画
+	skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
+
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());
 		particle->Draw(viewProjection_);

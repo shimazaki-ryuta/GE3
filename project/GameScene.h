@@ -30,6 +30,7 @@
 #include <memory>
 #include "LockOn.h"
 #include "Engine/Animation.h"
+#include "Engine/SkyBox.h"
 class GameScene
 {
 public:
@@ -125,8 +126,8 @@ private:
 	bool isDebugCameraActive_ = false;
 	//DebugCamera* debugCamera_ = nullptr;
 
-	std::unique_ptr<Skydome> skydome_;
-	Model* modelSkydome_ = nullptr;
+	//std::unique_ptr<Skydome> skydome_;
+	//Model* modelSkydome_ = nullptr;
 
 	std::unique_ptr<Ground> ground_;
 	Model* modelGround_ = nullptr;
@@ -186,5 +187,8 @@ private:
 
 	float grayScaleValue_;//グレースケールの強さ
 	std::unique_ptr<Animation> bulletAnimation_;
+
+	std::unique_ptr<SkyBox> skyBox_;
+	WorldTransform worldTransformSkyBox_;
 };
 

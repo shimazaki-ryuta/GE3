@@ -27,6 +27,7 @@
 //#include "Vector4.h"
 #include "Sprite.h"
 #include "Primitive3D.h"
+#include "SkyBox.h"
 //入力
 #include "Input.h"
 
@@ -111,7 +112,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Model::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
 	Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
-
+	SkyBox::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight(),dxCommon->GetCommandList());
 	//DeltaTime::GetInstance();
 
 	//音関係初期化

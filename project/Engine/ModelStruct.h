@@ -35,6 +35,12 @@ struct VertexData
 	Vector3 normal;
 	Vector4 triangleCenter;
 };
+
+//skybox用positionのみデータ
+struct VertexDataSkyBox {
+	Vector4 position;
+};
+
 struct MaterialData
 {
 	std::string textureFilePath;
