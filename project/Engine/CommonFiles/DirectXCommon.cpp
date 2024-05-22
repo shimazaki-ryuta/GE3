@@ -86,7 +86,7 @@ DirectXCommon::~DirectXCommon()
 	//useAdapter_->Release();
 	//dxgiFactory_->Release();
 }
-void DirectXCommon::DeletePostEffect() { delete postEffect; delete postEffect2; };
+void DirectXCommon::DeletePostEffect() { delete postEffect; delete postEffect2; delete postEffect3;};
 void DirectXCommon::Initialize(Window* win)
 {
 	win_ = win;
@@ -129,7 +129,7 @@ void DirectXCommon::PreDraw()
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 
-	barrier_.Transition.pResource = renderTargetResource_[kBlume].Get();
+	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeVert].Get();
 	//遷移前
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//遷移後
@@ -139,11 +139,11 @@ void DirectXCommon::PreDraw()
 
 	//描画先のRTVとDSVを設定
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[2]{rtvHandles_[kSorce3D],rtvHandles_[kBlume]};
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[2]{rtvHandles_[kSorce3D],rtvHandles_[kGaussBlumeVert]};
 	commandList_->OMSetRenderTargets(2, rtvHandle, false, &dsvHandle);
 	float clearColor[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
 	commandList_->ClearRenderTargetView(rtvHandles_[kSorce3D], clearColor, 0, nullptr);
-	commandList_->ClearRenderTargetView(rtvHandles_[kBlume], clearColor, 0, nullptr);
+	commandList_->ClearRenderTargetView(rtvHandles_[kGaussBlumeVert], clearColor, 0, nullptr);
 
 	//指定した深度で画面全体をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -179,11 +179,27 @@ void DirectXCommon::End3DSorceDraw() {
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
-	barrier_.Transition.pResource = renderTargetResource_[kBlume].Get();
+	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeVert].Get();
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
+
+	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeHori].Get();
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//TransitionBarrierを張る
+	commandList_->ResourceBarrier(1, &barrier_);
+
+	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGaussBlumeHori], false, nullptr);
+	float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
+	commandList_->ClearRenderTargetView(rtvHandles_[kGaussBlumeHori], clearColor2, 0, nullptr);
+
+	//バックバッファに書き込む
+	postEffect->PreDraw(commandList_.Get());
+	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kGaussBlumeVert]);
+	postEffect->PostDraw();
+
 
 	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -192,13 +208,12 @@ void DirectXCommon::End3DSorceDraw() {
 	commandList_->ResourceBarrier(1, &barrier_);
 
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGrayScale], false, nullptr);
-	float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
+	//float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
 	commandList_->ClearRenderTargetView(rtvHandles_[kGrayScale], clearColor2, 0, nullptr);
 
-	//バックバッファに書き込む
-	postEffect->PreDraw(commandList_.Get());
-	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kBlume]);
-	postEffect->PostDraw();
+	postEffect3->PreDraw(commandList_.Get());
+	postEffect3->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kGaussBlumeHori], renderSrvHandles_[kGaussBlumeVert]);
+	postEffect3->PostDraw();
 
 	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -303,7 +318,7 @@ void DirectXCommon::PostDraw()
 
 void DirectXCommon::CreatePostEffectSprite() {
 	postEffect=PostEffect::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 1.0f,1.0f,1.0f,1.0f });
-	postEffect->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/BlumePS.hlsl");
+	postEffect->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/GaussBlumeVertical.PS.hlsl");
 	postEffect->SetAnchorPoint({ 0.0f,0.0f });
 	postEffect->SetBlendMode(PostEffect::BlendMode::None);
 
@@ -311,6 +326,11 @@ void DirectXCommon::CreatePostEffectSprite() {
 	postEffect2->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/GrayScalePS.hlsl");
 	postEffect2->SetAnchorPoint({ 0.0f,0.0f });
 	postEffect2->SetBlendMode(PostEffect::BlendMode::None);
+
+	postEffect3 = PostEffect::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 1.0f,1.0f,1.0f,1.0f });
+	postEffect3->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/GaussBlumeHorizon.PS.hlsl");
+	postEffect3->SetAnchorPoint({ 0.0f,0.0f });
+	postEffect3->SetBlendMode(PostEffect::BlendMode::None);
 }
 
 void DirectXCommon::InitializeDXGIDevice()
@@ -444,13 +464,18 @@ void DirectXCommon::CreateRenderTargetView()
 	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 	srvPostEffectHandle = srvPostEffectStart;
 	//3つ目
-	rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	//swapchain以外のrenderTargetの分ポインタを格納する
+	for (uint32_t index = 2; index < kCountOfRenderTarget;index++) {
+		rtvHandles_[index].ptr = rtvHandles_[index-1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	}
+	/*rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	//renderSrvHandles_[kSorce3D] = TextureManager::LoadTexture("PostEffectRender/sorce3D.png");
 	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	rtvHandles_[6].ptr = rtvHandles_[5].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
+	rtvHandles_[7].ptr = rtvHandles_[6].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	*/
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -496,11 +521,20 @@ void DirectXCommon::CreateRenderTargetView()
 	srvPostEffectHandle++;
 
 	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
-	renderTargetResource_[kBlume] = resourse;
+	renderTargetResource_[kGaussBlumeVert] = resourse;
 	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	renderSrvHandles_[kBlume] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	device_->CreateShaderResourceView(renderTargetResource_[kBlume].Get(), &srvDesc, srvHandleCPU);
-	device_->CreateRenderTargetView(renderTargetResource_[kBlume].Get(), &rtvDesc_, rtvHandles_[kBlume]);
+	renderSrvHandles_[kGaussBlumeVert] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
+	device_->CreateShaderResourceView(renderTargetResource_[kGaussBlumeVert].Get(), &srvDesc, srvHandleCPU);
+	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeVert].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeVert]);
+
+	srvPostEffectHandle++;
+
+	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
+	renderTargetResource_[kGaussBlumeHori] = resourse;
+	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
+	renderSrvHandles_[kGaussBlumeHori] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
+	device_->CreateShaderResourceView(renderTargetResource_[kGaussBlumeHori].Get(), &srvDesc, srvHandleCPU);
+	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeHori].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeHori]);
 
 	srvPostEffectHandle++;
 

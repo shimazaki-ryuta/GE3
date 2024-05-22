@@ -70,8 +70,9 @@ public:
 	void CreateRenderTargetView();
 	void SetRenderTarget(int handles[]);
 	void CreatePostEffectSprite();
-	PostEffect* postEffect;
-	PostEffect* postEffect2;
+	PostEffect* postEffect;//縦gauss
+	PostEffect* postEffect2;//grayscale
+	PostEffect* postEffect3;//横gauss
 	void DeletePostEffect();
 
 	void SetGraiScaleStrength(float strength) ;
@@ -102,7 +103,8 @@ private:
 		kSorce3D,
 		kSorce2D,
 		kPost3D,
-		kBlume,
+		kGaussBlumeVert,
+		kGaussBlumeHori,
 		kGrayScale,
 		kCountOfRenderTarget
 	};

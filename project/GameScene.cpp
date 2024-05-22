@@ -597,7 +597,7 @@ void GameScene::Draw3D() {
 	//ground_->Draw(viewProjection_);
 	//skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
-	//	flooars_[index]->Draw(viewProjection_);
+		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
@@ -610,7 +610,7 @@ void GameScene::Draw3D() {
 	Model::PostDraw();
 
 	//skybox描画
-	skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
+	//skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
 
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());

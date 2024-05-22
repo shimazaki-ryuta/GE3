@@ -30,7 +30,7 @@ void BaseCharacter::SetShadowTexture(uint32_t handle) {
 		model.model_->SetEnableLighting(2);
 		model.model_->SetToonShadowTextureHandle(handle);
 		model.model_->SetShadingType(1);
-		//model.model_->SetGrowStrength(1.0f);
+		model.model_->SetGrowStrength(1.0f);
 	}
 }
 
