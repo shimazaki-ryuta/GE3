@@ -11,13 +11,13 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	model_.reset(model);
 	worldTransform_.Initialize();
 	//worldTransform_.translation_ = position;
-	worldTransform_.scale_ = {1.0f,1.0f,1.0f};
+	worldTransform_.scale_ = {3.0f,3.0f,3.0f};
 	worldTransform_.translation_.y = 0.0f;
 	worldTransform_.UpdateMatrix();
 	model_->SetEnableLighting(2);
 	model_->SetShiniess(40.0f);
 	model_->SetShadingType(1);
-	float width = 0.01f;
+	float width = 0.05f;
 	model_->SetOutLineWidth({ width,width ,width });
 	model_->SetOutLineColor({0.0f,1.0f,0.0f,1.0f});
 	model_->SetToonShadowTextureHandle(TextureManager::LoadTexture("toonShadow1.png"));
@@ -34,8 +34,10 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 void Ground::Update() {
 	ImGui::Begin("animationmodel");
 	ImGui::DragFloat("Speed",&t,0.1f);
+	ImGui::DragFloat3("Scale",&worldTransform_.scale_.x,0.1f,0.0f,5.0f);
 	ImGui::End();
 	testAnimation_->SetPlaySpeed(t);
+	worldTransform_.UpdateMatrix();
 }
 
 void Ground::Draw(const ViewProjection& viewProjection) {
@@ -43,9 +45,9 @@ void Ground::Draw(const ViewProjection& viewProjection) {
 	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
 	testSkeleton_->Update();
 	LoadModel::UpdateSkinCluster(cluster_,testSkeleton_->GetSkeletonData());
-	//model_->Draw(worldTransform_, viewProjection,cluster_);
-	testSkeleton_->Draw(worldTransform_,viewProjection);
+	model_->Draw(worldTransform_, viewProjection,cluster_);
+	//testSkeleton_->Draw(worldTransform_,viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {
-	//model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
+	model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
 }

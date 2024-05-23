@@ -28,7 +28,7 @@ VertexShaderOutput main(VertexShaderInput input) {
 	float32_t4x4 wvp = gTransformationMatrix.WVP;
 	float32_t4 interporationPosition;
 	float32_t4 ln = 1;
-	output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.ScaleInverse));
+	output.normal = (mul(input.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
 	ln.xyz = output.normal;
 	interporationPosition = mul(ln, gOutLineData.Scale);
 	

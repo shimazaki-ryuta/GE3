@@ -33,20 +33,20 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 	output.color.a = 0.0f;
 	float32_t weight = 0.0f;
 	float32_t kernel[11];
-	int halfKernel=5;
+	int32_t halfKernel=5;
 	uint32_t width,height;
 	gTexture.GetDimensions(width,height);
 	float32_t2 uvStepSize = float32_t2(rcp(width),rcp(height));
-	for (int y = -halfKernel; y <= halfKernel;y++) {
-		kernel[y+halfKernel] = gauss(float32_t(y),0.0f,3.0f);
+	for (int32_t y = -halfKernel; y <= halfKernel;y++) {
+		kernel[y+halfKernel] = gauss(float32_t(y),0.0f,6.0f);
 		weight += kernel[y+halfKernel];
 		float32_t2 texcoord = input.texcoord + float32_t2(float32_t(y),0.0f) * uvStepSize;
-		//float32_t3 fetchColor = gGrowMap.Sample(gSampler,texcoord).rgb;
-		float32_t3 fetchColor = gTexture.Sample(gSampler,texcoord).rgb;
+		float32_t3 fetchColor = gGrowMap.Sample(gSampler,texcoord).rgb;
+		//float32_t3 fetchColor = gTexture.Sample(gSampler,texcoord).rgb;
 		output.color.rgb += fetchColor*kernel[y+halfKernel];
 	}
 	output.color.rgb *= rcp(weight);
-	output.color.rgb += textureColor.rgb;
+	//output.color.rgb += textureColor.rgb;
 	output.color.a = gMaterial.color.a;
 	return output;
 }

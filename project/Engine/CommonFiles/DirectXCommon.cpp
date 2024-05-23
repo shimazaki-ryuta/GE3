@@ -197,7 +197,7 @@ void DirectXCommon::End3DSorceDraw() {
 
 	//バックバッファに書き込む
 	postEffect->PreDraw(commandList_.Get());
-	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kGaussBlumeVert]);
+	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kSorce3D]);
 	postEffect->PostDraw();
 
 
@@ -212,7 +212,7 @@ void DirectXCommon::End3DSorceDraw() {
 	commandList_->ClearRenderTargetView(rtvHandles_[kGrayScale], clearColor2, 0, nullptr);
 
 	postEffect3->PreDraw(commandList_.Get());
-	postEffect3->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kGaussBlumeHori], renderSrvHandles_[kGaussBlumeVert]);
+	postEffect3->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kGaussBlumeHori]);
 	postEffect3->PostDraw();
 
 	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();

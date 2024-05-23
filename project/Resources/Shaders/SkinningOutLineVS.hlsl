@@ -72,7 +72,7 @@ VertexShaderOutput main(VertexShaderInput input) {
 
 	output.position = skinned.position;
 	output.texcoord = input.texcoord;
-	output.normal = normalize(mul(skinned.normal,(float32_t3x3)gTransformationMatrix.ScaleInverse));
+	output.normal = (mul(skinned.normal,(float32_t3x3)gTransformationMatrix.WorldInverseTranspose));
 
 	//output.normal = normalize(mul(input.normal, (float32_t3x3)gTransformationMatrix.ScaleInverse));
 	ln.xyz = output.normal;

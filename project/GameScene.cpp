@@ -285,6 +285,43 @@ void GameScene::Update() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
+
+#ifdef _DEBUG
+	ImGui::Begin("FontOffset");
+
+	if (ImGui::Button("SaveFile")) {
+		//文字オフセット追加
+
+	}
+	static char text[8]="";
+
+	ImGui::InputText("key", text, sizeof(text),8);
+	static Vector2 t2;
+	//ImGui::SameLine();
+	ImGui::DragFloat2("position", &t2.x, 1.0f);
+	if (ImGui::Button("Add")) {
+		//文字オフセット追加
+
+	}
+	ImGui::Text(" ");
+	//ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
+	for (int index = 0; index < 10;index++) {
+		char key[32];
+		sprintf_s(key,32,"test : %d",index);
+		//ImGui::TreeNode("Offset");
+		static Vector2 t;
+		ImGui::DragFloat2(key,&t.x,1.0f,0.0f,100.0f,NULL,true);
+		ImGui::SameLine();
+		if (ImGui::Button("Remove")) {
+			//リスト削除
+		}
+	}
+
+	//ImGui::EndChild();
+	ImGui::End();
+#endif // _DEBUG
+
+
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
 	}
@@ -594,7 +631,7 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 	//Model::PreDraw(dxCommon_->GetCommandList());
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	//ground_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 	//skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
@@ -606,7 +643,7 @@ void GameScene::Draw3D() {
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	player_->DrawOutLine(viewProjection_);
 	player2_->DrawOutLine(viewProjection_);
-	//ground_->DrawOutLine(viewProjection_);
+	ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 
 	//skybox描画
