@@ -21,6 +21,7 @@
 #include "RandomEngine.h"
 #include "Engine/Audio/AudioManager.h"
 #include "GetDescriptorHandle.h"
+#include "ConvertString.h"
 GameScene::GameScene() {
 
 }
@@ -149,7 +150,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->Initialize(animationPlayer);
 	player_->InitializeFloatingGimmick();
 	player_->SetShadowTexture(toonShadowTextureHandle_);
-	player_->SetOutLineData(0.05f, {0,0,1.0f,1.0f});
+	player_->SetOutLineData(0.01f, {0,0,1.0f,1.0f});
 	modelWepon_.reset(Model::CreateFromOBJ("hammer"));
 	//player_->SetWepon(modelWepon_.get());
 
@@ -157,7 +158,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player2_->Initialize(animationPlayer2);
 	player2_->InitializeFloatingGimmick();
 	player2_->SetShadowTexture(toonShadowTextureHandle_);
-	player2_->SetOutLineData(0.05f, { 1.0f,0,0.0f,1.0f });
+	player2_->SetOutLineData(0.01f, { 1.0f,0,0.0f,1.0f });
 	//player2_->SetWepon(modelWepon_.get());
 	Model* model = new Model;
 	model->Create("Resources/bullet", "bullet.gltf");
@@ -290,31 +291,48 @@ void GameScene::Update() {
 	ImGui::Begin("FontOffset");
 
 	if (ImGui::Button("SaveFile")) {
-		//文字オフセット追加
-
+		std::string message = "Saved FontOffsets !";
+		MessageBoxA(nullptr, message.c_str(), "TextManager", 0);
 	}
 	static char text[8]="";
-
+	static std::map<std::wstring, Vector2> a;
 	ImGui::InputText("key", text, sizeof(text),8);
 	static Vector2 t2;
 	//ImGui::SameLine();
 	ImGui::DragFloat2("position", &t2.x, 1.0f);
 	if (ImGui::Button("Add")) {
 		//文字オフセット追加
-
+		std::wstring ws;
+		auto it = a.find(ConvertString(text));
+		//既存のkeyだったら値を変更
+		if (it != a.end()) {
+			a[it->first] = t2;
+		}
+		//無ければ追加する
+		else {
+			a.emplace(ConvertString(text), t2);
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Remove")) {
+		std::wstring ws;
+		auto it = a.find(ConvertString(text));
+		if (it != a.end()) {
+			a.erase(it->first);
+		}
 	}
 	ImGui::Text(" ");
 	//ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
-	for (int index = 0; index < 10;index++) {
-		char key[32];
-		sprintf_s(key,32,"test : %d",index);
-		//ImGui::TreeNode("Offset");
+	//int index = 0;
+	for (auto& obj : a) {
 		static Vector2 t;
-		ImGui::DragFloat2(key,&t.x,1.0f,0.0f,100.0f,NULL,true);
-		ImGui::SameLine();
-		if (ImGui::Button("Remove")) {
+		ImGui::DragFloat2(ConvertString(obj.first).c_str(), &obj.second.x, 1.0f, 0.0f, 100.0f, NULL, true);
+		//ImGui::SameLine();
+		/*if (ImGui::Button("Remove")) {
 			//リスト削除
-		}
+			a.erase(a.find(obj.first));
+		}*/
+		
 	}
 
 	//ImGui::EndChild();

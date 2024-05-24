@@ -197,7 +197,7 @@ void DirectXCommon::End3DSorceDraw() {
 
 	//バックバッファに書き込む
 	postEffect->PreDraw(commandList_.Get());
-	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kSorce3D]);
+	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kGaussBlumeVert]);
 	postEffect->PostDraw();
 
 

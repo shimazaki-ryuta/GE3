@@ -32,13 +32,13 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 	output.color.rgb = float32_t3(0.0f,0.0f,0.0f);
 	output.color.a = 0.0f;
 	float32_t weight = 0.0f;
-	float32_t kernel[11];
-	int32_t halfKernel=5;
+	float32_t kernel[31];
+	int32_t halfKernel=15;
 	uint32_t width,height;
 	gTexture.GetDimensions(width,height);
 	float32_t2 uvStepSize = float32_t2(rcp(width),rcp(height));
 	for (int32_t y = -halfKernel; y <= halfKernel;y++) {
-		kernel[y+halfKernel] = gauss(float32_t(y),0.0f,6.0f);
+		kernel[y+halfKernel] = gauss(float32_t(y),0.0f,5.0f);
 		weight += kernel[y+halfKernel];
 		float32_t2 texcoord = input.texcoord + float32_t2(float32_t(y),0.0f) * uvStepSize;
 		float32_t3 fetchColor = gGrowMap.Sample(gSampler,texcoord).rgb;

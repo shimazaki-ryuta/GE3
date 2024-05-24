@@ -33,4 +33,5 @@ private:
 	std::unique_ptr<Skeleton> testSkeleton_;
 	SkinCluster cluster_;
 	float t = 1.0f;
+	float growStrength_=0.0f;
 };

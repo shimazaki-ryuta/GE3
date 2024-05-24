@@ -21,7 +21,7 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	model_->SetOutLineWidth({ width,width ,width });
 	model_->SetOutLineColor({0.0f,1.0f,0.0f,1.0f});
 	model_->SetToonShadowTextureHandle(TextureManager::LoadTexture("toonShadow1.png"));
-	//model_->SetGrowStrength(1.0f);
+	//model_->SetGrowStrength(0.5f);
 	testAnimation_.reset(new Animation);
 	testAnimation_->Initialize();
 	testAnimation_->LoadAnimationFile("Resources/human", "walk.gltf");
@@ -35,9 +35,11 @@ void Ground::Update() {
 	ImGui::Begin("animationmodel");
 	ImGui::DragFloat("Speed",&t,0.1f);
 	ImGui::DragFloat3("Scale",&worldTransform_.scale_.x,0.1f,0.0f,5.0f);
+	ImGui::DragFloat("Strength", &growStrength_, 0.05f,0.0f,1.0f);
 	ImGui::End();
 	testAnimation_->SetPlaySpeed(t);
 	worldTransform_.UpdateMatrix();
+	model_->SetGrowStrength(growStrength_);
 }
 
 void Ground::Draw(const ViewProjection& viewProjection) {
@@ -49,5 +51,5 @@ void Ground::Draw(const ViewProjection& viewProjection) {
 	//testSkeleton_->Draw(worldTransform_,viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {
-	model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
+	//model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
 }
