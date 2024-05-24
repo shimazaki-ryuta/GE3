@@ -25,6 +25,9 @@ public:
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(const ViewProjection& viewProjection);
 	void DrawOutLine(const ViewProjection& viewProjection);
+
+	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
+
 private:
 	WorldTransform worldTransform_;
 	std::unique_ptr<Model> model_;

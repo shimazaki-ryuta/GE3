@@ -2,6 +2,7 @@
 
 Texture2D<float32_t4> gTexture : register(t0);
 Texture2D<float32_t4> gToonShadowTexture : register(t1);
+TextureCube<float32_t4> gEnvironmentTexture : register(t3);
 SamplerState gSampler : register(s0);
 SamplerState gSampler2 : register(s1);
 struct Material {
@@ -10,6 +11,7 @@ struct Material {
 	float32_t4x4 uvTransform;
 	float32_t shininess;
 	float32_t growStrength;
+	float32_t environmentCoefficient;
 	int32_t shadingType;
 };
 struct Camera {
@@ -126,6 +128,13 @@ PixelShaderOutput main(VertexShaderOutput input){
 	if (output.color.a == 0.0)
 	{
 		discard;
+	}
+	if(gMaterial.environmentCoefficient != 0.0f){
+		float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
+		float32_t3 refrectedVector = reflect(cameraToPosition,normalize(input.normal));
+		float32_t4 environmentColor = gEnvironmentTexture.Sample(gSampler,refrectedVector);
+		environmentColor.rgb *= gMaterial.environmentCoefficient;
+		output.color.rgb += environmentColor.rgb;
 	}
 	output.grow = gMaterial.color * textureColor * gMaterial.growStrength;
 	return output;

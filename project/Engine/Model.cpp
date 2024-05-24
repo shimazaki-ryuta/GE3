@@ -57,7 +57,7 @@ void Model::StaticInitialize(
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[9] = {};
+	D3D12_ROOT_PARAMETER rootParameters[10] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -118,6 +118,16 @@ void Model::StaticInitialize(
 	rootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[8].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[8].Descriptor.ShaderRegister = 8;
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeEn[1] = {};
+	descriptorRangeEn[0].BaseShaderRegister = 3;
+	descriptorRangeEn[0].NumDescriptors = 1;
+	descriptorRangeEn[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangeEn[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	rootParameters[9].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[9].DescriptorTable.pDescriptorRanges = descriptorRangeEn;
+	rootParameters[9].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeEn);
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -258,7 +268,7 @@ void Model::CreateRootSignatureSkinning() {
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[10] = {};
+	D3D12_ROOT_PARAMETER rootParameters[11] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -329,6 +339,16 @@ void Model::CreateRootSignatureSkinning() {
 	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters[9].DescriptorTable.pDescriptorRanges = descriptorRange3;
 	rootParameters[9].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange3);
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeEn[1] = {};
+	descriptorRangeEn[0].BaseShaderRegister = 3;
+	descriptorRangeEn[0].NumDescriptors = 1;
+	descriptorRangeEn[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangeEn[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[10].DescriptorTable.pDescriptorRanges = descriptorRangeEn;
+	rootParameters[10].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeEn);
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -797,6 +817,7 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 100.0f;
 	materialData_->growStrength = 0;
+	materialData_->environmentCoefficient = 0;
 	materialData_->shadingType = 0;
 	//ライティング用のカメラリソース
 	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));
@@ -886,6 +907,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
@@ -918,6 +940,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
@@ -950,7 +973,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
-
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, perspectivTextureHandle_);
 	sCommandList->SetGraphicsRootDescriptorTable(9,skinCluster.palleteSrvHandle.second);
 
 	//vb
@@ -990,6 +1013,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);

@@ -96,16 +96,27 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	spotLightData->decay = 2.0f;
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 
+	//skybox
+	skyBox_.reset(new SkyBox);
+	skyBox_->Initialize(TextureManager::LoadTexture("rostock_laage_airport_4k.dds"));
+	worldTransformSkyBox_.Initialize();
+	worldTransformSkyBox_.scale_ = { 1000.0f,1000.0f,1000.0f };
+	worldTransformSkyBox_.UpdateMatrix();
+
 	CollisionManager::GetInstance()->ClearList();
 	// 3Dモデルデータの生成
 	//model_.reset(Model::CreateFromOBJ("Player", true));
 	modelPlayerBody_.reset(Model::CreateFromOBJ("float_Body"));
+	modelPlayerBody_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	Model* modelpl1 = new Model;
 	modelpl1->Create("Resources/Player", "player.gltf");
+	modelpl1->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerHead_.reset(modelpl1);
 	//modelPlayerHead_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm_.reset(Model::CreateFromOBJ("float_L_arm"));
+	modelPlayerL_arm_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerR_arm_.reset(Model::CreateFromOBJ("float_R_arm"));
+	modelPlayerR_arm_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	// std::vector<Model*> modelPlayers_;
 	std::vector<HierarchicalAnimation> animationPlayer;
 	WorldTransform worldTransformPlayerBody = {
@@ -127,12 +138,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	animationPlayer.push_back({ modelPlayerR_arm_.get(), worldTransformPlayerR_arm });
 
 	modelPlayerBody2_.reset(Model::CreateFromOBJ("float_Body"));
+	modelPlayerBody2_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	Model* modelpl2 = new Model;
 	modelpl2->Create("Resources/Player", "player.gltf");
+	modelpl2->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerHead2_.reset(modelpl2);
 	//modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm2_.reset(Model::CreateFromOBJ("float_L_arm"));
+	modelPlayerL_arm2_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerR_arm2_.reset(Model::CreateFromOBJ("float_R_arm"));
+	modelPlayerR_arm2_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	// std::vector<Model*> modelPlayers_;
 	std::vector<HierarchicalAnimation> animationPlayer2;
 	animationPlayer2.push_back({ modelPlayerBody2_.get(), worldTransformPlayerBody });
@@ -188,7 +203,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	//modelPlayerHead_.reset(model);
 	ground_.reset(new Ground);
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
-
+	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 
 	//床
 	//flooar_.reset(new MovingFlooar);
@@ -275,11 +290,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	grayScaleValue_ = 0.0f;
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
-	skyBox_.reset(new SkyBox);
-	skyBox_->Initialize(TextureManager::LoadTexture("rostock_laage_airport_4k.dds"));
-	worldTransformSkyBox_.Initialize();
-	worldTransformSkyBox_.scale_ = {1000.0f,1000.0f,1000.0f};
-	worldTransformSkyBox_.UpdateMatrix();
 }
 
 void GameScene::Update() {
@@ -614,7 +624,7 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw2D() {
-	if (!isIngame_) {
+	/*if (!isIngame_) {
 		titleSprite_->Draw();
 		if (isButtonDraw_) {
 			pressASprite_->Draw();
@@ -636,7 +646,7 @@ void GameScene::Draw2D() {
 			}
 		}
 	}
-	fadeSprite_->Draw();
+	fadeSprite_->Draw();*/
 }
 
 void GameScene::Draw3D() {
@@ -652,7 +662,7 @@ void GameScene::Draw3D() {
 	ground_->Draw(viewProjection_);
 	//skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
-		flooars_[index]->Draw(viewProjection_);
+		//flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
@@ -665,7 +675,7 @@ void GameScene::Draw3D() {
 	Model::PostDraw();
 
 	//skybox描画
-	//skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
+	skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
 
 	if (isIngame_) {
 		Particle::PreDraw(dxCommon_->GetCommandList());

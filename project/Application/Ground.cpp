@@ -24,7 +24,7 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	//model_->SetGrowStrength(0.5f);
 	testAnimation_.reset(new Animation);
 	testAnimation_->Initialize();
-	testAnimation_->LoadAnimationFile("Resources/human", "walk.gltf");
+	testAnimation_->LoadAnimationFile("Resources/human", "sneakWalk.gltf");
 	testAnimation_->SetPlaySpeed(100.0f);
 	testSkeleton_.reset(new Skeleton);
 	testSkeleton_->Initialize(model->GetRootNode());
@@ -32,14 +32,17 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 }
 
 void Ground::Update() {
+	static float st;
 	ImGui::Begin("animationmodel");
 	ImGui::DragFloat("Speed",&t,0.1f);
 	ImGui::DragFloat3("Scale",&worldTransform_.scale_.x,0.1f,0.0f,5.0f);
 	ImGui::DragFloat("Strength", &growStrength_, 0.05f,0.0f,1.0f);
+	ImGui::DragFloat("EnvironmentSpecuraScale",&st,0.01f,0.0f,2.0f);
 	ImGui::End();
 	testAnimation_->SetPlaySpeed(t);
 	worldTransform_.UpdateMatrix();
 	model_->SetGrowStrength(growStrength_);
+	model_->SetEnvironmentCoefficient(st);
 }
 
 void Ground::Draw(const ViewProjection& viewProjection) {

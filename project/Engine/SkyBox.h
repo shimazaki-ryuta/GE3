@@ -61,6 +61,7 @@ public:
 
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection);
 	
+	uint32_t GetTextureHandle() { return textureHandle_; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;

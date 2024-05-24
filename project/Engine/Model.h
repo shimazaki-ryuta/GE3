@@ -31,6 +31,7 @@ public:
 		Matrix4x4 uvTransform;
 		float shininess;
 		float growStrength;
+		float environmentCoefficient;
 		int32_t shadingType;
 	};
 
@@ -102,6 +103,7 @@ public:
 
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
+	void SetEnvironmentCoefficient(float scale) { materialData_->environmentCoefficient = scale; };
 	void SetOutLineColor(const Vector4& color) { outlineData_->color = color; };
 	void SetOutLineWidth(const Vector3& wid) { outlineData_->scale = MakeScaleMatrix(wid); };
 	//シェーディングタイプ 0:通常 1:2値化 
@@ -114,6 +116,8 @@ public:
 	Node& GetRootNode() { return modelData_.rootNode; };
 
 	ModelData& GetModelData(){ return modelData_; };
+
+	void SetPerspectivTextureHandle(uint32_t handle) { perspectivTextureHandle_ = handle; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -148,5 +152,8 @@ private:
 	ModelData modelData_;
 	static void CreateRootSignatureSkinning();
 	static void CreateRootSignatureSkinningOutLine();
+
+	//遠景cubeMap
+	uint32_t perspectivTextureHandle_;
 };
 
