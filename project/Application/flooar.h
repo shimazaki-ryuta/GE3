@@ -18,6 +18,8 @@ public:
 		worldTransform_.translation_ = offset; 
 	};
 	void SetSize(const Vector3& size) { size_ = size; };
+
+	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 protected:
 	WorldTransform worldTransform_;
 	WorldTransform modelWorldTransform_;

@@ -217,7 +217,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	flooars_[0]->Initialize();
 	flooars_[0]->SetOffset({ 0.0f,0.0f,0.0f });
 	flooars_[0]->SetSize({ 120.0f,0.0f,120.0f });
-
+	flooars_[0]->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 
 	// カメラ生成
 	followCamera_ = std::make_unique<FollowCamera>();
@@ -295,60 +295,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 void GameScene::Update() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
-
-
-#ifdef _DEBUG
-	ImGui::Begin("FontOffset");
-
-	if (ImGui::Button("SaveFile")) {
-		std::string message = "Saved FontOffsets !";
-		MessageBoxA(nullptr, message.c_str(), "TextManager", 0);
-	}
-	static char text[8]="";
-	static std::map<std::wstring, Vector2> a;
-	ImGui::InputText("key", text, sizeof(text),8);
-	static Vector2 t2;
-	//ImGui::SameLine();
-	ImGui::DragFloat2("position", &t2.x, 1.0f);
-	if (ImGui::Button("Add")) {
-		//文字オフセット追加
-		std::wstring ws;
-		auto it = a.find(ConvertString(text));
-		//既存のkeyだったら値を変更
-		if (it != a.end()) {
-			a[it->first] = t2;
-		}
-		//無ければ追加する
-		else {
-			a.emplace(ConvertString(text), t2);
-		}
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Remove")) {
-		std::wstring ws;
-		auto it = a.find(ConvertString(text));
-		if (it != a.end()) {
-			a.erase(it->first);
-		}
-	}
-	ImGui::Text(" ");
-	//ImGui::BeginChild(ImGui::GetID((void*)0), ImVec2(250, 100), ImGuiWindowFlags_NoTitleBar);
-	//int index = 0;
-	for (auto& obj : a) {
-		static Vector2 t;
-		ImGui::DragFloat2(ConvertString(obj.first).c_str(), &obj.second.x, 1.0f, 0.0f, 100.0f, NULL, true);
-		//ImGui::SameLine();
-		/*if (ImGui::Button("Remove")) {
-			//リスト削除
-			a.erase(a.find(obj.first));
-		}*/
-		
-	}
-
-	//ImGui::EndChild();
-	ImGui::End();
-#endif // _DEBUG
-
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
@@ -662,7 +608,7 @@ void GameScene::Draw3D() {
 	ground_->Draw(viewProjection_);
 	//skydome_->Draw(viewProjection_);
 	for (int index = 0; index < 1; index++) {
-		//flooars_[index]->Draw(viewProjection_);
+		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);

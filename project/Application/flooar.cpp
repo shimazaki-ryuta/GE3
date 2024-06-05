@@ -11,6 +11,7 @@ void Flooar::Initialize() {
 	modelWorldTransform_.parent_ = &worldTransform_;
 	model_.reset(Model::CreateFromOBJ("Floor"));
 	model_->SetEnableLighting(2);
+	model_->SetEnvironmentCoefficient(0.2f);
 	size_ = {2.0f,0.0f,2.0f};
 	obb_.center = worldTransform_.translation_;
 	obb_.size = size_;

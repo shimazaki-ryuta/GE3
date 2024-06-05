@@ -16,8 +16,8 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	worldTransform_.UpdateMatrix();
 	model_->SetEnableLighting(2);
 	model_->SetShiniess(40.0f);
-	model_->SetShadingType(1);
-	float width = 0.05f;
+	model_->SetShadingType(0);
+	float width = 0.0125f;
 	model_->SetOutLineWidth({ width,width ,width });
 	model_->SetOutLineColor({0.0f,1.0f,0.0f,1.0f});
 	model_->SetToonShadowTextureHandle(TextureManager::LoadTexture("toonShadow1.png"));
@@ -54,5 +54,5 @@ void Ground::Draw(const ViewProjection& viewProjection) {
 	//testSkeleton_->Draw(worldTransform_,viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {
-	//model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
+	model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
 }
