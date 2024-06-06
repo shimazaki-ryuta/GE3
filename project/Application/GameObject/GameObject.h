@@ -11,11 +11,12 @@ class GameObject
 {
 public:
 	void Initialize(const GameObjectData& data);
-	void Update() {};
+	void Update() ;
 	void Draw(const ViewProjection& viewProjection,std::map<std::string, std::unique_ptr<Model>>& modelList);
 
 	//子ノード追加
 	void AppendChildlen(std::unique_ptr<GameObject> child);
+	void SetParent(WorldTransform* parent) { worldtransform_.parent_ = parent; };
 private:
 	WorldTransform worldtransform_;
 	

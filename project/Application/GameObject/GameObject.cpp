@@ -10,6 +10,16 @@ void GameObject::Initialize(const GameObjectData& data) {
 	childlen_.clear();
 }
 
+void GameObject::Update() {
+	worldtransform_.UpdateMatrix();
+	if (!childlen_.empty()) {
+		for (std::unique_ptr<GameObject>& child : childlen_) {
+			child->SetParent(&worldtransform_);
+			child->Update();
+		}
+	}
+}
+
 void GameObject::Draw(const ViewProjection& viewProjection, std::map<std::string, std::unique_ptr<Model>>& modelList) {
 	auto it = modelList.find(fileName);
 	if (it == modelList.end()) {
