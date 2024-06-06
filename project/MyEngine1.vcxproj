@@ -293,6 +293,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\PostEffect.cpp" />
     <ClCompile Include="Engine\Primitive3D.cpp" />
     <ClCompile Include="Engine\RandomEngine.cpp" />
+    <ClCompile Include="Engine\Scene\SceneLoader.cpp" />
     <ClCompile Include="Engine\ShaderCompiler.cpp" />
     <ClCompile Include="Engine\Skeleton.cpp" />
     <ClCompile Include="Engine\SkyBox.cpp" />
@@ -376,6 +377,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\PostEffect.h" />
     <ClInclude Include="Engine\Primitive3D.h" />
     <ClInclude Include="Engine\RandomEngine.h" />
+    <ClInclude Include="Engine\Scene\SceneLoader.h" />
     <ClInclude Include="Engine\ShaderCompiler.h" />
     <ClInclude Include="Engine\Skeleton.h" />
     <ClInclude Include="Engine\SkyBox.h" />

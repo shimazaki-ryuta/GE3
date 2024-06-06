@@ -1,0 +1,99 @@
+{
+    "name": "scene",
+    "objects": [
+        {
+            "id": 0,
+            "type": "MESH",
+            "name": "icoSphere",
+            "transform": {
+                "translation": [
+                    3.3999998569488525,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "id": 1,
+            "type": "MESH",
+            "name": "Cube2",
+            "transform": {
+                "translation": [
+                    0.0,
+                    3.2899999618530273,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "collider": {
+                "type": "BOX",
+                "center": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    2.0,
+                    2.0,
+                    2.0
+                ]
+            },
+            "children": [
+                {
+                    "id": 0,
+                    "type": "MESH",
+                    "name": "Cube",
+                    "transform": {
+                        "translation": [
+                            0.0,
+                            -3.2899999618530273,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "collider": {
+                        "type": "BOX",
+                        "center": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "size": [
+                            2.0,
+                            2.0,
+                            2.0
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
