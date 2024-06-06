@@ -32,6 +32,7 @@
 #include "Engine/Animation.h"
 #include "Engine/SkyBox.h"
 #include "Scene/SceneLoader.h"
+#include "GameObject/GameObject.h"
 class GameScene
 {
 public:
@@ -99,6 +100,8 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 
+	std::unique_ptr<DebugCamera> debugCamera_;
+	bool isDebugCameraActive_ = false;
 
 	struct Transforms cameraTransform { {1.0f, 1.0f, 1.0f}, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,-5.0f } };
 
@@ -119,5 +122,7 @@ private:
 	WorldTransform worldTransformSkyBox_;
 
 	std::unique_ptr<SceneLoader> sceneLoader_;
+	std::map<std::string, std::unique_ptr<Model>> modelList_;
+	std::vector<std::unique_ptr<GameObject>> objects_;
 };
 

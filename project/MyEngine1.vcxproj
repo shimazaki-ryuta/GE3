@@ -256,6 +256,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Curve.cpp" />
     <ClCompile Include="Application\flooar.cpp" />
     <ClCompile Include="Application\FollowCamera.cpp" />
+    <ClCompile Include="Application\GameObject\GameObject.cpp" />
     <ClCompile Include="Application\Goal.cpp" />
     <ClCompile Include="Application\Ground.cpp" />
     <ClCompile Include="Application\LockOn.cpp" />
@@ -333,6 +334,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Curve.h" />
     <ClInclude Include="Application\flooar.h" />
     <ClInclude Include="Application\FollowCamera.h" />
+    <ClInclude Include="Application\GameObject\GameObject.h" />
     <ClInclude Include="Application\Goal.h" />
     <ClInclude Include="Application\Ground.h" />
     <ClInclude Include="Application\LockOn.h" />
@@ -378,6 +380,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Primitive3D.h" />
     <ClInclude Include="Engine\RandomEngine.h" />
     <ClInclude Include="Engine\Scene\SceneLoader.h" />
+    <ClInclude Include="Engine\Scene\SceneStructs.h" />
     <ClInclude Include="Engine\ShaderCompiler.h" />
     <ClInclude Include="Engine\Skeleton.h" />
     <ClInclude Include="Engine\SkyBox.h" />

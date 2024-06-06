@@ -22,7 +22,7 @@ void SceneLoader::LoadFile(const std::string fileName) {
 	std::string name = deserialized["name"].get<std::string>();
 	assert(name.compare("scene") == 0);
 
-	sceneData.reset(new SceneData);
+	sceneData_.reset(new SceneData);
 
 	//全オブジェクト操作
 	for (nlohmann::json& object : deserialized["objects"]) {
@@ -38,8 +38,8 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		GameObjectData* objectData = nullptr;
 		//要素追加
 		if (!parent) {
-			sceneData->objects.emplace_back(GameObjectData{});
-			objectData = &sceneData->objects.back();
+			sceneData_->objects.emplace_back(GameObjectData{});
+			objectData = &sceneData_->objects.back();
 		}
 		else {
 			parent->children.emplace_back(GameObjectData{});
@@ -98,5 +98,65 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 }
 
 void SceneLoader::CreateModelList(std::map<std::string, std::unique_ptr<Model>>& list) {
+	for (GameObjectData& object: sceneData_->objects) {
+		Model* model = nullptr;
+		if (!object.fileName.empty()) {
 
+			// 読み込み済みモデルだったら何もせずコンティニュー
+			auto it = std::find_if(list.begin(), list.end(), [&](const auto& datas) {
+				return object.fileName == datas.first;
+				});
+			if (it != list.end()) {
+				continue;
+			}
+			model = new Model;
+			model->Create("Resources/Models", object.fileName);
+			list.emplace(object.fileName, model);
+		}
+		if (!object.children.empty()) {
+			for (GameObjectData& child : object.children) {
+				if (child.fileName.empty()) {
+					continue;
+				}
+				// 読み込み済みモデルだったら何もせずコンティニュー
+				auto it = std::find_if(list.begin(), list.end(), [&](const auto& datas) {
+					return child.fileName == datas.first;
+					});
+				if (it != list.end()) {
+					continue;
+				}
+				model = new Model;
+				model->Create("Resources/Models", child.fileName);
+				list.emplace(child.fileName, model);
+			}
+		}
+	}
+}
+
+void SceneLoader::CreateObjects(std::vector<std::unique_ptr<GameObject>>& list) {
+	for (GameObjectData& object : sceneData_->objects) {
+		std::unique_ptr<GameObject> instance;
+		instance.reset(new GameObject);
+		instance->Initialize(object);
+		if (!object.children.empty()) {
+			for (GameObjectData& child : object.children) {
+
+				CreateObjects(instance,child);
+			}
+		}
+		list.push_back(std::move(instance));
+	}
+}
+
+void SceneLoader::CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectData& data) {
+	std::unique_ptr<GameObject> instance;
+	instance.reset(new GameObject);
+	instance->Initialize(data);
+	if (!data.children.empty()) {
+		for (GameObjectData& child : data.children) {
+
+			CreateObjects(instance, child);
+		}
+	}
+	parent->AppendChildlen(std::move(instance));
 }

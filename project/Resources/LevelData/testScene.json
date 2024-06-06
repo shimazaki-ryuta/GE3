@@ -3,6 +3,53 @@
     "objects": [
         {
             "id": 0,
+            "type": "ARMATURE",
+            "name": "Armature",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    0.009999999776482582,
+                    0.009999999776482582,
+                    0.009999999776482582
+                ]
+            },
+            "file_name": "walk.gltf",
+            "children": [
+                {
+                    "id": 0,
+                    "type": "MESH",
+                    "name": "Retopology_hp_Plane.002",
+                    "transform": {
+                        "translation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            90.00001525878906,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": 1,
             "type": "MESH",
             "name": "icoSphere",
             "transform": {
@@ -24,7 +71,7 @@
             }
         },
         {
-            "id": 1,
+            "id": 2,
             "type": "MESH",
             "name": "Cube2",
             "transform": {
@@ -44,6 +91,7 @@
                     1.0
                 ]
             },
+            "file_name": "cube.obj",
             "collider": {
                 "type": "BOX",
                 "center": [
@@ -79,6 +127,7 @@
                             1.0
                         ]
                     },
+                    "file_name": "cube.obj",
                     "collider": {
                         "type": "BOX",
                         "center": [

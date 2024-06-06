@@ -35,6 +35,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	input_ = Input::GetInstance();
 
+	debugCamera_.reset(new DebugCamera);
+	debugCamera_->Initialize();
+
 	//audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
 	//audioHandle_ = AudioManager::GetInstance()->LoadAudio("1.mp3");
 	//AudioManager::GetInstance()->PlayWave(audioHandle_);
@@ -42,8 +45,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	
 	sceneLoader_.reset(new SceneLoader);
 	sceneLoader_->LoadFile("testScene");
+	modelList_.clear();
+	sceneLoader_->CreateModelList(modelList_);
+	objects_.clear();
+	sceneLoader_->CreateObjects(objects_);
 #ifdef _DEBUG
-	
+	isDebugCameraActive_ = true;
+	debugCamera_->SetUses(isDebugCameraActive_);
+	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
+	debugCamera_->SetPosition({ 0.0f, 1.7f, -10.0f });
 #endif // _DEBUG
 	
 	//srvの作成
@@ -108,13 +118,31 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	grayScaleValue_ = 0.0f;
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
+	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
+#ifdef _DEBUG
+	if (Input::GetKeyDown(DIK_RSHIFT)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+		debugCamera_->SetUses(isDebugCameraActive_);
+	}
+#endif // _DEBUG
 
+	for (std::unique_ptr<GameObject>& object:objects_) {
+		object->Update();
+	}
+
+	if (isDebugCameraActive_) {
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = debugCamera_->GetViewProjection().translation_;
+		//viewProjection_.TransferMatrix();
+	}
+	debugCamera_->Update();
 }
 
 void GameScene::Draw2D() {
@@ -126,6 +154,10 @@ void GameScene::Draw3D() {
 	//Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
 	
+	for (std::unique_ptr<GameObject>& object : objects_) {
+		object->Draw(viewProjection_,modelList_);
+	}
+
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	Model::PostDraw();
