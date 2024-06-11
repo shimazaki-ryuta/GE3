@@ -50,6 +50,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	objects_.clear();
 	sceneLoader_->CreateObjects(objects_);
 #ifdef _DEBUG
+
+	sceneLoader_->StartReceveJson();
+
 	isDebugCameraActive_ = true;
 	debugCamera_->SetUses(isDebugCameraActive_);
 	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });

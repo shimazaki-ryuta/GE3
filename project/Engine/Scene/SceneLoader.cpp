@@ -1,4 +1,7 @@
 #include "SceneLoader.h"
+#include <functional>
+#pragma comment(lib, "ws2_32.lib")//socket関係のライブラリ
+#pragma warning(disable:4996)//4996エラーを無視する
 
 void SceneLoader::LoadFile(const std::string fileName) {
 	const std::string fullpath = "Resources/LevelData/" + fileName + ".json";
@@ -159,4 +162,54 @@ void SceneLoader::CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectD
 		}
 	}
 	parent->AppendChildlen(std::move(instance));
+}
+
+//debug
+void SceneLoader::StartReceveJson() {
+	//portSetUp
+	socket_ = socket(AF_INET,//ipv4
+		SOCK_DGRAM,//udp tcpの場合はSOCK_STREAM
+		0);
+	//ポート番号と送信先IPアドレスの設定ローカルだから127.0.0.1
+	sockaddr_in address_;
+	address_.sin_family = AF_INET;
+	address_.sin_port = htons(50001);
+	address_.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+
+	//portOpen
+	bind(socket_, (struct sockaddr*)&address_, sizeof(address_));
+
+	//receveStart
+	//receveJsonDataThread = std::thread(std::bind(&SceneLoader::ReceveJsonData, this));
+	ReceveJsonData();
+}
+
+void SceneLoader::ReceveJsonData() {
+	static bool isEnd = false;
+	static int sockaddr_in_size = sizeof(struct sockaddr_in);
+	sockaddr_in from;
+	const static uint32_t buffSize = 2048;
+	char rBuff[buffSize];
+	std::string sData;
+	while (!isEnd) {
+		//recevedata
+		recvfrom(socket_, rBuff, buffSize -1, 0, (sockaddr*)&from, &sockaddr_in_size);
+		sData = rBuff;
+		//toJson
+		nlohmann::json jData = nlohmann::json::parse(sData);
+
+		//end
+		if (jData.contains("end")) {
+			closesocket(socket_);
+			isEnd = true;
+			continue;
+		}
+		sceneData_.reset(new SceneData);
+
+		//全オブジェクト操作
+		for (nlohmann::json& object : jData["objects"]) {
+			PraceObject(object);
+
+		}
+	}
 }
