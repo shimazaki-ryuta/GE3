@@ -10,6 +10,14 @@ void GameObject::Initialize(const GameObjectData& data) {
 	childlen_.clear();
 }
 
+void GameObject::SetParameter(const GameObjectData& data) {
+	worldtransform_.translation_ = data.transform.translate;
+	worldtransform_.rotation_ = data.transform.rotate;
+	worldtransform_.scale_ = data.transform.scale;
+	worldtransform_.UpdateMatrix();
+	fileName = data.fileName;
+}
+
 void GameObject::Update() {
 	worldtransform_.UpdateMatrix();
 	if (!childlen_.empty()) {

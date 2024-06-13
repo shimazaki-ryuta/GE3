@@ -17,6 +17,8 @@ public:
 	//子ノード追加
 	void AppendChildlen(std::unique_ptr<GameObject> child);
 	void SetParent(WorldTransform* parent) { worldtransform_.parent_ = parent; };
+	void SetParameter(const GameObjectData& data);
+	std::vector<std::unique_ptr<GameObject>>* GetChildlen() { return &childlen_; };
 private:
 	WorldTransform worldtransform_;
 	

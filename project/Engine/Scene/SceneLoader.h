@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <thread>
+#include <memory>
 #include "Model.h"
 #include "SceneStructs.h"
 #include "GameObject/GameObject.h"
@@ -26,12 +27,19 @@ public:
 	///debug
 	void StartReceveJson();
 	//closeportandThreadEnd
-	//void EndReceveThread();
+	void EndReceveThread();
 	void ReceveJsonData();
+
+	void ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& list);
+	//void ScanChanged(std::vector<std::unique_ptr<GameObject>>& list, GameObjectData& data,int32_t id);
+	void ScanChanged(std::unique_ptr<GameObject>& object, GameObjectData& datas, int32_t id);
+	//void AppendObject(std::unique_ptr<GameObject>* parent, GameObjectData& data);
+
 private:
 	//オブジェクト一個の解析
 	void PraceObject(nlohmann::json& object,GameObjectData* parent=nullptr);
 
+	bool isRecevedData_;
 
 	std::unique_ptr<SceneData> sceneData_;
 

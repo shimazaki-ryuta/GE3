@@ -27,7 +27,9 @@ GameScene::GameScene() {
 }
 
 GameScene::~GameScene() {
-
+#ifdef _DEBUG
+	sceneLoader_->EndReceveThread();
+#endif // _DEBUG
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon) {
@@ -129,6 +131,9 @@ void GameScene::Update() {
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
 #ifdef _DEBUG
+	sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->ApplyRecevedData(objects_);
+
 	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
