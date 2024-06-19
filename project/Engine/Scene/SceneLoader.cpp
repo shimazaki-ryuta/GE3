@@ -75,6 +75,26 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		objectData->transform.scale.y = (float)transform["scaling"][2];
 		objectData->transform.scale.z = (float)transform["scaling"][1];
 
+		//deltaTransform
+		objectData->deltaTransform.translate = {0,0,0};
+		objectData->deltaTransform.rotate = { 0,0,0 };
+		objectData->deltaTransform.scale = { 1.0f,1.0f,1.0f };
+		if (object.contains("delta_transform")) {
+			nlohmann::json& dtransform = object["delta_transform"];
+			//t
+			objectData->deltaTransform.translate.x = (float)dtransform["translation"][0];
+			objectData->deltaTransform.translate.y = (float)dtransform["translation"][2];
+			objectData->deltaTransform.translate.z = (float)dtransform["translation"][1];
+			//r
+			objectData->deltaTransform.rotate.x = -(float)dtransform["rotation"][0];
+			objectData->deltaTransform.rotate.y = -(float)dtransform["rotation"][2];
+			objectData->deltaTransform.rotate.z = -(float)dtransform["rotation"][1];
+			//s
+			objectData->deltaTransform.scale.x = (float)dtransform["scaling"][0];
+			objectData->deltaTransform.scale.y = (float)dtransform["scaling"][2];
+			objectData->deltaTransform.scale.z = (float)dtransform["scaling"][1];
+		}
+
 		//collider
 		if (object.contains("collider")) {
 			nlohmann::json& collider = object["collider"];
@@ -199,7 +219,7 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 4096;
+	const static uint32_t buffSize = 32768;
 	char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
@@ -222,6 +242,9 @@ void SceneLoader::ReceveJsonData() {
 
 		}
 		isRecevedData_ = true;
+		while (isRecevedData_) {
+
+		}
 	}
 	closesocket(socket_);
 	isEnd = true;
@@ -231,6 +254,11 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 	if (!isRecevedData_) {
 		return;
 	}
+	/*list.clear();
+	CreateObjects(list);
+	isRecevedData_ = false;
+	return;*/
+
 	//ルート走査
 	size_t index = 0;
 	//削除チェック

@@ -18,6 +18,7 @@ struct GameObjectData {
 	std::string type = "";
 	std::string fileName = "";
 	EulerTransform transform;
+	EulerTransform deltaTransform;
 	ColliderData collider;
 	std::vector<GameObjectData> children;
 };

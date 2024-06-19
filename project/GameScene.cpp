@@ -138,6 +138,10 @@ void GameScene::Update() {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
 	}
+
+	ImGui::Begin("FPS");
+	ImGui::Text("%f", ImGui::GetIO().Framerate);
+	ImGui::End();
 #endif // _DEBUG
 
 	for (std::unique_ptr<GameObject>& object:objects_) {

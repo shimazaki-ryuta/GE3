@@ -21,7 +21,7 @@ public:
 	std::vector<std::unique_ptr<GameObject>>* GetChildlen() { return &childlen_; };
 private:
 	WorldTransform worldtransform_;
-	
+	EulerTransform deltaTransform_;
 	std::vector<std::unique_ptr<GameObject>> childlen_;
 
 	std::string fileName = "";
