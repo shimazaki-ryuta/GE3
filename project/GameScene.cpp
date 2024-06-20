@@ -87,14 +87,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
 
-	//PointLight用のリソース
-	//pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
-	//pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-//	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	//pointLightData->position = { 0.0f,1.0f,0.0f };
-	//pointLightData->intensity = 1.0f;
-	//pointLightData->radius = 35.0f;
-	//pointLightData->decay = 1.0f;
+	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
+	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
+	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
+	directinalLightData->direction = Normalize(directinalLightData->direction);
+	directinalLightData->intensity = 0.6f;
 
 	//PointLight用のリソース
 	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(SpotLight));
@@ -165,7 +163,13 @@ void GameScene::Draw3D() {
 	//Primitive3D::PreDraw(dxCommon_->GetCommandList());
 	//Primitive3D::PostDraw();
 	Model::PreDraw(dxCommon_->GetCommandList());
-	
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, srvHandleGPU);
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+
+
+
 	for (std::unique_ptr<GameObject>& object : objects_) {
 		object->Draw(viewProjection_,modelList_);
 	}

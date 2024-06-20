@@ -33,7 +33,7 @@ void GameObject::Update() {
 }
 
 void GameObject::Draw(const ViewProjection& viewProjection, std::map<std::string, std::unique_ptr<Model>>& modelList) {
-	auto it = modelList.find(fileName);
+	auto it = modelList.find("cube.obj");
 	if (it == modelList.end()) {
 		return;
 	}

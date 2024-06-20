@@ -207,6 +207,12 @@ void DirectXCommon::End3DSorceDraw() {
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);
 
+	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeHori].Get();
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//TransitionBarrierを張る
+	commandList_->ResourceBarrier(1, &barrier_);
+
 	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGrayScale], false, nullptr);
 	//float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
 	commandList_->ClearRenderTargetView(rtvHandles_[kGrayScale], clearColor2, 0, nullptr);
@@ -385,7 +391,8 @@ void DirectXCommon::InitializeDXGIDevice()
 
 		D3D12_MESSAGE_ID denyIds[] = {
 			D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
-			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE
+			D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE,
+			D3D12_MESSAGE_ID_UNKNOWN
 		};
 
 		//抑制するレベル

@@ -73,7 +73,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	mainWindow = new Window();
 	mainWindow->CreateGameWindow(kTitle,kClientWidth,kClientHeight);
 	
-	/*
+	
 #ifdef _DEBUG
 	ID3D12Debug1* debugController = nullptr;
 	if(SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
@@ -82,7 +82,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif 
-*/
+
 	DirectXCommon* dxCommon = nullptr;
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(mainWindow);
@@ -182,7 +182,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//解放処理
 	delete dxCommon;
 #ifdef _DEBUG
-	//debugController->Release();
+	debugController->Release();
+
 #endif // _DEBUG
 	CloseWindow(mainWindow->GetHwnd());
 

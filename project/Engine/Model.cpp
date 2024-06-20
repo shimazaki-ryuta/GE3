@@ -785,6 +785,8 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 
 	vertexNum = modelData_.vertexNum;
 	textureHandle_ = modelData_.meshs.material.textureHandle;
+	toonShadowTextureHandle_ = textureHandle_;
+	perspectivTextureHandle_ = textureHandle_;
 	//頂点リソース
 	 vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) *vertexNum);
 

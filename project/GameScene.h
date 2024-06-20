@@ -88,6 +88,8 @@ public:
 
 private:
 	
+	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;
+	DirectionalLight* directinalLightData = nullptr;
 	
 	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
 	PointLight* pointLightData = nullptr;
