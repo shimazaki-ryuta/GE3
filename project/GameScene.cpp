@@ -22,6 +22,7 @@
 #include "Engine/Audio/AudioManager.h"
 #include "GetDescriptorHandle.h"
 #include "ConvertString.h"
+#include "CommonFiles/SRVManager.h"
 GameScene::GameScene() {
 
 }
@@ -82,10 +83,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 		pointLightData[index].isUse_ = 0;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
-	srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+	//D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+	//srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
 
-	dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
+	//dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
+	uint32_t handle = SRVManager::GetInstance()->CreateSRV(pointLightResource.Get(), &srvDesc);
+	srvHandleGPU = SRVManager::GetInstance()->GetGPUHandle(handle);
 
 	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
 	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));

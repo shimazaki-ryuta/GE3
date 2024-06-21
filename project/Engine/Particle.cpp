@@ -13,6 +13,7 @@
 #include "DeltaTime.h"
 #include "VectorFunction.h"
 #include "RandomEngine.h"
+#include "SRVManager.h"
 //std::shared_ptr<D3DResourceLeakChacker>Particle::leakchecker;
 ID3D12Device* Particle::sDevice = nullptr;
 UINT Particle::sDescriptorHandleIncrementSize;
@@ -272,26 +273,10 @@ void Particle::Initialize(uint32_t numInstance)
 	srvDesc.Buffer.NumElements = numInstance_;
 	srvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 
-	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
-	srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, sDescriptorHandleIncrementSize, uint32_t(kSrvStructuredBufferUseBegin));
+	kSrvStructuredBufferUseBegin = SRVManager::GetInstance()->CreateSRV(instancingResource_.Get(), &srvDesc);
+	srvHandleCPU = SRVManager::GetInstance()->GetCPUHandle(uint32_t(kSrvStructuredBufferUseBegin));
+	srvHandleGPU = SRVManager::GetInstance()->GetGPUHandle(uint32_t(kSrvStructuredBufferUseBegin));
 
-	sDevice->CreateShaderResourceView(instancingResource_.Get(), &srvDesc, srvHandleCPU);
-	kSrvStructuredBufferUseBegin++;
-	/*
-	//transform(仮)
-	for (uint32_t index = 0; index < numInstance_; ++index) {
-		struct Transform transform;
-		transform.scale = {1.0f,1.0f,1.0f};
-		transform.rotate = {0.0f,std::numbers::pi_v<float>,0.0f};
-		transform.translate = {RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-		//transforms.push_back(transform);
-		//ParticleData particle;
-		//particle.transform = transform;
-		Vector3 velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-		Vector4 color = { RandomEngine::GetRandom(0.0f,1.0f),RandomEngine::GetRandom(0.0f,1.0f), RandomEngine::GetRandom(0.0f,1.0f),1.0f };
-		float lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
-		particleData_.push_back(ParticleData{ transform,velocity,color,lifeTime,0 });
-	}*/
 }
 
 void Particle::MakeNewParticle(const Vector3& translate) {

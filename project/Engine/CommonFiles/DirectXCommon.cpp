@@ -13,6 +13,7 @@
 #include "../externals/imgui/imgui_impl_dx12.h"
 #include "../externals/imgui/imgui_impl_win32.h"
 
+#include "SRVManager.h"
 
 ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible)
 {
@@ -521,41 +522,34 @@ void DirectXCommon::CreateRenderTargetView()
 	clearValue.Color[3] = clearColor[3];
 	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kSorce3D] = resourse;
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	renderSrvHandles_[kSorce3D] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	device_->CreateShaderResourceView(renderTargetResource_[kSorce3D].Get(), &srvDesc, srvHandleCPU);
+	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kSorce3D].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kSorce3D].Get(), &rtvDesc_, rtvHandles_[2]);
-	srvPostEffectHandle++;
+	renderSrvHandles_[kSorce3D] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
 
 	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kGaussBlumeVert] = resourse;
-	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	renderSrvHandles_[kGaussBlumeVert] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	device_->CreateShaderResourceView(renderTargetResource_[kGaussBlumeVert].Get(), &srvDesc, srvHandleCPU);
+	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGaussBlumeVert].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeVert].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeVert]);
-
-	srvPostEffectHandle++;
+	renderSrvHandles_[kGaussBlumeVert] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
+	
 
 	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kGaussBlumeHori] = resourse;
-	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	renderSrvHandles_[kGaussBlumeHori] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	device_->CreateShaderResourceView(renderTargetResource_[kGaussBlumeHori].Get(), &srvDesc, srvHandleCPU);
+	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGaussBlumeHori].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeHori].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeHori]);
-
-	srvPostEffectHandle++;
-
+	renderSrvHandles_[kGaussBlumeHori] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
+	
 	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kGrayScale] = resourse;
-	srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	renderSrvHandles_[kGrayScale] = GetGPUDescriptorHandle(srvDescriptorHeap_.Get(), device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(srvPostEffectHandle));
-	device_->CreateShaderResourceView(renderTargetResource_[kGrayScale].Get(), &srvDesc, srvHandleCPU);
+	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGrayScale].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kGrayScale].Get(), &rtvDesc_, rtvHandles_[kGrayScale]);
+	renderSrvHandles_[kGrayScale] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
 }
 
 void DirectXCommon::CreateShaderResourceView()
 {
 	srvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNumSrvDescriptors, true);
+	SRVManager::GetInstance()->Initialize(device_.Get(),srvDescriptorHeap_.Get());
 }
 
 void DirectXCommon::CreateDepthStencilView()

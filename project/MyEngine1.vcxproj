@@ -276,6 +276,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Colider\Plane.cpp" />
     <ClCompile Include="Engine\Colider\Sphere.cpp" />
     <ClCompile Include="Engine\CommonFiles\DirectXCommon.cpp" />
+    <ClCompile Include="Engine\CommonFiles\SRVManager.cpp" />
     <ClCompile Include="Engine\CommonFiles\WinApp.cpp" />
     <ClCompile Include="Engine\ConvertString.cpp" />
     <ClCompile Include="Engine\D3DResourceLeakChacker.cpp" />
@@ -355,6 +356,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Colider\Plane.h" />
     <ClInclude Include="Engine\Colider\Sphere.h" />
     <ClInclude Include="Engine\CommonFiles\DirectXCommon.h" />
+    <ClInclude Include="Engine\CommonFiles\SRVManager.h" />
     <ClInclude Include="Engine\CommonFiles\WinApp.h" />
     <ClInclude Include="Engine\ConvertString.h" />
     <ClInclude Include="Engine\D3DResourceLeakChacker.h" />
