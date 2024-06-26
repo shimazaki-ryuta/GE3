@@ -123,6 +123,9 @@ private:
 	std::unique_ptr<SkyBox> skyBox_;
 	WorldTransform worldTransformSkyBox_;
 
+	std::unique_ptr<Ground> ground_;
+	Model* modelGround_ = nullptr;
+
 	std::unique_ptr<SceneLoader> sceneLoader_;
 	std::map<std::string, std::unique_ptr<Model>> modelList_;
 	std::vector<std::unique_ptr<GameObject>> objects_;

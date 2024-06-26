@@ -115,6 +115,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	worldTransformSkyBox_.scale_ = { 1000.0f,1000.0f,1000.0f };
 	worldTransformSkyBox_.UpdateMatrix();
 
+	// 地面
+	modelGround_ = new Model();
+	modelGround_->Create("Resources/human", "walk.gltf");
+
+	ground_.reset(new Ground);
+	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
+	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
+
 	CollisionManager::GetInstance()->ClearList();
 
 	CollisionManager::GetInstance();
@@ -156,6 +164,7 @@ void GameScene::Update() {
 		//viewProjection_.TransferMatrix();
 	}
 	debugCamera_->Update();
+	ground_->Update();
 }
 
 void GameScene::Draw2D() {
@@ -177,9 +186,11 @@ void GameScene::Draw3D() {
 		object->Draw(viewProjection_,modelList_);
 	}
 
+	ground_->Draw(viewProjection_);
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	Model::PostDraw();
+
 
 	//skybox描画
 	skyBox_->Draw(worldTransformSkyBox_,viewProjection_);
