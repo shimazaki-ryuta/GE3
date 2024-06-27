@@ -7,6 +7,7 @@
 #include <string>
 #include "Scene/SceneStructs.h"
 #include "Model.h"
+#include "Material.h"
 class GameObject
 {
 public:
@@ -23,6 +24,6 @@ private:
 	WorldTransform worldtransform_;
 	EulerTransform deltaTransform_;
 	std::vector<std::unique_ptr<GameObject>> childlen_;
-
+	std::unique_ptr<Material> material_;
 	std::string fileName = "";
 };
