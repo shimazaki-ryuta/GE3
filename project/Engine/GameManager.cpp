@@ -139,16 +139,16 @@ void GameManager::Run() {
 
 			//描画
 			dxCommon->PreDraw();
+			
 
-
-			scene->Draw3D();
+			//scene->Draw3D();
 
 			dxCommon->End3DSorceDraw();
-
+			/*
 			Sprite::PreDraw(dxCommon->GetCommandList());
 			scene->Draw2D();
 			Sprite::PostDraw();
-
+			*/
 			dxCommon->PostDraw();
 		}
 	}

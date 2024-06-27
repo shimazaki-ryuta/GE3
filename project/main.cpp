@@ -3,9 +3,13 @@
 //LeackChecker leackChecker;
 
 #include <Windows.h>
+#pragma comment(lib,"winmm.lib")
 #include "Engine/GameManager.h"
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+	//システムタイマーの分解能を上げる
+	timeBeginPeriod(1);
+
 	WSAData wsaData;
 	WSAStartup(MAKEWORD(2, 0), &wsaData);
 	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
