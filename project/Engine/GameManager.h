@@ -6,7 +6,8 @@
 #include "CommonFiles/WinApp.h"
 //directx12関係
 #include "CommonFiles/DirectXCommon.h"
-#include "../GameScene.h"
+#include "Scene/IScene.h"
+//#include "../GameScene.h"
 
 class GameManager
 {
@@ -31,7 +32,7 @@ private:
 	
 	Window* mainWindow = nullptr;
 	DirectXCommon* dxCommon = nullptr;
-	GameScene* gameScene = nullptr;
+	IScene* scene = nullptr;
 	ID3D12Debug1* debugController = nullptr;
 };
 

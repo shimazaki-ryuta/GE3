@@ -1,18 +1,15 @@
 #pragma once
+#include "Scene/IScene.h"
+
 #include "Vector2.h"
-#include "Sprite.h"
 
 #include <sstream>
 #include <vector>
 
 #include "Input.h"
 
-#include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Model.h"
-#include "Primitive3D.h"
-#include "CommonFiles/DirectXCommon.h"
 
 #include "DebugCamera.h"
 
@@ -31,9 +28,8 @@
 #include "LockOn.h"
 #include "Engine/Animation.h"
 #include "Engine/SkyBox.h"
-#include "Scene/SceneLoader.h"
-#include "GameObject/GameObject.h"
-class GameScene
+
+class GameScene : public IScene
 {
 public:
 	struct Transforms
@@ -80,10 +76,10 @@ public:
 
 	GameScene();
 	~GameScene();
-	void Initialize(DirectXCommon* dxCommon);
-	void Update();
-	void Draw3D();
-	void Draw2D();
+	void Initialize(DirectXCommon* dxCommon) override;
+	void Update() override;
+	void Draw3D() override;
+	void Draw2D() override;
 	
 
 private:

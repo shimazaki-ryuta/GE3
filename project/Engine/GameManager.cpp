@@ -38,6 +38,11 @@
 
 #include "Animation.h"
 
+#include "LoadModel.h"
+#include "Particle.h"
+
+#include "../GameScene.h"
+
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
 const std::string kTitle = "";
@@ -100,7 +105,7 @@ void GameManager::Initialize() {
 	const uint32_t descriptorSizeDSV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	dxCommon->SetDescriptorSizeDSV(descriptorSizeDSV);
 
-	gameScene = new GameScene;
+	scene = new GameScene;
 	//gameScene.reset(new GameScene);
 	//gameScene->Initialize(dxCommon);
 
@@ -112,7 +117,7 @@ void GameManager::Run() {
 	MSG msg{};
 	DeltaTime::GameLoopStart();
 
-	gameScene->Initialize(dxCommon);
+	scene->Initialize(dxCommon);
 
 	while (msg.message != WM_QUIT)
 	{
@@ -130,18 +135,18 @@ void GameManager::Run() {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 			GlobalVariables::GetInstance()->Update();
-			gameScene->Update();
+			scene->Update();
 
 			//描画
 			dxCommon->PreDraw();
 
 
-			gameScene->Draw3D();
+			scene->Draw3D();
 
 			dxCommon->End3DSorceDraw();
 
 			Sprite::PreDraw(dxCommon->GetCommandList());
-			gameScene->Draw2D();
+			scene->Draw2D();
 			Sprite::PostDraw();
 
 			dxCommon->PostDraw();
@@ -154,5 +159,5 @@ void GameManager::Run() {
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	delete gameScene;
+	delete scene;
 }

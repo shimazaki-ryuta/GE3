@@ -385,6 +385,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\PostEffect.h" />
     <ClInclude Include="Engine\Primitive3D.h" />
     <ClInclude Include="Engine\RandomEngine.h" />
+    <ClInclude Include="Engine\Scene\IScene.h" />
     <ClInclude Include="Engine\Scene\SceneLoader.h" />
     <ClInclude Include="Engine\Scene\SceneStructs.h" />
     <ClInclude Include="Engine\ShaderCompiler.h" />

@@ -215,7 +215,7 @@ void Model::StaticInitialize(
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//PSOの生成
@@ -454,7 +454,7 @@ void Model::CreateRootSignatureSkinning() {
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//PSOの生成
