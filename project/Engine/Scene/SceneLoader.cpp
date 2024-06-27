@@ -1,4 +1,5 @@
 #include "SceneLoader.h"
+#include "ConvertString.h"
 #include <functional>
 #pragma comment(lib, "ws2_32.lib")//socket関係のライブラリ
 #pragma warning(disable:4996)//4996エラーを無視する
@@ -232,8 +233,16 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		sData = rBuff;
+		nlohmann::json jData;
 		//toJson
-		nlohmann::json jData = nlohmann::json::parse(sData);
+		try {
+			jData = nlohmann::json::parse(sData);
+		}
+		catch (...) {
+			//Log(e.what());
+			//continue;
+			break;
+		}
 		sceneData_.reset(new SceneData);
 
 		//全オブジェクト走査

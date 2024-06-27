@@ -283,6 +283,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\DebugCamera.cpp" />
     <ClCompile Include="Engine\DeltaTime.cpp" />
     <ClCompile Include="Engine\FixFPS.cpp" />
+    <ClCompile Include="Engine\GameManager.cpp" />
     <ClCompile Include="Engine\GetDescriptorHandle.cpp" />
     <ClCompile Include="Engine\GlobalVariables.cpp" />
     <ClCompile Include="Engine\Input.cpp" />
@@ -364,6 +365,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\DebugCamera.h" />
     <ClInclude Include="Engine\DeltaTime.h" />
     <ClInclude Include="Engine\FixFPS.h" />
+    <ClInclude Include="Engine\GameManager.h" />
     <ClInclude Include="Engine\GetDescriptorHandle.h" />
     <ClInclude Include="Engine\GlobalVariables.h" />
     <ClInclude Include="Engine\Input.h" />
