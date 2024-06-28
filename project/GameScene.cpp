@@ -140,19 +140,19 @@ void GameScene::Update() {
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
 #ifdef _DEBUG
-	/*sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->CreateModelList(modelList_);
 	sceneLoader_->ApplyRecevedData(objects_);
 
 	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
 	}
-	*/
+	
 	ImGui::Begin("FPS");
 	ImGui::Text("%f", ImGui::GetIO().Framerate);
 	ImGui::End();
 #endif // _DEBUG
-	/*
+	
 	for (std::unique_ptr<GameObject>& object:objects_) {
 		object->Update();
 	}
@@ -164,7 +164,7 @@ void GameScene::Update() {
 		//viewProjection_.TransferMatrix();
 	}
 	debugCamera_->Update();
-	ground_->Update();*/
+	ground_->Update();
 }
 
 void GameScene::Draw2D() {
