@@ -95,7 +95,7 @@ private:
 	SpotLight* spotLightData = nullptr;
 
 
-	DirectXCommon* dxCommon_ = nullptr;
+	//DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 
 	std::unique_ptr<DebugCamera> debugCamera_;

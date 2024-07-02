@@ -7,7 +7,7 @@ class IScene
 {
 public:
 
-	virtual void Initialize(DirectXCommon* dxCommon) =0;
+	virtual void Initialize(DirectXCommon* dxCommon) { dxCommon_ = dxCommon; };
 	virtual void Update() {};
 	virtual void Draw3D() {};
 	virtual void Draw2D() {};
@@ -15,5 +15,5 @@ public:
 	virtual ~IScene() {};
 
 protected:
-
+	DirectXCommon* dxCommon_ = nullptr;
 };

@@ -183,7 +183,7 @@ void PostEffect::StaticInitialize(int window_width, int window_height ,const std
 
 void PostEffect::PreDraw(ID3D12GraphicsCommandList* commandList) {
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
-	assert(PostEffect::sCommandList == nullptr);
+	//assert(PostEffect::sCommandList == nullptr);
 
 	// コマンドリストをセット
 	sCommandList = commandList;

@@ -105,8 +105,43 @@ void DirectXCommon::Initialize(Window* win)
 	//InitializeImGui();
 }
 
-void DirectXCommon::SetRenderTarget(int handles[]) {
 
+void DirectXCommon::ClearRenderTarget(size_t renderTargetNum, const Vector4& clearColor) {
+	float clearColorf[] = { clearColor.x,clearColor.y,clearColor.z,clearColor.w };//RGBA
+	commandList_->ClearRenderTargetView(rtvHandles_[renderTargetNum], clearColorf, 0, nullptr);
+}
+void DirectXCommon::ResourceBarrier(size_t renderTargetHandle, D3D12_RESOURCE_STATES beforState, D3D12_RESOURCE_STATES afterState) {
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier_.Transition.pResource = renderTargetResource_[renderTargetHandle].Get();
+	//遷移前
+	barrier_.Transition.StateBefore = beforState;
+	//遷移後
+	barrier_.Transition.StateAfter = afterState;
+	//TransitionBarrierを張る
+	commandList_->ResourceBarrier(1, &barrier_);
+}
+
+void DirectXCommon::SetRenderTarget(size_t numRenderTargets, size_t* renderTargetHandles, size_t dsvNum) {
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[kCountOfRenderTarget] {};
+	for (size_t index = 0; index < numRenderTargets;index++) {
+		rtvHandle[index] = rtvHandles_[renderTargetHandles[index]];
+		size_t num = renderTargetHandles[index];
+		ResourceBarrier(num, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	}
+	if (dsvNum!=0) {
+		//仮
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+		commandList_->OMSetRenderTargets(uint32_t(numRenderTargets), rtvHandle, false, &dsvHandle);
+	}
+	else {
+		commandList_->OMSetRenderTargets(uint32_t(numRenderTargets), rtvHandle, false, nullptr);
+	}
+}
+
+void DirectXCommon::SetRenderTarget(size_t renderTargetHandles, size_t dsvNum) {
+	size_t renderTargets[1] = { renderTargetHandles };
+	SetRenderTarget(1,renderTargets,dsvNum);
 }
 
 void DirectXCommon::PreDraw()
@@ -116,36 +151,15 @@ void DirectXCommon::PreDraw()
 
 	//コマンドの確定
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
-
-	//TransitionBarrierの設定
-	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	
-
-	barrier_.Transition.pResource = renderTargetResource_[kSorce3D].Get();
-	//遷移前
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//遷移後
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeVert].Get();
-	//遷移前
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//遷移後
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	//描画先のRTVとDSVを設定
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[2]{rtvHandles_[kSorce3D],rtvHandles_[kGaussBlumeVert]};
-	commandList_->OMSetRenderTargets(2, rtvHandle, false, &dsvHandle);
-	float clearColor[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
-	commandList_->ClearRenderTargetView(rtvHandles_[kSorce3D], clearColor, 0, nullptr);
-	commandList_->ClearRenderTargetView(rtvHandles_[kGaussBlumeVert], clearColor, 0, nullptr);
-
+	///
+	size_t a[]={ 0,1 };
+	///
+	SetRenderTarget(2, a,1);
+	Vector4 clearColor = {0.0f,0.0f,0.0f,1.0f};
+	ClearRenderTarget(0,clearColor);
+	ClearRenderTarget(1,clearColor);
 	//指定した深度で画面全体をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
@@ -175,59 +189,29 @@ void DirectXCommon::PreDraw()
 }
 void DirectXCommon::End3DSorceDraw() {
 	//posteffect
-	barrier_.Transition.pResource = renderTargetResource_[kSorce3D].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeVert].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeHori].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGaussBlumeHori], false, nullptr);
-	float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
-	commandList_->ClearRenderTargetView(rtvHandles_[kGaussBlumeHori], clearColor2, 0, nullptr);
-
+	ResourceBarrier(0, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	ResourceBarrier(1, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	
+	SetRenderTarget(2,0);
+	ClearRenderTarget(2, Vector4{ 0.0f,0.0f,0.0f,1.0f });
+	
 	//バックバッファに書き込む
 	postEffect->PreDraw(commandList_.Get());
-	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kSorce3D]);
+	postEffect->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[0], renderSrvHandles_[0]);
 	postEffect->PostDraw();
 
+	ResourceBarrier(2, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	barrier_.Transition.pResource = renderTargetResource_[kGaussBlumeHori].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[kGrayScale], false, nullptr);
-	//float clearColor2[] = { 0.0f,0.0f,0.0f,1.0f };//RGBA
-	commandList_->ClearRenderTargetView(rtvHandles_[kGrayScale], clearColor2, 0, nullptr);
+	//grayscale
+	SetRenderTarget(3, 0);
+	ClearRenderTarget(3, Vector4{ 0.0f,0.0f,0.0f,1.0f });
 
 	postEffect3->PreDraw(commandList_.Get());
-	postEffect3->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kSorce3D], renderSrvHandles_[kGaussBlumeHori]);
+	postEffect3->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[0], renderSrvHandles_[2]);
 	postEffect3->PostDraw();
 
-	barrier_.Transition.pResource = renderTargetResource_[kGrayScale].Get();
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
-
+	ResourceBarrier(3, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
@@ -241,9 +225,9 @@ void DirectXCommon::End3DSorceDraw() {
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	dsvHandle.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	commandList_->OMSetRenderTargets(1, &rtvHandles_[backBufferIndex], false, &dsvHandle);
+	commandList_->OMSetRenderTargets(1, &swapChainRTVHandles_[backBufferIndex], false, &dsvHandle);
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//RGBA
-	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
+	commandList_->ClearRenderTargetView(swapChainRTVHandles_[backBufferIndex], clearColor, 0, nullptr);
 	//指定した深度で画面全体をクリアする
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	//ビューポート
@@ -270,11 +254,8 @@ void DirectXCommon::End3DSorceDraw() {
 
 	//バックバッファに書き込む
 	postEffect2->PreDraw(commandList_.Get());
-	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[kGrayScale], renderSrvHandles_[kGrayScale]);
+	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[3], renderSrvHandles_[3]);
 	postEffect2->PostDraw();
-
-
-
 
 }
 void DirectXCommon::PostDraw()
@@ -448,7 +429,7 @@ void DirectXCommon::CreateSwapChain()
 void DirectXCommon::CreateRenderTargetView()
 {
 	//RTV用のヒープでディスクリプタの数は2
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kCountOfRenderTarget, false);
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device_.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kCountOfRenderTarget+2, false);
 
 	//SwapChainからResourceをひっぱってくる
 
@@ -465,25 +446,19 @@ void DirectXCommon::CreateRenderTargetView()
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	//D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
 	//1つ目
-	rtvHandles_[0] = rtvStartHandle;
-	device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, rtvHandles_[0]);
+	swapChainRTVHandles_[0] = rtvStartHandle;
+	device_->CreateRenderTargetView(swapChainResources_[0].Get(), &rtvDesc_, swapChainRTVHandles_[0]);
 	//2つ目
-	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
-	srvPostEffectHandle = srvPostEffectStart;
+	swapChainRTVHandles_[1].ptr = swapChainRTVHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	device_->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, swapChainRTVHandles_[1]);
+	
 	//3つ目
 	//swapchain以外のrenderTargetの分ポインタを格納する
-	for (uint32_t index = 2; index < kCountOfRenderTarget;index++) {
+	rtvHandles_[0].ptr = swapChainRTVHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	for (uint32_t index = 1; index < kCountOfRenderTarget;index++) {
 		rtvHandles_[index].ptr = rtvHandles_[index-1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
-	/*rtvHandles_[2].ptr = rtvHandles_[1].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	//renderSrvHandles_[kSorce3D] = TextureManager::LoadTexture("PostEffectRender/sorce3D.png");
-	rtvHandles_[3].ptr = rtvHandles_[2].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[4].ptr = rtvHandles_[3].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[5].ptr = rtvHandles_[4].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[6].ptr = rtvHandles_[5].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	rtvHandles_[7].ptr = rtvHandles_[6].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	*/
+	
 	D3D12_HEAP_PROPERTIES heapProperties{};
 	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -520,7 +495,14 @@ void DirectXCommon::CreateRenderTargetView()
 	clearValue.Color[1] = clearColor[1];
 	clearValue.Color[2] = clearColor[2];
 	clearValue.Color[3] = clearColor[3];
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
+	for (size_t index = 0; index < kCountOfRenderTarget;index++) {
+		hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
+		renderTargetResource_[index] = resourse;
+		srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[index].Get(), &srvDesc);
+		device_->CreateRenderTargetView(renderTargetResource_[index].Get(), &rtvDesc_, rtvHandles_[index]);
+		renderSrvHandles_[index] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
+	}
+	/*hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
 	renderTargetResource_[kSorce3D] = resourse;
 	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kSorce3D].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kSorce3D].Get(), &rtvDesc_, rtvHandles_[2]);
@@ -543,7 +525,7 @@ void DirectXCommon::CreateRenderTargetView()
 	renderTargetResource_[kGrayScale] = resourse;
 	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGrayScale].Get(), &srvDesc);
 	device_->CreateRenderTargetView(renderTargetResource_[kGrayScale].Get(), &rtvDesc_, rtvHandles_[kGrayScale]);
-	renderSrvHandles_[kGrayScale] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
+	renderSrvHandles_[kGrayScale] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);*/
 }
 
 void DirectXCommon::CreateShaderResourceView()

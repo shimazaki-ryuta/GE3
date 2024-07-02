@@ -11,6 +11,7 @@
 #include "../externals/DirectXTex/DirectXTex.h"
 #include "../externals/DirectXTex/d3dx12.h"
 #include <memory>
+#include "Vector4.h"
 //#include <list>
 class PostEffect;
 class DirectXCommon
@@ -68,7 +69,7 @@ public:
 	/// RTV生成
 	/// </summary>
 	void CreateRenderTargetView();
-	void SetRenderTarget(int handles[]);
+	//void SetRenderTarget(int handles[]);
 	void CreatePostEffectSprite();
 	PostEffect* postEffect;//縦gauss
 	PostEffect* postEffect2;//grayscale
@@ -96,7 +97,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 
-	enum RenderTargetName
+	/*enum RenderTargetName
 	{
 		kSwap0,
 		kSwap1,
@@ -107,10 +108,12 @@ private:
 		kGaussBlumeHori,
 		kGrayScale,
 		kCountOfRenderTarget
-	};
+	};*/
 
+	static const size_t kCountOfRenderTarget = 10;
 
 	//RenderTarget
+	D3D12_CPU_DESCRIPTOR_HANDLE swapChainRTVHandles_[2];
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[kCountOfRenderTarget];
 	D3D12_GPU_DESCRIPTOR_HANDLE renderSrvHandles_[kCountOfRenderTarget] = {0};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
@@ -125,7 +128,10 @@ private:
 	//TransitionBarrier
 	D3D12_RESOURCE_BARRIER barrier_{};
 
-	//PSO
+	void ClearRenderTarget(size_t renderTargetNum,const Vector4& ClearColor);
+	void ResourceBarrier(size_t renderTargetHandle, D3D12_RESOURCE_STATES beforState, D3D12_RESOURCE_STATES afterState);
+	void SetRenderTarget(size_t numRenderTargets,size_t* renderTargetHandles, size_t dsvNum);
+	void SetRenderTarget(size_t renderTargetHandles, size_t dsvNum);
 
 
 	//texture
