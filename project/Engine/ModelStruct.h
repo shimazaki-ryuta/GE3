@@ -125,3 +125,21 @@ struct SkinCluster {
 	std::span <WellForGPU> mappedPalette;
 	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> palleteSrvHandle;
 };
+
+struct MaterialParamater{
+	Vector4 color;
+	Vector4 disolveColor;
+	int32_t enableLighting;
+	float padding[3];
+	Matrix4x4 uvTransform;
+	float shininess;
+	float growStrength;
+	float environmentCoefficient;
+	float disolveThreshold;
+	int32_t shadingType;
+};
+
+struct OutLineData {
+	Vector4 color;
+	Matrix4x4 scale;
+};

@@ -1,6 +1,7 @@
 #include "TextureManager.h"
 #include "ConvertString.h"
 #include "GetDescriptorHandle.h"
+#include "CommonFiles/SRVManager.h"
 //std::shared_ptr<D3DResourceLeakChacker>TextureManager::leakchecker;
 TextureManager* TextureManager::GetInstance()
 {
@@ -132,13 +133,14 @@ uint32_t TextureManager::Load(const std::string& fileName)
 		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 	}
 	//SRVを作成するDescriptorHeapの場所を決める
-	texture.srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorHandleSize, handle);
-	texture.srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorHandleSize, handle);
+	//texture.srvHandleCPU = GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorHandleSize, handle);
+	//texture.srvHandleGPU = GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorHandleSize, handle);
 
 	//textureSrvHandleCPU.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//textureSrvHandleGPU.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//SRVの生成
-	device_->CreateShaderResourceView(texture.resource.Get(), &srvDesc, texture.srvHandleCPU);
+	//device_->CreateShaderResourceView(texture.resource.Get(), &srvDesc, texture.srvHandleCPU);
+	texture.srvHandle = SRVManager::GetInstance()->CreateSRV(texture.resource.Get(), &srvDesc);
 
 	indexNextUseDiscriptorHeap++;
 
@@ -151,7 +153,7 @@ void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParamIndex, uint32_
 	dxCommon_->GetCommandList()->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	//SRVのDescriptorTableの先頭を設定。
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParamIndex, textures_[textureHandle].srvHandleGPU);
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(rootParamIndex,SRVManager::GetInstance()->GetGPUHandle(textures_[textureHandle].srvHandle));
 
 }
 

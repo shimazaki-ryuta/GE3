@@ -7,6 +7,7 @@
 #include <string>
 #include "Scene/SceneStructs.h"
 #include "Model.h"
+#include "Material.h"
 class GameObject
 {
 public:
@@ -17,10 +18,12 @@ public:
 	//子ノード追加
 	void AppendChildlen(std::unique_ptr<GameObject> child);
 	void SetParent(WorldTransform* parent) { worldtransform_.parent_ = parent; };
+	void SetParameter(const GameObjectData& data);
+	std::vector<std::unique_ptr<GameObject>>* GetChildlen() { return &childlen_; };
 private:
 	WorldTransform worldtransform_;
-	
+	EulerTransform deltaTransform_;
 	std::vector<std::unique_ptr<GameObject>> childlen_;
-
+	std::unique_ptr<Material> material_;
 	std::string fileName = "";
 };

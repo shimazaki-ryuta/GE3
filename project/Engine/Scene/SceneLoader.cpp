@@ -1,4 +1,8 @@
 #include "SceneLoader.h"
+#include "ConvertString.h"
+#include <functional>
+#pragma comment(lib, "ws2_32.lib")//socket関係のライブラリ
+#pragma warning(disable:4996)//4996エラーを無視する
 
 void SceneLoader::LoadFile(const std::string fileName) {
 	const std::string fullpath = "Resources/LevelData/" + fileName + ".json";
@@ -71,6 +75,26 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		objectData->transform.scale.x = (float)transform["scaling"][0];
 		objectData->transform.scale.y = (float)transform["scaling"][2];
 		objectData->transform.scale.z = (float)transform["scaling"][1];
+
+		//deltaTransform
+		objectData->deltaTransform.translate = {0,0,0};
+		objectData->deltaTransform.rotate = { 0,0,0 };
+		objectData->deltaTransform.scale = { 1.0f,1.0f,1.0f };
+		if (object.contains("delta_transform")) {
+			nlohmann::json& dtransform = object["delta_transform"];
+			//t
+			objectData->deltaTransform.translate.x = (float)dtransform["translation"][0];
+			objectData->deltaTransform.translate.y = (float)dtransform["translation"][2];
+			objectData->deltaTransform.translate.z = (float)dtransform["translation"][1];
+			//r
+			objectData->deltaTransform.rotate.x = -(float)dtransform["rotation"][0];
+			objectData->deltaTransform.rotate.y = -(float)dtransform["rotation"][2];
+			objectData->deltaTransform.rotate.z = -(float)dtransform["rotation"][1];
+			//s
+			objectData->deltaTransform.scale.x = (float)dtransform["scaling"][0];
+			objectData->deltaTransform.scale.y = (float)dtransform["scaling"][2];
+			objectData->deltaTransform.scale.z = (float)dtransform["scaling"][1];
+		}
 
 		//collider
 		if (object.contains("collider")) {
@@ -160,3 +184,149 @@ void SceneLoader::CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectD
 	}
 	parent->AppendChildlen(std::move(instance));
 }
+
+//debug
+void SceneLoader::StartReceveJson() {
+	isRecevedData_ = false;
+	//portSetUp
+	socket_ = socket(AF_INET,//ipv4
+		SOCK_DGRAM,//udp tcpの場合はSOCK_STREAM
+		0);
+	//ポート番号と送信先IPアドレスの設定ローカルだから127.0.0.1
+	sockaddr_in address_;
+	address_.sin_family = AF_INET;
+	address_.sin_port = htons(50001);
+	address_.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+
+	//portOpen
+	bind(socket_, (struct sockaddr*)&address_, sizeof(address_));
+
+	//receveStart
+	receveJsonDataThread = std::thread(std::bind(&SceneLoader::ReceveJsonData, this));
+	//ReceveJsonData();
+}
+
+void SceneLoader::EndReceveThread() {
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_port = htons(50001);
+	address.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	char buf[16] = "{""end"" : 0 }";
+	sendto(socket_, buf, 16, 0, (sockaddr*)&address, sizeof(address));
+	receveJsonDataThread.join();
+}
+
+void SceneLoader::ReceveJsonData() {
+	static bool isEnd = false;
+	static int sockaddr_in_size = sizeof(struct sockaddr_in);
+	sockaddr_in from;
+	const static uint32_t buffSize = 32768;
+	char rBuff[buffSize];
+	std::string sData;
+	while (!isEnd) {
+		//recevedata
+		recvfrom(socket_, rBuff, buffSize -1, 0, (sockaddr*)&from, &sockaddr_in_size);
+
+		//end
+		if (strstr(rBuff,"end")) {
+			break;
+		}
+
+		sData = rBuff;
+		nlohmann::json jData;
+		//toJson
+		try {
+			jData = nlohmann::json::parse(sData);
+		}
+		catch (...) {
+			//Log(e.what());
+			//continue;
+			break;
+		}
+		sceneData_.reset(new SceneData);
+
+		//全オブジェクト走査
+		for (nlohmann::json& object : jData["objects"]) {
+			PraceObject(object);
+
+		}
+		isRecevedData_ = true;
+		while (isRecevedData_) {
+
+		}
+	}
+	closesocket(socket_);
+	isEnd = true;
+}
+
+void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& list) {
+	if (!isRecevedData_) {
+		return;
+	}
+	/*list.clear();
+	CreateObjects(list);
+	isRecevedData_ = false;
+	return;*/
+
+	//ルート走査
+	size_t index = 0;
+	//削除チェック
+	std::erase_if(list, [&](std::unique_ptr<GameObject>& obj) {
+		if (index++ < sceneData_->objects.size()) {
+			return false;
+		}
+		return true;
+	});
+	//変更チェック
+	index = 0;
+	for (std::unique_ptr<GameObject> &object : list) {
+		if (index < sceneData_->objects.size()) {
+			ScanChanged(object, sceneData_->objects[index], int32_t(index));
+		}
+		index++;
+	}
+
+
+	//追加チェック
+	for (index; index < sceneData_->objects.size(); index++) {
+		//追加処理
+		std::unique_ptr<GameObject> instance;
+		instance.reset(new GameObject);
+		instance->Initialize(sceneData_->objects[index]);
+		if (!sceneData_->objects[index].children.empty()) {
+			for (GameObjectData& child : sceneData_->objects[index].children) {
+
+				CreateObjects(instance, child);
+			}
+		}
+		list.push_back(std::move(instance));
+	}
+	isRecevedData_ = false;
+}
+
+void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData& datas, int32_t id) {
+	//本体更新
+	object->SetParameter(datas);
+
+	size_t index = 0;
+	//子要素削除チェック
+	std::erase_if(*object->GetChildlen(), [&](std::unique_ptr<GameObject>& obj) {
+		if (index++ < datas.children.size()) {
+			return false;
+		}
+		return true;
+	});
+
+	//子要素変更チェック
+	index = 0;
+	for (std::unique_ptr<GameObject>& child : *object->GetChildlen()) {
+		ScanChanged(child, datas.children[index], int32_t(index));
+		index++;
+	}
+
+	//子要素追加
+	for (index; index < datas.children.size(); index++) {
+		CreateObjects(object, datas.children[index]);
+	}
+}
+

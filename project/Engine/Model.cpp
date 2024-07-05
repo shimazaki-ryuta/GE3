@@ -57,7 +57,7 @@ void Model::StaticInitialize(
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[10] = {};
+	D3D12_ROOT_PARAMETER rootParameters[11] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -128,6 +128,16 @@ void Model::StaticInitialize(
 	rootParameters[9].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[9].DescriptorTable.pDescriptorRanges = descriptorRangeEn;
 	rootParameters[9].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeEn);
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeDisolve[1] = {};
+	descriptorRangeDisolve[0].BaseShaderRegister = 4;
+	descriptorRangeDisolve[0].NumDescriptors = 1;
+	descriptorRangeDisolve[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangeDisolve[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	rootParameters[10].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[10].DescriptorTable.pDescriptorRanges = descriptorRangeDisolve;
+	rootParameters[10].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeDisolve);
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -205,7 +215,7 @@ void Model::StaticInitialize(
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//PSOの生成
@@ -268,7 +278,7 @@ void Model::CreateRootSignatureSkinning() {
 	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
 	//RootParameter作成
-	D3D12_ROOT_PARAMETER rootParameters[11] = {};
+	D3D12_ROOT_PARAMETER rootParameters[12] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[0].Descriptor.ShaderRegister = 0;
@@ -349,6 +359,16 @@ void Model::CreateRootSignatureSkinning() {
 	rootParameters[10].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 	rootParameters[10].DescriptorTable.pDescriptorRanges = descriptorRangeEn;
 	rootParameters[10].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeEn);
+
+	D3D12_DESCRIPTOR_RANGE descriptorRangeDisolve[1] = {};
+	descriptorRangeDisolve[0].BaseShaderRegister = 4;
+	descriptorRangeDisolve[0].NumDescriptors = 1;
+	descriptorRangeDisolve[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRangeDisolve[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	rootParameters[11].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[11].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[11].DescriptorTable.pDescriptorRanges = descriptorRangeDisolve;
+	rootParameters[11].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeDisolve);
 
 	descriptionRootSignature.pParameters = rootParameters;
 	descriptionRootSignature.NumParameters = _countof(rootParameters);
@@ -434,7 +454,7 @@ void Model::CreateRootSignatureSkinning() {
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;*/
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
 	//PSOの生成
@@ -785,6 +805,9 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 
 	vertexNum = modelData_.vertexNum;
 	textureHandle_ = modelData_.meshs.material.textureHandle;
+	toonShadowTextureHandle_ = textureHandle_;
+	perspectivTextureHandle_ = textureHandle_;
+	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
 	//頂点リソース
 	 vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) *vertexNum);
 
@@ -809,16 +832,21 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	std::memcpy(indexData_,modelData_.meshs.indices.data(),sizeof(uint32_t)*modelData_.meshs.indices.size());
 
 	//マテリアル用のリソースを作成
-	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Material));
+	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(MaterialParamater));
 	//Material* materialData = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	materialData_->disolveColor = Vector4{1.0f,1.0f,1.0f,1.0f};
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
 	materialData_->shininess = 100.0f;
 	materialData_->growStrength = 0;
 	materialData_->environmentCoefficient = 0;
 	materialData_->shadingType = 0;
+
+	//ptrに内部のリソースセット
+	materialResourcePtr_ = materialResource_.Get();
+
 	//ライティング用のカメラリソース
 	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));
 	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
@@ -830,6 +858,7 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
 	outlineData_->color = Vector4{ 0.0f, 0.0f, 0.0f, 1.0f };
 	outlineData_->scale = MakeScaleMatrix({1.05f,1.05f,1.05f});
+	outlineResourcePtr_ = outlineResource_.Get();
 
 	//ローカル変換行列
 	localMatrixResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Matrix4x4));
@@ -894,7 +923,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 	cameraData_->worldPosition = viewProjection.translation_;
-	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//localMatrix用のリソース
@@ -908,6 +937,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, disolveMaskTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
@@ -927,7 +957,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 	cameraData_->worldPosition = viewProjection.translation_;
-	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//localMatrix用のリソース
@@ -941,6 +971,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, disolveMaskTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
@@ -960,7 +991,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 	cameraData_->worldPosition = viewProjection.translation_;
-	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//localMatrix用のリソース
@@ -974,6 +1005,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, perspectivTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(11, disolveMaskTextureHandle_);
 	sCommandList->SetGraphicsRootDescriptorTable(9,skinCluster.palleteSrvHandle.second);
 
 	//vb
@@ -1000,7 +1032,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//transformationMatrixData->World = worldTransform.matWorld_;
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 	cameraData_->worldPosition = viewProjection.translation_;
-	sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	//localMatrix用のリソース
@@ -1014,6 +1046,7 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, disolveMaskTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	sCommandList->IASetIndexBuffer(&indexBufferView_);
@@ -1031,7 +1064,7 @@ void Model::DrawOutLine(WorldTransform& worldTransform, const ViewProjection& vi
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 
-	sCommandList->SetGraphicsRootConstantBufferView(0, outlineResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, outlineResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 	
@@ -1052,7 +1085,7 @@ void Model::DrawOutLine(WorldTransform& worldTransform, const ViewProjection& vi
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
 
-	sCommandList->SetGraphicsRootConstantBufferView(0, outlineResource_->GetGPUVirtualAddress());
+	sCommandList->SetGraphicsRootConstantBufferView(0, outlineResourcePtr_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
 	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
 

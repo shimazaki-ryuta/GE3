@@ -14,8 +14,9 @@ public:
 	struct Texture
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
-		D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+		//D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
+		//D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU;
+		uint32_t srvHandle;
 		std::string name;
 	};
 
@@ -60,7 +61,7 @@ private:
 	UINT descriptorHandleSize;
 	std::string directoryPath_;
 
-	uint32_t indexNextUseDiscriptorHeap = 1u;
+	uint32_t indexNextUseDiscriptorHeap = 0u;
 	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
 	std::array<Texture, kSrvTextureUseEnd> textures_;
 

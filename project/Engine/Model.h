@@ -14,6 +14,7 @@
 #include <memory>
 //#include <stdfloat>
 #include "ModelStruct.h"
+#include "Material.h"
 class Model
 {
 public:
@@ -21,24 +22,6 @@ public:
 	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
-	
-
-	struct Material
-	{
-		Vector4 color;
-		int32_t enableLighting;
-		float padding[3];
-		Matrix4x4 uvTransform;
-		float shininess;
-		float growStrength;
-		float environmentCoefficient;
-		int32_t shadingType;
-	};
-
-	struct OutLineData {
-		Vector4 color;
-		Matrix4x4 scale;
-	};
 
 	struct TransformationMatrix
 	{
@@ -119,17 +102,28 @@ public:
 
 	void SetPerspectivTextureHandle(uint32_t handle) { perspectivTextureHandle_ = handle; };
 
+	void SetMaterial(Material* material) { 
+		materialResourcePtr_ = material->GetMaterialResource(); 
+		outlineResourcePtr_ = material->GetOutlineResource();
+	};
+	void SetInnerMaterial() {
+		materialResourcePtr_ = materialResource_.Get(); 
+		outlineResourcePtr_ = outlineResource_.Get();
+	};
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
+	ID3D12Resource* materialResourcePtr_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> outlineResource_;
+	ID3D12Resource* outlineResourcePtr_;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
-	Material* materialData_ = nullptr;
+	MaterialParamater* materialData_ = nullptr;
 	OutLineData* outlineData_ = nullptr;
 	CameraForGpu* cameraData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> localMatrixResource_;
@@ -140,6 +134,7 @@ private:
 	Vector4 color_;
 	uint32_t textureHandle_;
 	uint32_t toonShadowTextureHandle_ = 1;
+	uint32_t disolveMaskTextureHandle_;
 	Matrix4x4 uvTransform_;
 
 	Matrix4x4 wvp_;

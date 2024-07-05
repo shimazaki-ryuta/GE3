@@ -22,12 +22,15 @@
 #include "Engine/Audio/AudioManager.h"
 #include "GetDescriptorHandle.h"
 #include "ConvertString.h"
+#include "CommonFiles/SRVManager.h"
 GameScene::GameScene() {
 
 }
 
 GameScene::~GameScene() {
-
+#ifdef _DEBUG
+	sceneLoader_->EndReceveThread();
+#endif // _DEBUG
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon) {
@@ -35,11 +38,28 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	input_ = Input::GetInstance();
 
+	debugCamera_.reset(new DebugCamera);
+	debugCamera_->Initialize();
+
 	//audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
 	audioHandle_ = AudioManager::GetInstance()->LoadAudio("1.mp3");
 	//AudioManager::GetInstance()->PlayWave(audioHandle_);
+
+
+	sceneLoader_.reset(new SceneLoader);
+	sceneLoader_->LoadFile("testScene");
+	modelList_.clear();
+	sceneLoader_->CreateModelList(modelList_);
+	objects_.clear();
+	sceneLoader_->CreateObjects(objects_);
 #ifdef _DEBUG
 
+	sceneLoader_->StartReceveJson();
+
+	isDebugCameraActive_ = true;
+	debugCamera_->SetUses(isDebugCameraActive_);
+	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
+	debugCamera_->SetPosition({ 0.0f, 1.7f, -10.0f });
 #endif // _DEBUG
 
 	//srvの作成
@@ -63,27 +83,19 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 		pointLightData[index].isUse_ = 0;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
-	srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+	//D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
+	//srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
 
-	dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
+	//dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
+	uint32_t handle = SRVManager::GetInstance()->CreateSRV(pointLightResource.Get(), &srvDesc);
+	srvHandleGPU = SRVManager::GetInstance()->GetGPUHandle(handle);
 
-	//DirectionalLight用のリソース
 	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
 	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
 	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
 	directinalLightData->direction = Normalize(directinalLightData->direction);
 	directinalLightData->intensity = 0.6f;
-
-	//PointLight用のリソース
-	//pointLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(PointLight));
-	//pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-//	pointLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	//pointLightData->position = { 0.0f,1.0f,0.0f };
-	//pointLightData->intensity = 1.0f;
-	//pointLightData->radius = 35.0f;
-	//pointLightData->decay = 1.0f;
 
 	//PointLight用のリソース
 	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(SpotLight));
@@ -98,10 +110,21 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	//skybox
 	skyBox_.reset(new SkyBox);
-	skyBox_->Initialize(TextureManager::LoadTexture("rostock_laage_airport_4k.dds"));
+	skyBox_->Initialize(TextureManager::LoadTexture("skyBox.dds"));
+	//skyBox_->SetColor({1.0f,1.0f,1.0f,1.0f});
 	worldTransformSkyBox_.Initialize();
 	worldTransformSkyBox_.scale_ = { 1000.0f,1000.0f,1000.0f };
 	worldTransformSkyBox_.UpdateMatrix();
+
+	// 地面
+	modelGround_ = new Model();
+	modelGround_->Create("Resources/human", "walk.gltf");
+
+	ground_.reset(new Ground);
+	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
+	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
+
+	CollisionManager::GetInstance()->ClearList();
 
 	CollisionManager::GetInstance()->ClearList();
 	// 3Dモデルデータの生成
@@ -283,6 +306,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	fadeAlpha_ = 1.0f;
 
 	lockOn_->Update(player2_.get(), viewProjection_);
+
 	CollisionManager::GetInstance();
 	colorPhase_ = 0;
 	color_ = 0.0f;
@@ -290,11 +314,26 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	grayScaleValue_ = 0.0f;
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
+	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
+
+#ifdef _DEBUG
+	sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->ApplyRecevedData(objects_);
+
+	if (Input::GetKeyDown(DIK_RSHIFT)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+		debugCamera_->SetUses(isDebugCameraActive_);
+	}
+
+	ImGui::Begin("FPS");
+	ImGui::Text("%f", ImGui::GetIO().Framerate);
+	ImGui::End();
+#endif // _DEBUG
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
@@ -570,29 +609,7 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw2D() {
-	/*if (!isIngame_) {
-		titleSprite_->Draw();
-		if (isButtonDraw_) {
-			pressASprite_->Draw();
-		}
-	}
-	if (isIngame_ && !isEnd_) {
-		shotSprite_->Draw();
-		dashSprite_->Draw();
-		jumpSprite_->Draw();
 
-		lockOn_->Draw();
-	}
-	if (isEnd_) {
-		backSprite_->Draw();
-		endSprite_->Draw();
-		if (endCount_ == 120) {
-			if (isButtonDraw_) {
-				pressASprite_->Draw();
-			}
-		}
-	}
-	fadeSprite_->Draw();*/
 }
 
 void GameScene::Draw3D() {
@@ -603,10 +620,7 @@ void GameScene::Draw3D() {
 	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, srvHandleGPU);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
-	//Model::PreDraw(dxCommon_->GetCommandList());
-	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	ground_->Draw(viewProjection_);
-	//skydome_->Draw(viewProjection_);
+
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
 	}
@@ -617,8 +631,8 @@ void GameScene::Draw3D() {
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	player_->DrawOutLine(viewProjection_);
 	player2_->DrawOutLine(viewProjection_);
-	ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
+
 
 	//skybox描画
 	skyBox_->Draw(worldTransformSkyBox_, viewProjection_);
@@ -628,8 +642,5 @@ void GameScene::Draw3D() {
 		particle->Draw(viewProjection_);
 		Particle::PostDraw();
 	}
-}
-
-void GameScene::TransitionFade() {
 
 }

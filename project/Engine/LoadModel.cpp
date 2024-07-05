@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Animation.h"
 #include "GetDescriptorHandle.h"
+#include "SRVManager.h"
 size_t LoadModel::srvSkinClusterHandle = 0;
 ID3D12Device* LoadModel::sDevice = nullptr;
 ID3D12DescriptorHeap* LoadModel::sSrvDescriptorHeap=nullptr;
@@ -254,9 +255,8 @@ SkinCluster LoadModel::CreateSkinCluster(const SkeletonData& skeleton, const Mod
 	WellForGPU* mappedPalette = nullptr;
 	skinCluster.paletteResource->Map(0,nullptr,reinterpret_cast<void**>(&mappedPalette));
 	skinCluster.mappedPalette = {mappedPalette,skeleton.joints.size()};
-	skinCluster.palleteSrvHandle.first = GetCPUDescriptorHandle(sSrvDescriptorHeap, descriptorSize, uint32_t(srvSkinClusterStart + srvSkinClusterHandle));
-	skinCluster.palleteSrvHandle.second = GetGPUDescriptorHandle(sSrvDescriptorHeap, descriptorSize, uint32_t(srvSkinClusterStart + srvSkinClusterHandle));
-	srvSkinClusterHandle++;
+	
+	//srvSkinClusterHandle++;
 	//srv
 	D3D12_SHADER_RESOURCE_VIEW_DESC paletteSrvDesc{};
 	paletteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -266,7 +266,11 @@ SkinCluster LoadModel::CreateSkinCluster(const SkeletonData& skeleton, const Mod
 	paletteSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 	paletteSrvDesc.Buffer.NumElements = UINT(skeleton.joints.size());
 	paletteSrvDesc.Buffer.StructureByteStride = sizeof(WellForGPU);
-	sDevice->CreateShaderResourceView(skinCluster.paletteResource.Get(),&paletteSrvDesc,skinCluster.palleteSrvHandle.first);
+	//sDevice->CreateShaderResourceView(skinCluster.paletteResource.Get(),&paletteSrvDesc,skinCluster.palleteSrvHandle.first);
+	srvSkinClusterHandle = SRVManager::GetInstance()->CreateSRV(skinCluster.paletteResource.Get(), &paletteSrvDesc);
+	skinCluster.palleteSrvHandle.first = SRVManager::GetInstance()->GetCPUHandle(uint32_t(srvSkinClusterHandle));
+	skinCluster.palleteSrvHandle.second = SRVManager::GetInstance()->GetGPUHandle(uint32_t(srvSkinClusterHandle));
+
 
 	//influence用resource
 	skinCluster.influenceResource = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexInfluence) * modelData.meshs.vertices.size());

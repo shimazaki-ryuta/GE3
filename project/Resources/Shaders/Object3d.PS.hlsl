@@ -3,15 +3,18 @@
 Texture2D<float32_t4> gTexture : register(t0);
 Texture2D<float32_t4> gToonShadowTexture : register(t1);
 TextureCube<float32_t4> gEnvironmentTexture : register(t3);
+Texture2D<float32_t> disolveMaskTexture : register(t4);
 SamplerState gSampler : register(s0);
 SamplerState gSampler2 : register(s1);
 struct Material {
 	float32_t4 color;
+	float32_t4 disolveColor;
 	int32_t enableLighting;
 	float32_t4x4 uvTransform;
 	float32_t shininess;
 	float32_t growStrength;
 	float32_t environmentCoefficient;
+	float32_t disolveThreshold;
 	int32_t shadingType;
 };
 struct Camera {
@@ -135,6 +138,25 @@ PixelShaderOutput main(VertexShaderOutput input){
 		float32_t4 environmentColor = gEnvironmentTexture.Sample(gSampler,refrectedVector);
 		environmentColor.rgb *= gMaterial.environmentCoefficient;
 		output.color.rgb += environmentColor.rgb;
+	}
+	//disolve
+	{
+		float32_t mask = disolveMaskTexture.Sample(gSampler,transformedUV.xy);
+		float min = gMaterial.disolveThreshold-0.03f;
+		float edge = 1.0f - smoothstep(min,min+0.06f,mask);
+		edge *=2.0f;
+		edge -=1.0f;
+		if(mask <= min){
+			discard;
+		}
+		edge = (1.0f-(edge*edge));
+		edge *= edge*edge*edge*edge;
+		//edge = 1.0f - pow(1.0f - edge,5);
+		edge+=0.1f;
+		if(min < mask && mask < min+0.06f && gMaterial.disolveThreshold!=0.0f){
+			//output.color.rgb = edge * float32_t3(5.2f,0.2f,0.2f) * 3.0f;
+			output.color.rgb = edge * gMaterial.disolveColor.rgb * 3.0f;
+		}
 	}
 	output.grow = gMaterial.color * textureColor * gMaterial.growStrength;
 	return output;

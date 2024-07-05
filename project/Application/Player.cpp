@@ -91,6 +91,17 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	testSkeleton_.reset(new Skeleton);
 	testSkeleton_->Initialize(models_[1].model_->GetRootNode());
 	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(), models_[1].model_->GetModelData());
+
+	material_.reset(new Material);
+	material_->Initialize();
+	material_->paramater_.enableLighting = 2;
+	material_->paramater_.shadingType = 1;
+	material_->paramater_.disolveThreshold = 0.0f;
+	material_->paramater_.environmentCoefficient = 0.2f;
+	//material_->paramater_.disolveColor = Vector4{ 1.0f, 1.0f, 1.0f, 0.0f };
+	material_->paramater_.disolveColor = Vector4{ 0.2f, 0.2f, 5.2f, 0.0f };
+	material_->outline_.color = { 0.0f,0.0f,1.0f,1.0f };
+	material_->ApplyParamater();
 }
 
 void Player::ReStart() {
@@ -115,6 +126,8 @@ void Player::ReStart() {
 	//weaponCollider_.SetIsCollision(false);
 	bullets_.clear();
 	isDead_ = false;
+	material_->paramater_.disolveThreshold = 0;
+	material_->ApplyParamater();
 }
 
 void Player::BehaviorRootInitialize() {
@@ -231,6 +244,11 @@ void Player::Update() {
 		}*/
 	}
 	else {
+
+		if (material_->paramater_.disolveThreshold < 1.0f) {
+			material_->paramater_.disolveThreshold += 0.005f;
+		}
+
 		if (models_[0].worldTransform_.rotation_.x > -3.14f/2.0f) {
 			models_[0].worldTransform_.rotation_.x -= 0.05f;
 		}
@@ -269,6 +287,8 @@ void Player::Update() {
 		(*iterator)->Update();
 	}
 
+
+	material_->ApplyParamater();
 	preJoyState_ = joyState_;
 }
 
@@ -432,6 +452,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		model.model_->Draw(model.worldTransform_, viewProjection);
 	}*/
 	for (uint32_t index = 0; index < models_.size();index++) {
+		models_[index].model_->SetMaterial(material_.get());
 		if (index == 1) {
 			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection,cluster_);
 		}
@@ -448,15 +469,14 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 void Player::DrawOutLine(const ViewProjection& viewProjection)
 {
-	/*for (HierarchicalAnimation& model : models_) {
-		model.model_->DrawOutLine(model.worldTransform_, viewProjection);
-	}*/
-	for (uint32_t index = 0; index < models_.size(); index++) {
-		if (index == 1) {
-			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection, cluster_);
-		}
-		else {
-			models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection);
+	if (material_->paramater_.disolveThreshold == 0.0f) {
+		for (uint32_t index = 0; index < models_.size(); index++) {
+			if (index == 1) {
+				models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection, cluster_);
+			}
+			else {
+				models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection);
+			}
 		}
 	}
 }

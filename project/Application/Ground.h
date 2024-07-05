@@ -1,5 +1,6 @@
 #pragma once
 #include "Model.h"
+#include "Material.h"
 #include "WorldTransform.h"
 
 #include <memory>
@@ -31,6 +32,7 @@ public:
 private:
 	WorldTransform worldTransform_;
 	std::unique_ptr<Model> model_;
+	std::unique_ptr<Material> material_;
 
 	std::unique_ptr<Animation> testAnimation_;
 	std::unique_ptr<Skeleton> testSkeleton_;

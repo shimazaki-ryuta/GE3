@@ -81,8 +81,8 @@ void PostEffect::StaticInitialize(int window_width, int window_height ,const std
 
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
@@ -183,7 +183,7 @@ void PostEffect::StaticInitialize(int window_width, int window_height ,const std
 
 void PostEffect::PreDraw(ID3D12GraphicsCommandList* commandList) {
 	// PreDrawとPostDrawがペアで呼ばれていなければエラー
-	assert(PostEffect::sCommandList == nullptr);
+	//assert(PostEffect::sCommandList == nullptr);
 
 	// コマンドリストをセット
 	sCommandList = commandList;
