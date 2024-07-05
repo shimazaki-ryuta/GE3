@@ -19,9 +19,17 @@ void Material::Initialize() {
 	materialData_->shadingType = 0;
 	materialData_->disolveThreshold = 0.0f;
 
+	outlineResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(OutLineData));
+	//Material* materialData = nullptr;
+	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
+	outlineData_->color = Vector4{ 0.0f, 0.0f, 0.0f, 1.0f };
+	outlineData_->scale = MakeScaleMatrix({ 0.05f,0.05f,0.05f });
+
 	paramater_ = *materialData_;
+	outline_ = *outlineData_;
 }
 
 void Material::ApplyParamater() {
 	*materialData_  = paramater_;
+	*outlineData_ = outline_;
 }

@@ -43,7 +43,7 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 		float32_t3 fetchColor = gGrowMap.Sample(gSampler,texcoord).rgb;
 		float value = dot(fetchColor,float32_t3(0.2125f,0.7154f,0.0721f));
 		weight += kernel[y+halfKernel];
-		if(value >= 0.7f){
+		if(value >= 0.9f){
 			output.color.rgb += fetchColor*kernel[y+halfKernel];
 		}
 	}

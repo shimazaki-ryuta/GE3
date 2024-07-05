@@ -27,6 +27,7 @@ public:
 	ID3D12Resource* GetOutlineResource() { return outlineResource_.Get(); };
 
 	MaterialParamater paramater_;
+	OutLineData outline_;
 
 	void ApplyParamater();
 

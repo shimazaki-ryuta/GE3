@@ -13,6 +13,7 @@
 #include "Bullet.h"
 #include "../Engine/Animation.h"
 #include "Skeleton.h"
+#include "Material.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -160,4 +161,5 @@ private:
 	std::unique_ptr<Animation> testAnimation_;
 	std::unique_ptr<Skeleton> testSkeleton_;
 	SkinCluster cluster_;
+	std::unique_ptr<Material> material_;
 };

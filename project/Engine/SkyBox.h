@@ -63,6 +63,10 @@ public:
 	
 	uint32_t GetTextureHandle() { return textureHandle_; };
 
+	void SetColor(const Vector4& color) {
+		materialData_->color = color;
+	}
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
