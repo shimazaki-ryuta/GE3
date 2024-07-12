@@ -17,6 +17,12 @@ void GameObject::Initialize(const GameObjectData& data) {
 	material_->paramater_.disolveThreshold = 0.5f;
 	material_->paramater_.disolveColor = Vector4{ 1.0f, 1.0f, 1.0f, 0.0f };
 	material_->ApplyParamater();
+
+	//collider
+	if (!data.collider.type.empty()) {
+		collider_.reset(new Collider);
+		collider_->Inirialize(data.collider);
+	}
 }
 
 void GameObject::SetParameter(const GameObjectData& data) {
@@ -26,6 +32,10 @@ void GameObject::SetParameter(const GameObjectData& data) {
 	worldtransform_.UpdateMatrix();
 	worldtransform_.matWorld_ *= MakeAffineMatrix(deltaTransform_.scale, deltaTransform_.rotate, deltaTransform_.translate);
 	fileName = data.fileName;
+	if (!data.collider.type.empty()) {
+		collider_.reset(new Collider);
+		collider_->Inirialize(data.collider);
+	}
 }
 
 void GameObject::Update() {
@@ -36,6 +46,9 @@ void GameObject::Update() {
 			child->SetParent(&worldtransform_);
 			child->Update();
 		}
+	}
+	if (collider_.get()) {
+		collider_->ApplyWorldTransform(worldtransform_);
 	}
 }
 
@@ -55,4 +68,17 @@ void GameObject::Draw(const ViewProjection& viewProjection, std::map<std::string
 
 void GameObject::AppendChildlen(std::unique_ptr<GameObject> child) {
 	childlen_.push_back(std::move(child));
+}
+
+void GameObject::AppendColliderList(std::list<Collider*>& list) {
+	if (collider_.get()) {
+		if (collider_->GetType() == Collider::ColliderType::Shpere) {
+			list.push_back(collider_.get());
+		}
+	}
+	if (!childlen_.empty()) {
+		for (std::unique_ptr<GameObject>& child : childlen_) {
+			child->AppendColliderList(list);
+		}
+	}
 }

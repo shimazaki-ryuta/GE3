@@ -16,6 +16,7 @@
 #include "CollisionManager.h"
 #include "RandomEngine.h"
 #include "../Engine/TextureManager.h"
+#include "Collision.h"
 static int startFrame = 0;
 static int endFrame = 40;
 static int rigidityFrame = 30;
@@ -275,8 +276,8 @@ void Player::Update() {
 */
 
 	obb_.center = worldTransform_.GetWorldPosition();
-	obb_.size = { 0.5f,1.0f,0.5f };
-	obb_.center.y += obb_.size.y / 2.0f;
+	obb_.size = { 1.0f,1.0f,1.0f };
+	//obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
@@ -552,5 +553,21 @@ void Player::OutCollision() {
 		worldTransform_.translation_.x = world.m[3][0];
 		worldTransform_.translation_.y = world.m[3][1];
 		worldTransform_.translation_.z = world.m[3][2];
+		isFlooar_ = false;
+	}
+}
+
+void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
+	if (worldTransform_.parent_ != &parent) {
+		//Vector3 point = GetClosestPoint(obb_,partner);
+		//PushBack(0,obb_,partner);
+		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center) * (Inverse(parent.matWorld_));
+		worldTransform_.translation_.x = rocal.m[3][0];
+		worldTransform_.translation_.y = rocal.m[3][1];
+		worldTransform_.translation_.z = rocal.m[3][2];
+
+		worldTransform_.parent_ = &parent;
+		velocity_ = { 0,0,0 };
+		isFlooar_ = true;
 	}
 }

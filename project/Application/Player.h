@@ -71,6 +71,8 @@ public:
 
 	void OnCollisionEnemy() { ReStart(); };
 
+	void OnCollisionSphere(WorldTransform& parent,Sphere partner);
+
 	OBB& GetOBB() { return obb_; };
 
 	void ReStart();

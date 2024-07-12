@@ -100,7 +100,7 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		if (object.contains("collider")) {
 			nlohmann::json& collider = object["collider"];
 			objectData->collider.type = collider["type"];
-			if (objectData->collider.type.compare("BOX") == 0) {
+			if (objectData->collider.type.compare("BOX") == 0 || objectData->collider.type.compare("SPHERE") == 0) {
 				objectData->collider.transform.translate.x = (float)collider["center"][0];
 				objectData->collider.transform.translate.y = (float)collider["center"][2];
 				objectData->collider.transform.translate.z = (float)collider["center"][1];

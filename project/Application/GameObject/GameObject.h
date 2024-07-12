@@ -20,10 +20,18 @@ public:
 	void SetParent(WorldTransform* parent) { worldtransform_.parent_ = parent; };
 	void SetParameter(const GameObjectData& data);
 	std::vector<std::unique_ptr<GameObject>>* GetChildlen() { return &childlen_; };
+
+	WorldTransform* GetWorldTransform() { return &worldtransform_; };
+
+	void AppendColliderList(std::list<Collider*>& list);
+
+	Collider* GetCollider() { return collider_.get(); };
+
 private:
 	WorldTransform worldtransform_;
 	EulerTransform deltaTransform_;
 	std::vector<std::unique_ptr<GameObject>> childlen_;
+	std::unique_ptr<Collider> collider_;
 	std::unique_ptr<Material> material_;
 	std::string fileName = "";
 };

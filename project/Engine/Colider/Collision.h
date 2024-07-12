@@ -28,3 +28,8 @@ bool IsCollision(const OBB& obb, const Segment& segment);
 bool IsCollision(const OBB& obb, const Line& segment);
 bool IsCollision(const OBB& obb, const Ray& segment);
 bool IsCollision(const OBB& obb1, const OBB& obb2);
+
+Vector3 GetClosestPoint(const OBB& obb, const Sphere& sphere);
+
+//押し戻し、係数tが0だったら左だけ押し戻し
+void PushBack(float t,OBB& obb,Sphere& sphere);

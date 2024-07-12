@@ -335,6 +335,10 @@ void GameScene::Update() {
 	ImGui::End();
 #endif // _DEBUG
 
+	for (std::unique_ptr<GameObject>& object : objects_) {
+		object->Update();
+	}
+
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
 	}
@@ -370,11 +374,7 @@ void GameScene::Update() {
 		viewProjection_.rotation_.y += 0.01f;
 		viewProjection_.rotation_.x = 0.10f;
 		viewProjection_.UpdateMatrix();
-		//viewProjection_.matView = followCamera_->GetViewProjection().matView;
-		//viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-		//viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
 		if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
-			//isIngame_ = true;
 			isStart_ = true;
 			isTransitionFade_ = false;
 		}
@@ -394,16 +394,12 @@ void GameScene::Update() {
 
 	}
 	else {
-		//flooar_->Update();
 		player_->Update();
 		if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
 			player_->ReStart();
-			/*for (std::list<std::unique_ptr<Enemy>>::iterator enemy = enemies_.begin(); enemy != enemies_.end(); enemy++) {
-				enemy->get()->ReStart();
-			}*/
 		}
 
-		ai_->Update();
+		//ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();
@@ -414,6 +410,13 @@ void GameScene::Update() {
 
 		followCamera_->Update();
 
+		//objectのコライダーリスト取得
+		std::list<Collider*> colliderList;
+		colliderList.clear();
+		for (std::unique_ptr<GameObject>& object : objects_) {
+			object->AppendColliderList(colliderList);
+		}
+
 		bool isCollision = false;
 		for (int index = 0; index < 1; index++) {
 			if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
@@ -422,6 +425,20 @@ void GameScene::Update() {
 				isCollision = true;
 			}
 		}
+		//objectとの当たり判定
+		/*for (Collider* collider : colliderList) {
+	
+		}*/
+		for (std::unique_ptr<GameObject>& object : objects_) {
+			if (object->GetCollider()) {
+				if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
+				{
+					player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
+					isCollision = true;
+				}
+			}
+		}
+
 		if (!isCollision) {
 			player_->OutCollision();
 		}
@@ -483,7 +500,6 @@ void GameScene::Update() {
 					endSprite_->SetTextureHandle(endTextureHandle_[1]);
 					player_->SetIsDead(true);
 					followCamera_->Shake();
-					//followCamera_->SetTarget(player2_->GetWorldTransformBody());
 					isEnd_ = true;
 				}
 			}
@@ -505,14 +521,6 @@ void GameScene::Update() {
 			if (endCount_ == 120) {
 				if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
 					isTransitionFade_ = true;
-					/*isIngame_ = false;
-					player_->ReStart();
-					player2_->ReStart();
-					followCamera_->Reset();
-					followCamera_->SetTarget(player_->GetWorldTransform());
-					ai_->Initialize();
-					endCount_ = 0;
-					isEnd_ = false;*/
 				}
 			}
 		}
@@ -555,11 +563,9 @@ void GameScene::Update() {
 
 
 		{
-			// viewProjection_.UpdateMatrix();
 			viewProjection_.matView = followCamera_->GetViewProjection().matView;
 			viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 			viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
-			//viewProjection_.TransferMatrix();
 		}
 		lockOn_->Update(player2_.get(), viewProjection_);
 		followCamera_->SetLockOnTarget(nullptr);
@@ -596,6 +602,7 @@ void GameScene::Update() {
 			}
 		}
 	}
+
 	particle->Updade();
 	preJoyState_ = joyState;
 	buttonCount_++;
@@ -613,13 +620,15 @@ void GameScene::Draw2D() {
 }
 
 void GameScene::Draw3D() {
-	//Primitive3D::PreDraw(dxCommon_->GetCommandList());
-	//Primitive3D::PostDraw();
+	
 	Model::PreDraw(dxCommon_->GetCommandList());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
-	//dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(5, srvHandleGPU);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
+
+	for (std::unique_ptr<GameObject>& object : objects_) {
+		object->Draw(viewProjection_, modelList_);
+	}
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);

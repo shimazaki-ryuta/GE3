@@ -8,6 +8,9 @@
 #include "AABB.h"
 #include "OBB.h"
 #include <functional>
+#include <memory>
+#include "Scene/SceneStructs.h"
+#include "WorldTransform.h"
 struct Vector3;
 
 class Collider
@@ -28,7 +31,15 @@ public:
 		Plane plane;
 	};
 
+	struct Data
+	{
+		ColliderShape offset;
+		ColliderShape inst;
+	};
+
 	Collider();
+
+	void Inirialize(ColliderData data);
 
 	//OnCollisionがよばれたときに実行するイベントをセットする
 	//void SetOnCollisionEvent(std::function<void(Collider&)>);
@@ -54,14 +65,18 @@ public:
 	void SetIsDraw(bool is) { isDraw_ = is; };
 	void SetIsCollision(bool is) { isCollision_ = is; };
 	bool GetIsCollision() { return isCollision_; };
-	ColliderShape GetColliderShape() { return collider_; };
+	ColliderShape GetColliderShape() { return collider_->inst; };
 	auto GetType() {return colliderType_; };
+
+	//保有オブジェクトのワールドトランスフォームを取得
+	void ApplyWorldTransform(WorldTransform& parent);
+
 private:
 	uint32_t collisionAttribute_ = 0xffffffff;
 	uint32_t collisionMask_ = 0xffffffff;
 
 	ColliderType colliderType_;
-	ColliderShape collider_;
+	std::unique_ptr<Data> collider_;
 
 	std::function<void()> onCollisionEvent;
 	//std::function<void()> onCollisionEventNULL;

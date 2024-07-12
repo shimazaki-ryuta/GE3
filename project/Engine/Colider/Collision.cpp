@@ -401,8 +401,39 @@ bool IsCollision(const Sphere& s, const AABB& aabb) {
 bool IsCollision(const Sphere& s, const OBB& obb) {
 	return IsCollision(obb, s);
 }
-/*
-bool IsCollision(const AABB& aabb, const OBB& obb) {
-	return IsCollision(obb, aabb);
+
+Vector3 GetClosestPoint(const OBB& obb, const Sphere& sphere) {
+
+	AABB aabb;
+	aabb.min.x = -obb.size.x;
+	aabb.min.y = -obb.size.y;
+	aabb.min.z = -obb.size.z;
+	aabb.max.x = obb.size.x;
+	aabb.max.y = obb.size.y;
+	aabb.max.z = obb.size.z;
+
+	Matrix4x4 world = GetRotate(obb) * MakeTranslateMatrix(obb.center);
+	Matrix4x4 worldInverse = Inverse(world);
+	Sphere localSphere;
+	localSphere.center = sphere.center * worldInverse;
+	localSphere.radius = sphere.radius;
+	
+	Vector3 closestPoint{ std::clamp(localSphere.center.x,aabb.min.x,aabb.max.x),
+		std::clamp(localSphere.center.y,aabb.min.y,aabb.max.y) ,
+		std::clamp(localSphere.center.z,aabb.min.z,aabb.max.z) };
+
+	return Transform(closestPoint,world);
 }
-*/
+
+void PushBack(float t,OBB& obb, Sphere& sphere) {
+	Vector3 closestPoint = GetClosestPoint(obb,sphere);
+	float distance = Length(closestPoint - sphere.center);
+	if (distance <= sphere.radius)
+	{
+		Vector3 center = sphere.center + (closestPoint - sphere.center) * 0.5f;
+		Vector3 a =  (sphere.center - closestPoint )  * (1.0f - t);
+		Vector3 b =  Normalize(sphere.center - closestPoint)  * t;
+		obb.center += a;
+		sphere.center += b;
+	}
+}
