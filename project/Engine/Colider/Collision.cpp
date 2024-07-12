@@ -431,7 +431,7 @@ void PushBack(float t,OBB& obb, Sphere& sphere) {
 	if (distance <= sphere.radius)
 	{
 		Vector3 center = sphere.center + (closestPoint - sphere.center) * 0.5f;
-		Vector3 a =  (sphere.center - closestPoint )  * (1.0f - t);
+		Vector3 a =  Normalize(sphere.center - closestPoint )* (sphere.radius - distance) * (1.0f - t);
 		Vector3 b =  Normalize(sphere.center - closestPoint)  * t;
 		obb.center += a;
 		sphere.center += b;

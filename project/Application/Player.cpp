@@ -558,16 +558,20 @@ void Player::OutCollision() {
 }
 
 void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
-	if (worldTransform_.parent_ != &parent) {
+	//if (worldTransform_.parent_ != &parent) {
 		//Vector3 point = GetClosestPoint(obb_,partner);
-		//PushBack(0,obb_,partner);
-		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center) * (Inverse(parent.matWorld_));
+		PushBack(0,obb_,partner);
+		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center);
+		if (worldTransform_.parent_) {
+			rocal *= (Inverse(worldTransform_.parent_->matWorld_));
+		}
 		worldTransform_.translation_.x = rocal.m[3][0];
 		worldTransform_.translation_.y = rocal.m[3][1];
 		worldTransform_.translation_.z = rocal.m[3][2];
 
-		worldTransform_.parent_ = &parent;
+		//worldTransform_.parent_ = &parent;
+		worldTransformWepon_.UpdateMatrix();
 		velocity_ = { 0,0,0 };
 		isFlooar_ = true;
-	}
+	//}
 }

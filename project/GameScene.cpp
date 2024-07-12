@@ -426,15 +426,12 @@ void GameScene::Update() {
 			}
 		}
 		//objectとの当たり判定
-		/*for (Collider* collider : colliderList) {
-	
-		}*/
+		
 		for (std::unique_ptr<GameObject>& object : objects_) {
 			if (object->GetCollider()) {
 				if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
 				{
-					player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
-					isCollision = true;
+					//player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
 				}
 			}
 		}
