@@ -221,7 +221,7 @@ void SceneLoader::ReceveJsonData() {
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
 	const static uint32_t buffSize = 32768;
-	char rBuff[buffSize];
+	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
 		//recevedata

@@ -111,7 +111,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	//skybox
 	skyBox_.reset(new SkyBox);
 	skyBox_->Initialize(TextureManager::LoadTexture("skyBox.dds"));
-	//skyBox_->SetColor({1.0f,1.0f,1.0f,1.0f});
+	skyBox_->SetColor({0.25f,0.25f,0.25f,1.0f});
 	worldTransformSkyBox_.Initialize();
 	worldTransformSkyBox_.scale_ = { 1000.0f,1000.0f,1000.0f };
 	worldTransformSkyBox_.UpdateMatrix();
@@ -632,11 +632,13 @@ void GameScene::Draw3D() {
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	player_->DrawOutLine(viewProjection_);
 	player2_->DrawOutLine(viewProjection_);
+	ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 
 

@@ -49,7 +49,7 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 	*/
 	
 	//boxfilter
-	uint32_t width,height;
+	/*uint32_t width,height;
 	gTexture.GetDimensions(width,height);
 	float32_t2 uvStepSize = float32_t2(rcp(width),rcp(height));
 	textureColor.rgb = float32_t3(0.0f,0.0f,0.0f);
@@ -59,7 +59,7 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 			float32_t3 fetchColor = gTexture.Sample(gSampler,texcoord).rgb;
 			textureColor.rgb += fetchColor*kKernel3x3[x][y];
 		}
-	}
+	}*/
 	
 
 	float value = dot(textureColor,float32_t3(0.2125f,0.7154f,0.0721f));
@@ -81,10 +81,10 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 	vignettingColor.gb = output.color.gb * vignette;
 	output.color.rgb = (1.0f - t) * output.color.rgb + t* vignettingColor;
 
-	float32_t3 hsv = RGBToHSV(output.color.rgb);
+	//float32_t3 hsv = RGBToHSV(output.color.rgb);
 	//hsv.r += 0.5f;
-	hsv.r = fmod(hsv.r,1.0f);
-	output.color.rgb = HSVToRGB(hsv);
+	//hsv.r = fmod(hsv.r,1.0f);
+	//output.color.rgb = HSVToRGB(hsv);
 
 	return output;
 }
