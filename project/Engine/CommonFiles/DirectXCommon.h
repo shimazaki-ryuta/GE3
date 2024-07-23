@@ -74,9 +74,12 @@ public:
 	PostEffect* postEffect;//縦gauss
 	PostEffect* postEffect2;//grayscale
 	PostEffect* postEffect3;//横gauss
+	PostEffect* postEffect4;//hsvFilter
 	void DeletePostEffect();
 
 	void SetGraiScaleStrength(float strength) ;
+	void SetHSVFilter(const Vector4& filter);
+
 private:
 	Window* win_=nullptr;
 

@@ -98,7 +98,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	material_->paramater_.enableLighting = 2;
 	material_->paramater_.shadingType = 1;
 	material_->paramater_.disolveThreshold = 0.0f;
-	material_->paramater_.environmentCoefficient = 0.2f;
+	material_->paramater_.environmentCoefficient = 0.0f;
 	//material_->paramater_.disolveColor = Vector4{ 1.0f, 1.0f, 1.0f, 0.0f };
 	material_->paramater_.disolveColor = Vector4{ 0.2f, 0.2f, 5.2f, 0.0f };
 	material_->outline_.color = { 0.0f,0.0f,1.0f,1.0f };
@@ -560,17 +560,17 @@ void Player::OutCollision() {
 void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
 	//if (worldTransform_.parent_ != &parent) {
 		//Vector3 point = GetClosestPoint(obb_,partner);
-		PushBack(0,obb_,partner);
+		//PushBack(0,obb_,partner);
 		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center);
 		if (worldTransform_.parent_) {
-			rocal *= (Inverse(worldTransform_.parent_->matWorld_));
+			rocal *= (Inverse(parent.matWorld_));
 		}
 		worldTransform_.translation_.x = rocal.m[3][0];
 		worldTransform_.translation_.y = rocal.m[3][1];
 		worldTransform_.translation_.z = rocal.m[3][2];
 
-		//worldTransform_.parent_ = &parent;
-		worldTransformWepon_.UpdateMatrix();
+		worldTransform_.parent_ = &parent;
+		worldTransform_.UpdateMatrix();
 		velocity_ = { 0,0,0 };
 		isFlooar_ = true;
 	//}

@@ -196,4 +196,6 @@ private:
 	bool isStart_;
 	float fadeAlpha_;
 	bool isIngame_;
+
+	Vector4 hsvFilter_;
 };

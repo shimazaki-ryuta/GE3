@@ -81,10 +81,10 @@ PixelShaderOutput main(SpriteVertexShaderOutput input) {
 	vignettingColor.gb = output.color.gb * vignette;
 	output.color.rgb = (1.0f - t) * output.color.rgb + t* vignettingColor;
 
-	//float32_t3 hsv = RGBToHSV(output.color.rgb);
+	float32_t3 hsv = RGBToHSV(output.color.rgb);
 	//hsv.r += 0.5f;
 	//hsv.r = fmod(hsv.r,1.0f);
-	//output.color.rgb = HSVToRGB(hsv);
+	output.color.rgb = HSVToRGB(hsv);
 
 	return output;
 }

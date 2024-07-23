@@ -315,6 +315,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
 	viewProjection_.Initialize();
+	hsvFilter_ = {0.0f,0.0f,0.0f,0.0f};
 }
 
 void GameScene::Update() {
@@ -333,6 +334,13 @@ void GameScene::Update() {
 	ImGui::Begin("FPS");
 	ImGui::Text("%f", ImGui::GetIO().Framerate);
 	ImGui::End();
+
+	ImGui::Begin("HSV");
+	ImGui::DragFloat("h",&hsvFilter_.x,0.01f);
+	ImGui::DragFloat("s", &hsvFilter_.y, 0.01f);
+	ImGui::DragFloat("v", &hsvFilter_.z, 0.01f);
+	ImGui::End();
+	dxCommon_->SetHSVFilter(hsvFilter_);
 #endif // _DEBUG
 
 	for (std::unique_ptr<GameObject>& object : objects_) {
@@ -431,7 +439,7 @@ void GameScene::Update() {
 			if (object->GetCollider()) {
 				if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
 				{
-					//player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
+					player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
 				}
 			}
 		}

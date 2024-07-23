@@ -87,7 +87,7 @@ DirectXCommon::~DirectXCommon()
 	//useAdapter_->Release();
 	//dxgiFactory_->Release();
 }
-void DirectXCommon::DeletePostEffect() { delete postEffect; delete postEffect2; delete postEffect3;};
+void DirectXCommon::DeletePostEffect() { delete postEffect; delete postEffect2; delete postEffect3; delete postEffect4;};
 void DirectXCommon::Initialize(Window* win)
 {
 	win_ = win;
@@ -213,6 +213,15 @@ void DirectXCommon::End3DSorceDraw() {
 	//TransitionBarrierを張る
 	ResourceBarrier(3, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
+	SetRenderTarget(2, 0);
+	ClearRenderTarget(2, Vector4{ 0.0f,0.0f,0.0f,1.0f });
+
+	postEffect2->PreDraw(commandList_.Get());
+	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[3], renderSrvHandles_[3]);
+	postEffect2->PostDraw();
+
+	ResourceBarrier(2, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	//遷移前
@@ -253,9 +262,9 @@ void DirectXCommon::End3DSorceDraw() {
 	//commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 
 	//バックバッファに書き込む
-	postEffect2->PreDraw(commandList_.Get());
-	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[3], renderSrvHandles_[3]);
-	postEffect2->PostDraw();
+	postEffect4->PreDraw(commandList_.Get());
+	postEffect4->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[2], renderSrvHandles_[2]);
+	postEffect4->PostDraw();
 
 }
 void DirectXCommon::PostDraw()
@@ -319,6 +328,12 @@ void DirectXCommon::CreatePostEffectSprite() {
 	postEffect3->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/GaussBlumeHorizon.PS.hlsl");
 	postEffect3->SetAnchorPoint({ 0.0f,0.0f });
 	postEffect3->SetBlendMode(PostEffect::BlendMode::None);
+
+	postEffect4 = PostEffect::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 1.0f,1.0f,1.0f,1.0f });
+	postEffect4->Initialize(L"Resources/shaders/BlumeVS.hlsl", L"Resources/shaders/HSVFilter.PS.hlsl");
+	postEffect4->SetAnchorPoint({ 0.0f,0.0f });
+	postEffect4->SetBlendMode(PostEffect::BlendMode::None);
+	postEffect4->SetColor({0.0f,0.0f,0.0f,1.0f});
 }
 
 void DirectXCommon::InitializeDXGIDevice()
@@ -502,30 +517,7 @@ void DirectXCommon::CreateRenderTargetView()
 		device_->CreateRenderTargetView(renderTargetResource_[index].Get(), &rtvDesc_, rtvHandles_[index]);
 		renderSrvHandles_[index] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
 	}
-	/*hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
-	renderTargetResource_[kSorce3D] = resourse;
-	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kSorce3D].Get(), &srvDesc);
-	device_->CreateRenderTargetView(renderTargetResource_[kSorce3D].Get(), &rtvDesc_, rtvHandles_[2]);
-	renderSrvHandles_[kSorce3D] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
-
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
-	renderTargetResource_[kGaussBlumeVert] = resourse;
-	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGaussBlumeVert].Get(), &srvDesc);
-	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeVert].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeVert]);
-	renderSrvHandles_[kGaussBlumeVert] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
 	
-
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
-	renderTargetResource_[kGaussBlumeHori] = resourse;
-	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGaussBlumeHori].Get(), &srvDesc);
-	device_->CreateRenderTargetView(renderTargetResource_[kGaussBlumeHori].Get(), &rtvDesc_, rtvHandles_[kGaussBlumeHori]);
-	renderSrvHandles_[kGaussBlumeHori] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);
-	
-	hr = device_->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue, IID_PPV_ARGS(&resourse));
-	renderTargetResource_[kGrayScale] = resourse;
-	srvPostEffectHandle = SRVManager::GetInstance()->CreateSRV(renderTargetResource_[kGrayScale].Get(), &srvDesc);
-	device_->CreateRenderTargetView(renderTargetResource_[kGrayScale].Get(), &rtvDesc_, rtvHandles_[kGrayScale]);
-	renderSrvHandles_[kGrayScale] = SRVManager::GetInstance()->GetGPUHandle(srvPostEffectHandle);*/
 }
 
 void DirectXCommon::CreateShaderResourceView()
@@ -777,3 +769,7 @@ int32_t DirectXCommon::LoadTexture(const std::string& filePath)
 */
 
 void DirectXCommon::SetGraiScaleStrength(float strength) { postEffect2->SetColor({ 1.0f,1.0f,1.0f,strength }); };
+
+void DirectXCommon::SetHSVFilter(const Vector4& filter) {
+	postEffect4->SetColor(filter);
+};
