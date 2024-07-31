@@ -35,7 +35,7 @@ void Player2::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	worldTransform_.translation_.z = 60;
 	obb_.center = worldTransform_.translation_;
 	obb_.size = {1.0f,1.0f,1.0f};
-	obb_.center.y += obb_.size.y / 2.0f;
+	//obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	input_ = Input::GetInstance();
 	direction_ = {0,0,-1.0f};
@@ -272,7 +272,7 @@ void Player2::Update() {
 
 	obb_.center = worldTransform_.GetWorldPosition();
 	obb_.size = { 0.5f,1.0f,0.5f };
-	obb_.center.y += obb_.size.y / 2.0f;
+	//obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();

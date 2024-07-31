@@ -149,12 +149,10 @@ PixelShaderOutput main(VertexShaderOutput input){
 		if(mask <= min){
 			discard;
 		}
-		edge = (1.0f-(edge*edge));
-		edge *= edge*edge*edge*edge;
-		//edge = 1.0f - pow(1.0f - edge,5);
+		edge = (1.0f-pow(edge,2));
+		edge *= pow(edge,4);
 		edge+=0.1f;
 		if(min < mask && mask < min+0.06f && gMaterial.disolveThreshold!=0.0f){
-			//output.color.rgb = edge * float32_t3(5.2f,0.2f,0.2f) * 3.0f;
 			output.color.rgb = edge * gMaterial.disolveColor.rgb * 3.0f;
 		}
 	}

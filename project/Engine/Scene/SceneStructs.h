@@ -23,7 +23,23 @@ struct GameObjectData {
 	std::vector<GameObjectData> children;
 };
 
+//地形の頂点一個分のデータ
+struct TerrainVerticesData {
+	int32_t id;
+	Vector3 position;
+	Vector3 normal;
+	Vector2 uv;
+};
+
+//地形生成用データ
+struct TerrainData {
+	std::string fileName = "";
+	GameObjectData object;
+	std::vector<TerrainVerticesData> verticesDatas;
+};
+
 //シーンのオブジェクト配置のでーた
 struct SceneData {
 	std::vector<GameObjectData> objects;
+	//TerrainData terrainData;
 };

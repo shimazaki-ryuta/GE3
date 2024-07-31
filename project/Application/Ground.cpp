@@ -59,7 +59,7 @@ void Ground::Draw(const ViewProjection& viewProjection) {
 	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
 	testSkeleton_->Update();
 	LoadModel::UpdateSkinCluster(cluster_,testSkeleton_->GetSkeletonData());
-	//model_->Draw(worldTransform_, viewProjection,cluster_);
+	model_->Draw(worldTransform_, viewProjection,cluster_);
 	//testSkeleton_->Draw(worldTransform_,viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {

@@ -27,7 +27,7 @@ void SceneLoader::LoadFile(const std::string fileName) {
 	assert(name.compare("scene") == 0);
 
 	sceneData_.reset(new SceneData);
-
+	terrainData_.reset(new TerrainData);
 	//全オブジェクト操作
 	for (nlohmann::json& object : deserialized["objects"]) {
 		PraceObject(object);
@@ -41,15 +41,21 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		static GameObjectData preObjectData;//仮参照用ローカル変数
 		GameObjectData* objectData = nullptr;
 		//要素追加
-		if (!parent) {
-			sceneData_->objects.emplace_back(GameObjectData{});
-			objectData = &sceneData_->objects.back();
+
+
+		if (object["name"] == "field") {
+			objectData = &terrainData_->object;
 		}
 		else {
-			parent->children.emplace_back(GameObjectData{});
-			objectData = &parent->children.back();
+			if (!parent) {
+				sceneData_->objects.emplace_back(GameObjectData{});
+				objectData = &sceneData_->objects.back();
+			}
+			else {
+				parent->children.emplace_back(GameObjectData{});
+				objectData = &parent->children.back();
+			}
 		}
-
 		//タイプ指定
 		if (object.contains("type")) {
 			objectData->type = object["type"];
@@ -185,9 +191,39 @@ void SceneLoader::CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectD
 	parent->AppendChildlen(std::move(instance));
 }
 
+void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
+	
+	terrain.reset(new Terrain);
+	terrain->Initialize(terrainData_->object);
+}
+
+void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
+	terrainData_->verticesDatas.clear();
+	for (nlohmann::json& object : data["vertices"]) {
+		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
+		TerrainVerticesData& datas = terrainData_->verticesDatas.back();
+		datas.id = object["id"];
+		datas.position.x = object["pos"][0];
+		datas.position.y = object["pos"][2];
+		datas.position.z = object["pos"][1];
+		datas.normal.x = object["normal"][0];
+		datas.normal.y = object["normal"][2];
+		datas.normal.z = object["normal"][1];
+	}
+}
+
+void SceneLoader::ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain) {
+	if (!isRecevedTerrain_) {
+		return;
+	}
+	terrain->SetMeshData(*(terrainData_.get()));
+	isRecevedTerrain_ = false;
+}
+
 //debug
 void SceneLoader::StartReceveJson() {
 	isRecevedData_ = false;
+	isRecevedTerrain_ = false;
 	//portSetUp
 	socket_ = socket(AF_INET,//ipv4
 		SOCK_DGRAM,//udp tcpの場合はSOCK_STREAM
@@ -225,6 +261,7 @@ void SceneLoader::ReceveJsonData() {
 	std::string sData;
 	while (!isEnd) {
 		//recevedata
+		//strcpy(rBuff,"\0");
 		recvfrom(socket_, rBuff, buffSize -1, 0, (sockaddr*)&from, &sockaddr_in_size);
 
 		//end
@@ -243,15 +280,23 @@ void SceneLoader::ReceveJsonData() {
 			//continue;
 			break;
 		}
-		sceneData_.reset(new SceneData);
 
-		//全オブジェクト走査
-		for (nlohmann::json& object : jData["objects"]) {
-			PraceObject(object);
-
+		//分岐
+		if (jData.contains("vertices")) {
+			ReadTerrainVertices(jData);
+			isRecevedTerrain_ = true;
 		}
-		isRecevedData_ = true;
-		while (isRecevedData_) {
+		else {
+			sceneData_.reset(new SceneData);
+
+			//全オブジェクト走査
+			for (nlohmann::json& object : jData["objects"]) {
+				PraceObject(object);
+
+			}
+			isRecevedData_ = true;
+		}
+		while (isRecevedData_ || isRecevedTerrain_) {
 
 		}
 	}

@@ -30,6 +30,8 @@
 #include "Engine/Animation.h"
 #include "Engine/SkyBox.h"
 
+#include "Terrain/Terrain.h"
+
 class GameScene : public IScene
 {
 public:
@@ -198,4 +200,6 @@ private:
 	bool isIngame_;
 
 	Vector4 hsvFilter_;
+
+	std::unique_ptr<Terrain> terrain_;
 };

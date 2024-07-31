@@ -52,11 +52,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	sceneLoader_->CreateModelList(modelList_);
 	objects_.clear();
 	sceneLoader_->CreateObjects(objects_);
+	sceneLoader_->CreateTerrain(terrain_);
 #ifdef _DEBUG
 
 	sceneLoader_->StartReceveJson();
 
-	isDebugCameraActive_ = true;
+	isDebugCameraActive_ = false;
 	debugCamera_->SetUses(isDebugCameraActive_);
 	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
 	debugCamera_->SetPosition({ 0.0f, 1.7f, -10.0f });
@@ -325,12 +326,15 @@ void GameScene::Update() {
 #ifdef _DEBUG
 	sceneLoader_->CreateModelList(modelList_);
 	sceneLoader_->ApplyRecevedData(objects_);
+	sceneLoader_->ApplyTerrainVertices(terrain_);
 
 	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
 	}
-
+	if (isDebugCameraActive_) {
+		debugCamera_->Update();
+	}
 	ImGui::Begin("FPS");
 	ImGui::Text("%f", ImGui::GetIO().Framerate);
 	ImGui::End();
@@ -346,6 +350,7 @@ void GameScene::Update() {
 	for (std::unique_ptr<GameObject>& object : objects_) {
 		object->Update();
 	}
+	terrain_->Update();
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Update();
@@ -407,7 +412,7 @@ void GameScene::Update() {
 			player_->ReStart();
 		}
 
-		//ai_->Update();
+		ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();
@@ -618,6 +623,10 @@ void GameScene::Update() {
 	fadeSprite_->SetColor({ 0,0,0,fadeAlpha_ });
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 	ground_->Update();
+	if (isDebugCameraActive_) {
+		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+	}
 }
 
 void GameScene::Draw2D() {
@@ -632,15 +641,16 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 
 	for (std::unique_ptr<GameObject>& object : objects_) {
-		object->Draw(viewProjection_, modelList_);
+		//object->Draw(viewProjection_, modelList_);
 	}
+	//terrain_->Draw(viewProjection_);
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());

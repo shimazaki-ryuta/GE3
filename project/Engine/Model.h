@@ -111,6 +111,8 @@ public:
 		outlineResourcePtr_ = outlineResource_.Get();
 	};
 
+	VertexData* GetVertexData() { return vertexData_; };
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

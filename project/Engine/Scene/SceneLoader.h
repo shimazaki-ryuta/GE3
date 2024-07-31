@@ -14,6 +14,7 @@
 #include "Model.h"
 #include "SceneStructs.h"
 #include "GameObject/GameObject.h"
+#include "Terrain/Terrain.h"
 class SceneLoader
 {
 public:
@@ -24,25 +25,31 @@ public:
 	void CreateObjects(std::vector<std::unique_ptr<GameObject>>& list);
 	void CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectData& data);
 
+	//terrain
+	void CreateTerrain(std::unique_ptr<Terrain>& terrain);
+	void ReadTerrainVertices(nlohmann::json& data);
+	void ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain);
+
 	///debug
 	void StartReceveJson();
-	//closeportandThreadEnd
 	void EndReceveThread();
 	void ReceveJsonData();
 
 	void ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& list);
-	//void ScanChanged(std::vector<std::unique_ptr<GameObject>>& list, GameObjectData& data,int32_t id);
 	void ScanChanged(std::unique_ptr<GameObject>& object, GameObjectData& datas, int32_t id);
-	//void AppendObject(std::unique_ptr<GameObject>* parent, GameObjectData& data);
+	
+	//変形したポリゴンのデータを作る
+	//void CreateTerrainData();
 
 private:
 	//オブジェクト一個の解析
 	void PraceObject(nlohmann::json& object,GameObjectData* parent=nullptr);
 
 	bool isRecevedData_;
+	bool isRecevedTerrain_;
 
 	std::unique_ptr<SceneData> sceneData_;
-
+	std::unique_ptr<TerrainData> terrainData_;
 
 	std::thread receveJsonDataThread;
 	SOCKET socket_;
