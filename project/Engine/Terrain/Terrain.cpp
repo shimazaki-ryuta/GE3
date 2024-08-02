@@ -18,7 +18,7 @@ void Terrain::Initialize(const GameObjectData& data) {
 	material_->ApplyParamater();
 
 	model_.reset(new Model);
-	model_->Create("Resources/TerrainTest", data.fileName);
+	model_->Create("Resources/TerrainTest", "TerrainTest.obj");
 }
 
 void Terrain::SetMeshData(TerrainData& data) {
@@ -30,8 +30,8 @@ void Terrain::SetMeshData(TerrainData& data) {
 
 	VertexData* vertices = model_->GetVertexData();
 	for (TerrainVerticesData & vData : data.verticesDatas) {
-		//vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
-		vertices[vData.id].position.y = vData.position.y;
+		vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
+		//vertices[vData.id].position.y = vData.position.y;
 		//vertices[vData.id].normal = vData.normal;
 	}
 }

@@ -242,7 +242,7 @@ void SkyBox::Initialize(uint32_t textureHandle)
 	//Material* materialData = nullptr;
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	
+	materialData_->expornentiation = Vector3{1.0f,1.0f,1.0f};
 }
 
 

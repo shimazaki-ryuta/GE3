@@ -344,6 +344,13 @@ void GameScene::Update() {
 	ImGui::DragFloat("s", &hsvFilter_.y, 0.01f);
 	ImGui::DragFloat("v", &hsvFilter_.z, 0.01f);
 	ImGui::End();
+
+	ImGui::Begin("SkyBox");
+	ImGui::ColorEdit3("color", &skyColor_.x);
+	ImGui::DragFloat3("expornent", &skyExpornent_.x, 0.01f);
+	ImGui::End();
+	skyBox_->SetColor(skyColor_);
+	skyBox_->SetExpornentiation(skyExpornent_);
 	dxCommon_->SetHSVFilter(hsvFilter_);
 #endif // _DEBUG
 
@@ -412,7 +419,7 @@ void GameScene::Update() {
 			player_->ReStart();
 		}
 
-		ai_->Update();
+		//ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();
@@ -641,16 +648,16 @@ void GameScene::Draw3D() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 
 	for (std::unique_ptr<GameObject>& object : objects_) {
-		//object->Draw(viewProjection_, modelList_);
+		object->Draw(viewProjection_, modelList_);
 	}
-	//terrain_->Draw(viewProjection_);
+	terrain_->Draw(viewProjection_);
 
 	for (int index = 0; index < 1; index++) {
 		flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
-	//ground_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());

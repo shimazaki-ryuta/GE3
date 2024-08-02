@@ -21,7 +21,7 @@ public:
 	struct Material
 	{
 		Vector4 color;
-		
+		Vector3 expornentiation;
 	};
 
 	struct OutLineData {
@@ -65,7 +65,11 @@ public:
 
 	void SetColor(const Vector4& color) {
 		materialData_->color = color;
-	}
+	};
+
+	void SetExpornentiation(const Vector3& expornentiation) {
+		materialData_->expornentiation = expornentiation;
+	};
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;

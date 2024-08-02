@@ -33,7 +33,7 @@
 	],
 	"meshes":[
 		{
-			"name":"\u5e73\u9762",
+			"name":"field",
 			"primitives":[
 				{
 					"attributes":{

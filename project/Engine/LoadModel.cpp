@@ -97,7 +97,7 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 	std::string filePath = directoryPath + "/" + filename;
 
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
 	assert(scene->HasMeshes());
 	MeshData meshd;
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {

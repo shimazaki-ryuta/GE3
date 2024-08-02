@@ -202,4 +202,8 @@ private:
 	Vector4 hsvFilter_;
 
 	std::unique_ptr<Terrain> terrain_;
+
+	//skyboxcolor
+	Vector4 skyColor_ = {0.45f,0.45f,0.45f,1.0f};
+	Vector3 skyExpornent_ = {1.6f,1.6f,1.6f};
 };
