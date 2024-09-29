@@ -366,13 +366,13 @@ void GameScene::Update() {
 	switch (colorPhase_)
 	{
 	case 0:
-		directinalLightData->color = Vector4{ 1.0f - color_,color_, 0.0f, 1.0f };
+		//directinalLightData->color = Vector4{ 1.0f - color_,color_, 0.0f, 1.0f };
 		break;
 	case 1:
-		directinalLightData->color = Vector4{ 0,1.0f - color_, color_, 1.0f };
+		//directinalLightData->color = Vector4{ 0,1.0f - color_, color_, 1.0f };
 		break;
 	case 2:
-		directinalLightData->color = Vector4{ color_,0, 1.0f - color_, 1.0f };
+		//directinalLightData->color = Vector4{ color_,0, 1.0f - color_, 1.0f };
 		break;
 	default:
 		break;
@@ -419,7 +419,7 @@ void GameScene::Update() {
 			player_->ReStart();
 		}
 
-		//ai_->Update();
+		ai_->Update();
 
 		player2_->SetData(ai_->GetData());
 		player2_->Update();

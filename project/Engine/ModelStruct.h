@@ -66,6 +66,20 @@ struct MeshData
 	MaterialData material;
 };
 
+struct Index {
+	uint32_t vertex;
+	uint32_t uv;
+	uint32_t normal;
+};
+
+struct MeshDataTerrain
+{
+	std::map<std::string, JointWeightData> skinClusterData;
+	std::vector<VertexData> vertices;
+	std::vector<Index> indices;
+	MaterialData material;
+};
+
 struct Node {
 	QuaternionTransform transform;
 	Matrix4x4 localMatrix;

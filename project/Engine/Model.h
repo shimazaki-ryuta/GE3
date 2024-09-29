@@ -72,7 +72,10 @@ public:
 
 	void Create(const  std::string& directoryPath, const std::string& filename);
 
+	void CreateTerrain(const  std::string& directoryPath, const std::string& filename);
+
 	static Model* CreateFromOBJ(const  std::string& directoryPath);
+
 
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);

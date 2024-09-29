@@ -37,60 +37,93 @@ MaterialData LoadModel::LoadMaterialTemplateFile(const  std::string& directoryPa
 	}
 	return materialData;
 }
+MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename)
+{
+	MaterialData materialData;
+	std::string line;
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+	while (std::getline(file, line)) {
+		std::string identifilter;
+		std::istringstream s(line);
+		s >> identifilter;
+		if (identifilter == "map_Kd")
+		{
+			std::string textureFirename;
+			s >> textureFirename;
+			materialData.textureFilePath = /*directoryPath + "/" + */ textureFirename;
+		}
+	}
+	return materialData;
+}
 
 ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;
-	std::string filePath = directoryPath + "/" + filename;
-	
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
-	assert(scene->HasMeshes());
+	std::vector<Vector4> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector2> texcoords;
+	std::string line;
 	MeshData meshd;
-	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes;++meshIndex) {
-		aiMesh* mesh = scene->mMeshes[meshIndex];
-		assert(mesh->HasNormals());//法線要求
-		assert(mesh->HasTextureCoords(0));//texcoord要求
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
 
-		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
-			aiFace& face = mesh->mFaces[faceIndex];
-			assert(face.mNumIndices == 3);
-			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
-				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = { position.x,position.y,position.z,1.0f };
-				vertex.normal = { normal.x,normal.y, normal.z };
-				vertex.texcoord = { texcoord.x,texcoord.y };
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-				vertex.triangleCenter = {1.0f,1.0f,1.0f,1.0f};
-				meshd.vertices.push_back(vertex);
-				//meshs.push_back(mesh);
-				//modelData.meshs.vertices.push_back(vertex);
+	while (std::getline(file, line)) {
+		std::string identifilter;
+		std::istringstream s(line);
+		s >> identifilter;
+
+		if (identifilter == "v") {
+			Vector4 position;
+			s >> position.x >> position.y >> position.z;
+			position.w = 1.0f;
+			position.x *= -1.0f;
+			positions.push_back(position);
+		}
+		else if (identifilter == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcoord.y = 1.0f - texcoord.y;
+			texcoords.push_back(texcoord);
+		}
+		else if (identifilter == "vn") {
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normal.x *= -1.0f;
+			normals.push_back(normal);
+		}
+		else if (identifilter == "f") {
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/');
+					elementIndices[element] = std::stoi(index);
+				}
+				//VertexData vertex = {position,texcoord,normal};
+				//modelData.vertices.push_back(vertex);
+				
+				meshd.indices.push_back(elementIndices[0] - 1);
 			}
+	
 		}
-		//modelData.vertexNum = 1;
-		
+		else if (identifilter == "mtllib") {
+			std::string materialFirename;
+			s >> materialFirename;
+			meshd.material = LoadMaterialTemplateFile(directoryPath, materialFirename);
+		}
 	}
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
-		aiMaterial* material = scene->mMaterials[materialIndex];
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
-			aiString textureFilePath;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			std::string materialFirename = textureFilePath.C_Str();
-			//meshd.material = LoadModel::LoadMaterialTemplateFile(directoryPath,materialFirename);
-			meshd.material.textureFilePath = /*directoryPath + "/" + */ materialFirename;
-			meshd.material.textureHandle = TextureManager::LoadTexture(meshd.material.textureFilePath);
-		}
+	int i = 0;
+	for (Vector4& pos : positions) {
+		meshd.vertices.push_back(VertexData{ pos,texcoords[i],normals[i],{1.0f,1.0f,1.0f} });
 	}
 	modelData.meshs = meshd;
-	modelData.vertexNum = modelData.meshs.vertices.size();
+	modelData.vertexNum = meshd.vertices.size();
 	return modelData;
 }
-
 ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;

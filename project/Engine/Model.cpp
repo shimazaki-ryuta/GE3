@@ -869,6 +869,78 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	}
 }
 
+void Model::CreateTerrain(const  std::string& directoryPath, const std::string& filename)
+{
+	modelData_ = LoadModel::LoadObjFile(directoryPath, filename);
+
+	//std::string filePath = directoryPath + "/" + filename;
+
+	vertexNum = modelData_.vertexNum;
+	textureHandle_ = modelData_.meshs.material.textureHandle;
+	toonShadowTextureHandle_ = textureHandle_;
+	perspectivTextureHandle_ = textureHandle_;
+	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
+	//頂点リソース
+	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * vertexNum);
+
+	//頂点バッファ
+	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * vertexNum);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+
+	//VertexData* vertexData = nullptr;
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
+
+	//インデックスリソース
+	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
+
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	indexBufferView_.SizeInBytes = uint32_t(sizeof(uint32_t) * modelData_.meshs.indices.size());
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
+	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
+
+	//マテリアル用のリソースを作成
+	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(MaterialParamater));
+	//Material* materialData = nullptr;
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	materialData_->disolveColor = Vector4{ 1.0f,1.0f,1.0f,1.0f };
+	materialData_->enableLighting = 0;
+	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->shininess = 100.0f;
+	materialData_->growStrength = 0;
+	materialData_->environmentCoefficient = 0;
+	materialData_->shadingType = 0;
+
+	//ptrに内部のリソースセット
+	materialResourcePtr_ = materialResource_.Get();
+
+	//ライティング用のカメラリソース
+	cameraResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(CameraForGpu));
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
+	cameraData_->worldPosition = { 0,0,0 };
+
+	//アウトライン用リソース
+	outlineResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(OutLineData));
+	//Material* materialData = nullptr;
+	outlineResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineData_));
+	outlineData_->color = Vector4{ 0.0f, 0.0f, 0.0f, 1.0f };
+	outlineData_->scale = MakeScaleMatrix({ 1.05f,1.05f,1.05f });
+	outlineResourcePtr_ = outlineResource_.Get();
+
+	//ローカル変換行列
+	localMatrixResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(Matrix4x4));
+	localMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&localMatrixData_));
+	*localMatrixData_ = MakeIdentity4x4();
+	if (!modelData_.rootNode.name.empty()) {
+		*localMatrixData_ = modelData_.rootNode.localMatrix;
+	}
+}
+
 Model* Model::CreateFromOBJ(const  std::string& filename)
 {
 	std::string directoryPath = "Resources/" + filename;

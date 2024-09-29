@@ -18,7 +18,8 @@ void Terrain::Initialize(const GameObjectData& data) {
 	material_->ApplyParamater();
 
 	model_.reset(new Model);
-	model_->Create("Resources/TerrainTest", "TerrainTest.obj");
+	model_->CreateTerrain("Resources/TerrainTest", "TerrainTest.obj");
+
 }
 
 void Terrain::SetMeshData(TerrainData& data) {
