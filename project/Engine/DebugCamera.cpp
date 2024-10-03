@@ -18,7 +18,7 @@ void DebugCamera::Initialize()
 }
 void DebugCamera::Update()
 {
-#ifdef _DEBUG
+#ifdef DEMO
 	if (isUses_) {
 		ImGui::Begin("DebugCamera");
 		ImGui::DragFloat3("rotate", &viewProjection_.rotation_.x, 0.1f);

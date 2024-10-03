@@ -33,7 +33,7 @@ void Terrain::SetMeshData(TerrainData& data) {
 	for (TerrainVerticesData & vData : data.verticesDatas) {
 		vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
 		//vertices[vData.id].position.y = vData.position.y;
-		//vertices[vData.id].normal = vData.normal;
+		vertices[vData.id].normal = vData.normal;
 	}
 }
 

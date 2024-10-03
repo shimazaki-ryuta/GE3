@@ -271,7 +271,7 @@ void DirectXCommon::PostDraw()
 {
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	
-#ifdef _DEBUG
+#ifdef DEMO
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 #endif // _DEBUG
 	//描く処理終了、画面に移すため状態を遷移

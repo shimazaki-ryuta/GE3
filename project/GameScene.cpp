@@ -28,7 +28,7 @@ GameScene::GameScene() {
 }
 
 GameScene::~GameScene() {
-#ifdef _DEBUG
+#ifdef DEMO
 	sceneLoader_->EndReceveThread();
 #endif // _DEBUG
 }
@@ -53,7 +53,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	objects_.clear();
 	sceneLoader_->CreateObjects(objects_);
 	sceneLoader_->CreateTerrain(terrain_);
-#ifdef _DEBUG
+#ifdef DEMO
 
 	sceneLoader_->StartReceveJson();
 
@@ -323,7 +323,7 @@ void GameScene::Update() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 
-#ifdef _DEBUG
+#ifdef DEMO
 	sceneLoader_->CreateModelList(modelList_);
 	sceneLoader_->ApplyRecevedData(objects_);
 	sceneLoader_->ApplyTerrainVertices(terrain_);
