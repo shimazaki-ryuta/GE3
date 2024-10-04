@@ -209,6 +209,9 @@ void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 		datas.normal.x = object["normal"][0];
 		datas.normal.y = object["normal"][2];
 		datas.normal.z = object["normal"][1];
+
+		//datas.uv.x = object["uv"][0];
+		//datas.uv.y = object["uv"][1];
 	}
 }
 
