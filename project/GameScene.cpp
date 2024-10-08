@@ -653,7 +653,7 @@ void GameScene::Draw3D() {
 	terrain_->Draw(viewProjection_);
 
 	for (int index = 0; index < 1; index++) {
-		flooars_[index]->Draw(viewProjection_);
+		//flooars_[index]->Draw(viewProjection_);
 	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);

@@ -63,6 +63,7 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 	std::vector<Vector4> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector2> texcoords;
+	std::vector<VertexData> verticeslistes_;//頂点座標から逆引きできるように
 	std::string line;
 	MeshData meshd;
 	std::ifstream file(directoryPath + "/" + filename);
@@ -107,6 +108,12 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 				//modelData.vertices.push_back(vertex);
 				
 				meshd.indices.push_back(elementIndices[0] - 1);
+				VertexData data;
+				data.position = positions[elementIndices[0] - 1];
+				data.texcoord = texcoords[elementIndices[1] - 1];
+				data.normal = normals[elementIndices[2] - 1];
+				data.triangleCenter = {1.0f,1.0f,1.0f};
+				verticeslistes_.push_back(data);
 			}
 	
 		}
@@ -116,9 +123,19 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 			meshd.material = LoadMaterialTemplateFile(directoryPath, materialFirename);
 		}
 	}
-	int i = 0;
+	//int i = 0;
 	for (Vector4& pos : positions) {
-		meshd.vertices.push_back(VertexData{ pos,texcoords[i],normals[i],{1.0f,1.0f,1.0f} });
+		//int tIndex = 0;
+		//int nIndex = 0;
+		for (VertexData& vData : verticeslistes_) {
+			if (vData.position.x == pos.x && 
+				vData.position.y == pos.y && 
+				vData.position.z == pos.z) {
+				meshd.vertices.push_back(VertexData{ pos,vData.texcoord,vData.normal,{1.0f,1.0f,1.0f} });
+				break;
+			}
+		}
+		//i++;
 	}
 	modelData.meshs = meshd;
 	modelData.vertexNum = meshd.vertices.size();
