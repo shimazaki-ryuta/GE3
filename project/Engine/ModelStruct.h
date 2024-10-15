@@ -93,6 +93,20 @@ struct ModelData {
 	Node rootNode;
 };
 
+struct BlenderIndex {
+	uint32_t position;
+	uint32_t texcoord;
+	uint32_t normal;
+};
+
+struct ModelDataFromBlender {
+	std::vector<Vector4> positions;
+	std::vector<Vector2> texcoords;
+	std::vector<Vector3> normals;
+	std::vector<BlenderIndex> indices;
+	MaterialData material;
+};
+
 template<typename tValue>
 struct Keyframe {
 	float time;

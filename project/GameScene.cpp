@@ -31,6 +31,9 @@ GameScene::~GameScene() {
 #ifdef DEMO
 	sceneLoader_->EndReceveThread();
 #endif // _DEBUG
+#ifdef _DEBUG
+	sceneLoader_->EndReceveThread();
+#endif // _DEBUG
 }
 
 void GameScene::Initialize(DirectXCommon* dxCommon) {
@@ -54,6 +57,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	sceneLoader_->CreateObjects(objects_);
 	sceneLoader_->CreateTerrain(terrain_);
 #ifdef DEMO
+
+	sceneLoader_->StartReceveJson();
+
+	isDebugCameraActive_ = false;
+	debugCamera_->SetUses(isDebugCameraActive_);
+	//debugCamera_->SetRotate({ std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float> ,0.0f });
+	debugCamera_->SetPosition({ 0.0f, 1.7f, -10.0f });
+#endif // _DEBUG
+#ifdef _DEBUG
 
 	sceneLoader_->StartReceveJson();
 
@@ -352,6 +364,21 @@ void GameScene::Update() {
 	skyBox_->SetColor(skyColor_);
 	skyBox_->SetExpornentiation(skyExpornent_);
 	dxCommon_->SetHSVFilter(hsvFilter_);
+#endif // _DEBUG
+
+#ifdef _DEBUG
+	sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->ApplyRecevedData(objects_);
+	sceneLoader_->ApplyTerrainVertices(terrain_);
+
+	if (Input::GetKeyDown(DIK_RSHIFT)) {
+		isDebugCameraActive_ = !isDebugCameraActive_;
+		debugCamera_->SetUses(isDebugCameraActive_);
+	}
+	if (isDebugCameraActive_) {
+		debugCamera_->Update();
+	}
+	
 #endif // _DEBUG
 
 	for (std::unique_ptr<GameObject>& object : objects_) {

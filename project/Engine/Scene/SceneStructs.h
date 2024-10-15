@@ -31,11 +31,20 @@ struct TerrainVerticesData {
 	Vector2 uv;
 };
 
+struct FromBlenderJsonObject {
+	uint32_t id;
+	Vector3 value;
+};
+
 //地形生成用データ
 struct TerrainData {
 	std::string fileName = "";
 	GameObjectData object;
-	std::vector<TerrainVerticesData> verticesDatas;
+	//std::vector<TerrainVerticesData> verticesDatas;
+	std::vector<FromBlenderJsonObject> positions;
+	std::vector<FromBlenderJsonObject> normals;
+	std::vector<FromBlenderJsonObject> texcoords;
+	std::vector<BlenderIndex> indices;
 };
 
 //シーンのオブジェクト配置のでーた

@@ -18,6 +18,7 @@ public:
 	static void SInitialize(ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap);
 
 	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	static ModelDataFromBlender LoadObjFileMeshShink(const std::string& directoryPath, const std::string& filename);
 	static ModelData LoadModelFile(const std::string& directoryPath, const std::string& filename);
 	static MaterialData LoadMaterialTemplateFile(const  std::string& directoryPath, const std::string& filename);
 	static Node ReadNode(aiNode* node);

@@ -869,14 +869,23 @@ void Model::Create(const  std::string& directoryPath, const std::string& filenam
 	}
 }
 
+void Model::ReMappingVertices() {
+	std::vector<VertexData> verticeslistes_;
+
+	for (BlenderIndex& index : modelDataFromBlender_.indices) {
+		verticeslistes_.push_back({ modelDataFromBlender_.positions[index.position],modelDataFromBlender_.texcoords[index.texcoord] ,modelDataFromBlender_.normals[index.normal],{1.0f,1.0f,1.0f} });
+	}
+	std::memcpy(vertexData_, verticeslistes_.data(), sizeof(VertexData) * vertexNum);
+}
+
 void Model::CreateTerrain(const  std::string& directoryPath, const std::string& filename)
 {
-	modelData_ = LoadModel::LoadObjFile(directoryPath, filename);
+	modelDataFromBlender_ = LoadModel::LoadObjFileMeshShink(directoryPath, filename);
 
 	//std::string filePath = directoryPath + "/" + filename;
 
-	vertexNum = modelData_.vertexNum;
-	textureHandle_ = modelData_.meshs.material.textureHandle;
+	vertexNum = modelDataFromBlender_.indices.size();
+	textureHandle_ = modelDataFromBlender_.material.textureHandle;
 	toonShadowTextureHandle_ = textureHandle_;
 	perspectivTextureHandle_ = textureHandle_;
 	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
@@ -891,17 +900,20 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 
 	//VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
+	//std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
+
+	//頂点データに再格納
+	ReMappingVertices();
 
 	//インデックスリソース
-	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
+	//indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
 
-	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	indexBufferView_.SizeInBytes = uint32_t(sizeof(uint32_t) * modelData_.meshs.indices.size());
-	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+	//indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	//indexBufferView_.SizeInBytes = uint32_t(sizeof(uint32_t) * modelData_.meshs.indices.size());
+	//indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
+	//indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
+	//std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
 
 	//マテリアル用のリソースを作成
 	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(MaterialParamater));
@@ -1017,6 +1029,39 @@ void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProje
 	//sCommandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 	//sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
 	sCommandList->DrawIndexedInstanced(UINT(modelData_.meshs.indices.size()), 1, 0, 0, 0);
+}
+
+void Model::DrawMeshShink(WorldTransform& worldTransform, const ViewProjection& viewProjection) {
+	ReMappingVertices();
+	// パイプラインステートの設定
+	sCommandList->SetPipelineState(sPipelineState.Get());
+	// ルートシグネチャの設定
+	sCommandList->SetGraphicsRootSignature(sRootSignature.Get());
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//transformationMatrixData->WVP = worldTransform.matWorld_ * viewProjection.matView * viewProjection.matProjection;
+	//transformationMatrixData->World = worldTransform.matWorld_;
+	worldTransform.TransfarMatrix(viewProjection.matView * viewProjection.matProjection);
+	cameraData_->worldPosition = viewProjection.translation_;
+	sCommandList->SetGraphicsRootConstantBufferView(0, materialResourcePtr_->GetGPUVirtualAddress());
+	//wvp用のCBufferの場所を設定
+	sCommandList->SetGraphicsRootConstantBufferView(1, worldTransform.transformResource_->GetGPUVirtualAddress());
+	//localMatrix用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(8, localMatrixResource_->GetGPUVirtualAddress());
+	//Lighting用のリソースの場所を設定
+	//sCommandList->SetGraphicsRootConstantBufferView(3, directinalLightResource->GetGPUVirtualAddress());
+	//camera用のリソース
+	sCommandList->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+
+	//sCommandList->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(7, toonShadowTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(9, perspectivTextureHandle_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, disolveMaskTextureHandle_);
+	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+	sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
+	
 }
 
 void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, uint32_t textureHandle) {

@@ -141,6 +141,72 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 	modelData.vertexNum = meshd.vertices.size();
 	return modelData;
 }
+
+ModelDataFromBlender LoadModel::LoadObjFileMeshShink(const std::string& directoryPath, const std::string& filename) {
+	ModelDataFromBlender modelData;
+	std::vector<Vector4> positions;
+	std::vector<Vector3> normals;
+	std::vector<Vector2> texcoords;
+	std::vector<VertexData> verticeslistes_;//頂点座標から逆引きできるように
+	std::string line;
+	//MeshData meshd;
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line)) {
+		std::string identifilter;
+		std::istringstream s(line);
+		s >> identifilter;
+
+		if (identifilter == "v") {
+			Vector4 position;
+			s >> position.x >> position.y >> position.z;
+			position.w = 1.0f;
+			position.x *= -1.0f;
+			modelData.positions.push_back(position);
+			//positions.push_back(position);
+		}
+		else if (identifilter == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.x >> texcoord.y;
+			texcoord.y = 1.0f - texcoord.y;
+			modelData.texcoords.push_back(texcoord);
+			//texcoords.push_back(texcoord);
+		}
+		else if (identifilter == "vn") {
+			Vector3 normal;
+			s >> normal.x >> normal.y >> normal.z;
+			normal.x *= -1.0f;
+			modelData.normals.push_back(normal);
+			//normals.push_back(normal);
+		}
+		else if (identifilter == "f") {
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/');
+					elementIndices[element] = std::stoi(index);
+				}
+
+				modelData.indices.push_back({ elementIndices[0] - 1 ,elementIndices[1] - 1 ,elementIndices[2] - 1 });
+
+			}
+
+		}
+		else if (identifilter == "mtllib") {
+			std::string materialFirename;
+			s >> materialFirename;
+			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFirename);
+		}
+	}
+	
+	return modelData;
+}
+
 ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::string& filename)
 {
 	ModelData modelData;

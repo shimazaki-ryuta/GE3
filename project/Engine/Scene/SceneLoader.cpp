@@ -198,20 +198,36 @@ void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
 }
 
 void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
-	terrainData_->verticesDatas.clear();
-	for (nlohmann::json& object : data["vertices"]) {
-		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
-		TerrainVerticesData& datas = terrainData_->verticesDatas.back();
+	terrainData_->positions.clear();
+	terrainData_->normals.clear();
+	terrainData_->texcoords.clear();
+	for (nlohmann::json& object : data["position"]) {
+		terrainData_->positions.emplace_back(FromBlenderJsonObject{});
+		FromBlenderJsonObject& datas = terrainData_->positions.back();
 		datas.id = object["id"];
-		datas.position.x = object["pos"][0];
-		datas.position.y = object["pos"][2];
-		datas.position.z = object["pos"][1];
-		datas.normal.x = object["normal"][0];
-		datas.normal.y = object["normal"][2];
-		datas.normal.z = object["normal"][1];
+		datas.value.x = object["value"][0];
+		datas.value.y = object["value"][2];
+		datas.value.z = object["value"][1];
+		
+	}
+	for (nlohmann::json& object : data["normal"]) {
+		terrainData_->normals.emplace_back(FromBlenderJsonObject{});
+		FromBlenderJsonObject& datas = terrainData_->normals.back();
+		datas.id = object["id"];
+		datas.value.x = object["value"][0];
+		datas.value.y = object["value"][2];
+		datas.value.z = object["value"][1];
+		
+	}
 
-		//datas.uv.x = object["uv"][0];
-		//datas.uv.y = object["uv"][1];
+	for (nlohmann::json& object : data["indices"]) {
+		terrainData_->indices.emplace_back(BlenderIndex{});
+		BlenderIndex& datas = terrainData_->indices.back();
+		//datas.id = object["id"];
+		datas.position = object["value"][0];
+		datas.texcoord = object["value"][1];
+		datas.normal = object["value"][2];
+
 	}
 }
 
@@ -259,7 +275,7 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 32768;
+	const static uint32_t buffSize = 134217728;
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
@@ -285,8 +301,8 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		//分岐
-		if (jData.contains("vertices")) {
-			ReadTerrainVertices(jData);
+		if (jData.contains("meshDatas")) {
+			ReadTerrainVertices(jData["meshDatas"]);
 			isRecevedTerrain_ = true;
 		}
 		else {

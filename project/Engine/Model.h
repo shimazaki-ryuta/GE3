@@ -74,10 +74,15 @@ public:
 
 	void CreateTerrain(const  std::string& directoryPath, const std::string& filename);
 
+	void ReMappingVertices();
+
 	static Model* CreateFromOBJ(const  std::string& directoryPath);
 
 
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
+
+	void DrawMeshShink(WorldTransform& worldTransform, const ViewProjection& viewProjection);
+
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
 
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, ID3D12Resource* animationMatrixResource);
@@ -116,6 +121,8 @@ public:
 
 	VertexData* GetVertexData() { return vertexData_; };
 
+	ModelDataFromBlender* GetModelDataFromBlender() { return &modelDataFromBlender_; };
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
@@ -150,6 +157,9 @@ private:
 	std::vector<MeshData*> meshs_;
 
 	ModelData modelData_;
+
+	ModelDataFromBlender modelDataFromBlender_;
+
 	static void CreateRootSignatureSkinning();
 	static void CreateRootSignatureSkinningOutLine();
 
