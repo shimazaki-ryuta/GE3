@@ -880,8 +880,12 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	toonShadowTextureHandle_ = textureHandle_;
 	perspectivTextureHandle_ = textureHandle_;
 	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
+
+	//仮最大数
+	size_t vertMaxNum = 1024;
+
 	//頂点リソース
-	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * vertexNum);
+	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertMaxNum > vertexNum ? vertMaxNum : vertexNum));
 
 	//頂点バッファ
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
