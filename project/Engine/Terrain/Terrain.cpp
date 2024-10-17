@@ -28,13 +28,19 @@ void Terrain::SetMeshData(TerrainData& data) {
 	worldtransform_.scale_ = data.object.transform.scale;
 	worldtransform_.UpdateMatrix();
 	worldtransform_.matWorld_ *= MakeAffineMatrix(deltaTransform_.scale, deltaTransform_.rotate, deltaTransform_.translate);
-
-	VertexData* vertices = model_->GetVertexData();
+	std::vector<VertexData>& vertices =  model_->GetModelData().meshs.vertices;
+	//VertexData* vertices = model_->GetVertexData();
+	//一旦古いデータ全部消して一から(後で変える)
+	vertices.clear();
 	for (TerrainVerticesData & vData : data.verticesDatas) {
-		vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
-		//vertices[vData.id].position.y = vData.position.y;
-		vertices[vData.id].normal = vData.normal;
-		vertices[vData.id].texcoord = vData.uv;
+		vertices.emplace_back();
+		VertexData& vertex = vertices.back();
+		vertex.position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
+		vertex.normal = vData.normal;
+		vertex.texcoord = vData.uv;
+		//vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
+		//vertices[vData.id].normal = vData.normal;
+		//vertices[vData.id].texcoord = vData.uv;
 	}
 }
 

@@ -985,6 +985,9 @@ void Model::PostDraw() {
 }
 
 void Model::DrawTerrain(WorldTransform& worldTransform, const ViewProjection& viewProjection) {
+
+	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * modelData_.meshs.vertices.size());
+
 	// パイプラインステートの設定
 	sCommandList->SetPipelineState(sPipelineState.Get());
 	// ルートシグネチャの設定

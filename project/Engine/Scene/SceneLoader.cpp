@@ -213,6 +213,7 @@ void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 
 		datas.uv.x = object["texcoord"][0];
 		datas.uv.y = object["texcoord"][1];
+		datas.uv.y *= -1.0f;
 	}
 }
 
