@@ -128,12 +128,7 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 		//int tIndex = 0;
 		//int nIndex = 0;
 		for (VertexData& vData : verticeslistes_) {
-			if (vData.position.x == pos.x && 
-				vData.position.y == pos.y && 
-				vData.position.z == pos.z) {
-				meshd.vertices.push_back(VertexData{ pos,vData.texcoord,vData.normal,{1.0f,1.0f,1.0f} });
-				break;
-			}
+				meshd.vertices.push_back(vData);
 		}
 		//i++;
 	}

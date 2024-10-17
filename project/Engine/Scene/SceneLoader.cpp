@@ -199,19 +199,20 @@ void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
 
 void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 	terrainData_->verticesDatas.clear();
-	for (nlohmann::json& object : data["vertices"]) {
+	for (nlohmann::json& object : data["meshDatas"]["vertices"]) {
 		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
 		TerrainVerticesData& datas = terrainData_->verticesDatas.back();
 		datas.id = object["id"];
-		datas.position.x = object["pos"][0];
-		datas.position.y = object["pos"][2];
-		datas.position.z = object["pos"][1];
+		//datas.id = 0;
+		datas.position.x = object["position"][0];
+		datas.position.y = object["position"][2];
+		datas.position.z = object["position"][1];
 		datas.normal.x = object["normal"][0];
 		datas.normal.y = object["normal"][2];
 		datas.normal.z = object["normal"][1];
 
-		//datas.uv.x = object["uv"][0];
-		//datas.uv.y = object["uv"][1];
+		datas.uv.x = object["texcoord"][0];
+		datas.uv.y = object["texcoord"][1];
 	}
 }
 
@@ -285,7 +286,7 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		//分岐
-		if (jData.contains("vertices")) {
+		if (jData.contains("meshDatas")) {
 			ReadTerrainVertices(jData);
 			isRecevedTerrain_ = true;
 		}

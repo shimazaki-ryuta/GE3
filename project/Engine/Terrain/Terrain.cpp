@@ -47,5 +47,5 @@ void Terrain::Update() {
 void Terrain::Draw(const ViewProjection& viewProjection) {
 	
 	model_->SetMaterial(material_.get());
-	model_->Draw(worldtransform_, viewProjection);
+	model_->DrawTerrain(worldtransform_, viewProjection);
 }
