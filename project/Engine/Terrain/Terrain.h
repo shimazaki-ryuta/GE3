@@ -10,6 +10,7 @@ public:
 	void Update();
 	void Draw(const ViewProjection& viewProjection);
 	
+	void SetTransformData(TerrainData& data);
 	void SetMeshData(TerrainData& data);
 	
 	~Terrain() {};

@@ -217,6 +217,13 @@ void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 	}
 }
 
+void SceneLoader::ApplyTerrainTransform(std::unique_ptr<Terrain>& terrain) {
+	if (!isRecevedData_) {
+		return;
+	}
+	terrain->SetTransformData(*(terrainData_.get()));
+}
+
 void SceneLoader::ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain) {
 	if (!isRecevedTerrain_) {
 		return;

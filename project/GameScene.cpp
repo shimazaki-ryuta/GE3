@@ -325,6 +325,7 @@ void GameScene::Update() {
 
 #ifdef DEMO
 	sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->ApplyTerrainTransform(terrain_);
 	sceneLoader_->ApplyRecevedData(objects_);
 	sceneLoader_->ApplyTerrainVertices(terrain_);
 
