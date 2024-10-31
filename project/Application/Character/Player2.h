@@ -10,7 +10,7 @@
 #include "Collider.h"
 #include "input.h"
 #include "3D/Particle.h"
-#include "Bullet.h"
+#include "GameObject/Bullet.h"
 #include "3D/Animation.h"
 #include "3D/Skeleton.h"
 #include "3D/Material.h"

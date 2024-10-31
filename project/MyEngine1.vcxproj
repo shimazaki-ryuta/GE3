@@ -318,20 +318,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application\BaseCharacter.cpp" />
-    <ClCompile Include="Application\Board.cpp" />
-    <ClCompile Include="Application\Bullet.cpp" />
+    <ClCompile Include="Application\Character\BaseCharacter.cpp" />
+    <ClCompile Include="Application\GameObject\Board.cpp" />
+    <ClCompile Include="Application\GameObject\Bullet.cpp" />
     <ClCompile Include="Application\Curve.cpp" />
-    <ClCompile Include="Application\flooar.cpp" />
-    <ClCompile Include="Application\FollowCamera.cpp" />
+    <ClCompile Include="Application\GameObject\flooar.cpp" />
+    <ClCompile Include="Application\Camera\FollowCamera.cpp" />
     <ClCompile Include="Application\GameObject\GameObject.cpp" />
     <ClCompile Include="Application\Ground.cpp" />
-    <ClCompile Include="Application\LockOn.cpp" />
-    <ClCompile Include="Application\MovingFlooar.cpp" />
-    <ClCompile Include="Application\Player.cpp" />
-    <ClCompile Include="Application\Player2.cpp" />
-    <ClCompile Include="Application\PlayerAI.cpp" />
-    <ClCompile Include="Application\Skydome.cpp" />
+    <ClCompile Include="Application\Camera\LockOn.cpp" />
+    <ClCompile Include="Application\GameObject\MovingFlooar.cpp" />
+    <ClCompile Include="Application\Character\Player.cpp" />
+    <ClCompile Include="Application\Character\Player2.cpp" />
+    <ClCompile Include="Application\Character\PlayerAI.cpp" />
+    <ClCompile Include="Application\GameObject\Skydome.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
     <ClCompile Include="Engine\3D\Animation.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
@@ -371,7 +371,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Terrain\Terrain.cpp" />
     <ClCompile Include="Engine\TextureManager.cpp" />
     <ClCompile Include="Engine\3D\ViewProjection.cpp" />
-    <ClCompile Include="Engine\WIndowProcedure.cpp" />
     <ClCompile Include="Engine\3D\WorldTransform.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
@@ -405,20 +404,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\BaseCharacter.h" />
-    <ClInclude Include="Application\Board.h" />
-    <ClInclude Include="Application\Bullet.h" />
+    <ClInclude Include="Application\Character\BaseCharacter.h" />
+    <ClInclude Include="Application\GameObject\Board.h" />
+    <ClInclude Include="Application\GameObject\Bullet.h" />
     <ClInclude Include="Application\Curve.h" />
-    <ClInclude Include="Application\flooar.h" />
-    <ClInclude Include="Application\FollowCamera.h" />
+    <ClInclude Include="Application\GameObject\flooar.h" />
+    <ClInclude Include="Application\Camera\FollowCamera.h" />
     <ClInclude Include="Application\GameObject\GameObject.h" />
     <ClInclude Include="Application\Ground.h" />
-    <ClInclude Include="Application\LockOn.h" />
-    <ClInclude Include="Application\MovingFlooar.h" />
-    <ClInclude Include="Application\Player.h" />
-    <ClInclude Include="Application\Player2.h" />
-    <ClInclude Include="Application\PlayerAI.h" />
-    <ClInclude Include="Application\Skydome.h" />
+    <ClInclude Include="Application\Camera\LockOn.h" />
+    <ClInclude Include="Application\GameObject\MovingFlooar.h" />
+    <ClInclude Include="Application\Character\Player.h" />
+    <ClInclude Include="Application\Character\Player2.h" />
+    <ClInclude Include="Application\Character\PlayerAI.h" />
+    <ClInclude Include="Application\GameObject\Skydome.h" />
     <ClInclude Include="Application\TimedCall.h" />
     <ClInclude Include="Engine\3D\Animation.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
@@ -467,7 +466,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Terrain\Terrain.h" />
     <ClInclude Include="Engine\TextureManager.h" />
     <ClInclude Include="Engine\3D\ViewProjection.h" />
-    <ClInclude Include="Engine\WindowProcedure.h" />
     <ClInclude Include="Engine\3D\WorldTransform.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />

@@ -61,28 +61,28 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\BaseCharacter.cpp">
+    <ClCompile Include="Application\Character\BaseCharacter.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Board.cpp">
+    <ClCompile Include="Application\GameObject\Board.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\Curve.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\flooar.cpp">
+    <ClCompile Include="Application\GameObject\flooar.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\FollowCamera.cpp">
+    <ClCompile Include="Application\Camera\FollowCamera.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\Ground.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\MovingFlooar.cpp">
+    <ClCompile Include="Application\GameObject\MovingFlooar.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Skydome.cpp">
+    <ClCompile Include="Application\GameObject\Skydome.cpp">
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="Application\TimedCall.cpp">
@@ -134,9 +134,6 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3D\ViewProjection.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\WIndowProcedure.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\3D\WorldTransform.cpp">
@@ -199,19 +196,19 @@
     <ClCompile Include="Engine\Audio\AudioManager.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Player.cpp">
+    <ClCompile Include="Application\Character\Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Player2.cpp">
+    <ClCompile Include="Application\Character\Player2.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\PlayerAI.cpp">
+    <ClCompile Include="Application\Character\PlayerAI.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Bullet.cpp">
+    <ClCompile Include="Application\GameObject\Bullet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Application\LockOn.cpp">
+    <ClCompile Include="Application\Camera\LockOn.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\2D\PostEffect.cpp">
@@ -252,28 +249,28 @@
     <ClInclude Include="GameScene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\BaseCharacter.h">
+    <ClInclude Include="Application\Character\BaseCharacter.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Board.h">
+    <ClInclude Include="Application\GameObject\Board.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\Curve.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\flooar.h">
+    <ClInclude Include="Application\GameObject\flooar.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\FollowCamera.h">
+    <ClInclude Include="Application\Camera\FollowCamera.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\Ground.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\MovingFlooar.h">
+    <ClInclude Include="Application\GameObject\MovingFlooar.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Skydome.h">
+    <ClInclude Include="Application\GameObject\Skydome.h">
       <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="Application\TimedCall.h">
@@ -325,9 +322,6 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3D\ViewProjection.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\WindowProcedure.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\3D\WorldTransform.h">
@@ -408,19 +402,19 @@
     <ClInclude Include="Engine\Audio\AudioManager.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Player.h">
+    <ClInclude Include="Application\Character\Player.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Player2.h">
+    <ClInclude Include="Application\Character\Player2.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\PlayerAI.h">
+    <ClInclude Include="Application\Character\PlayerAI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Bullet.h">
+    <ClInclude Include="Application\GameObject\Bullet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Application\LockOn.h">
+    <ClInclude Include="Application\Camera\LockOn.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2D\PostEffect.h">

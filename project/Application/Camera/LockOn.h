@@ -2,8 +2,7 @@
 #include "3D/WorldTransform.h"
 #include "3D/ViewProjection.h"
 #include "Input.h"
-#include "Enemy.h"
-#include "Player2.h"
+#include "Character/Player2.h"
 #include <memory>
 #include <list>
 #include "TextureManager.h"
