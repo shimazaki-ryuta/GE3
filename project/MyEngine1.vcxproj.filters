@@ -76,9 +76,6 @@
     <ClCompile Include="Application\FollowCamera.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Goal.cpp">
-      <Filter>Application</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Ground.cpp">
       <Filter>Application</Filter>
     </ClCompile>
@@ -91,61 +88,58 @@
     <ClCompile Include="Application\TimedCall.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ConvertString.cpp">
+    <ClCompile Include="Engine\CommonFiles\ConvertString.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\D3DResourceLeakChacker.cpp">
+    <ClCompile Include="Engine\CommonFiles\D3DResourceLeakChacker.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\DebugCamera.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\DeltaTime.cpp">
+    <ClCompile Include="Engine\CommonFiles\DeltaTime.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\FixFPS.cpp">
+    <ClCompile Include="Engine\CommonFiles\FixFPS.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GetDescriptorHandle.cpp">
+    <ClCompile Include="Engine\CommonFiles\GetDescriptorHandle.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\GlobalVariables.cpp">
+    <ClCompile Include="Engine\GlobalVariables\GlobalVariables.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Input.cpp">
+    <ClCompile Include="Engine\CommonFiles\Input.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\LoadModel.cpp">
+    <ClCompile Include="Engine\3D\LoadModel.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Model.cpp">
+    <ClCompile Include="Engine\3D\Model.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Particle.cpp">
+    <ClCompile Include="Engine\3D\Particle.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Primitive3D.cpp">
+    <ClCompile Include="Engine\CommonFiles\RandomEngine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\RandomEngine.cpp">
+    <ClCompile Include="Engine\CommonFiles\ShaderCompiler.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ShaderCompiler.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Sprite.cpp">
+    <ClCompile Include="Engine\2D\Sprite.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\TextureManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ViewProjection.cpp">
+    <ClCompile Include="Engine\3D\ViewProjection.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\WIndowProcedure.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\WorldTransform.cpp">
+    <ClCompile Include="Engine\3D\WorldTransform.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Colider\AABB.cpp">
@@ -220,19 +214,19 @@
     <ClCompile Include="Application\LockOn.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\PostEffect.cpp">
+    <ClCompile Include="Engine\2D\PostEffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\QuaternionFunction.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Animation.cpp">
+    <ClCompile Include="Engine\3D\Animation.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Skeleton.cpp">
+    <ClCompile Include="Engine\3D\Skeleton.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\SkyBox.cpp">
+    <ClCompile Include="Engine\3D\SkyBox.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\SceneLoader.cpp">
@@ -244,7 +238,7 @@
     <ClCompile Include="Engine\CommonFiles\SRVManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Material.cpp">
+    <ClCompile Include="Engine\3D\Material.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Engine\GameManager.cpp">
@@ -273,9 +267,6 @@
     <ClInclude Include="Application\FollowCamera.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Goal.h">
-      <Filter>Application</Filter>
-    </ClInclude>
     <ClInclude Include="Application\Ground.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -288,61 +279,58 @@
     <ClInclude Include="Application\TimedCall.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ConvertString.h">
+    <ClInclude Include="Engine\CommonFiles\ConvertString.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\D3DResourceLeakChacker.h">
+    <ClInclude Include="Engine\CommonFiles\D3DResourceLeakChacker.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\DebugCamera.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\DeltaTime.h">
+    <ClInclude Include="Engine\CommonFiles\DeltaTime.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\FixFPS.h">
+    <ClInclude Include="Engine\CommonFiles\FixFPS.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GetDescriptorHandle.h">
+    <ClInclude Include="Engine\CommonFiles\GetDescriptorHandle.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\GlobalVariables.h">
+    <ClInclude Include="Engine\GlobalVariables\GlobalVariables.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Input.h">
+    <ClInclude Include="Engine\CommonFiles\Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\LoadModel.h">
+    <ClInclude Include="Engine\3D\LoadModel.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Model.h">
+    <ClInclude Include="Engine\3D\Model.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Particle.h">
+    <ClInclude Include="Engine\3D\Particle.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Primitive3D.h">
+    <ClInclude Include="Engine\CommonFiles\RandomEngine.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\RandomEngine.h">
+    <ClInclude Include="Engine\CommonFiles\ShaderCompiler.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ShaderCompiler.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Sprite.h">
+    <ClInclude Include="Engine\2D\Sprite.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\TextureManager.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ViewProjection.h">
+    <ClInclude Include="Engine\3D\ViewProjection.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\WindowProcedure.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\WorldTransform.h">
+    <ClInclude Include="Engine\3D\WorldTransform.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Colider\AABB.h">
@@ -435,13 +423,13 @@
     <ClInclude Include="Application\LockOn.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\PostEffect.h">
+    <ClInclude Include="Engine\2D\PostEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ModelStruct.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Animation.h">
+    <ClInclude Include="Engine\3D\Animation.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Math\Quaternion.h">
@@ -450,10 +438,10 @@
     <ClInclude Include="Engine\Math\QuaternionFunction.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Skeleton.h">
+    <ClInclude Include="Engine\3D\Skeleton.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\SkyBox.h">
+    <ClInclude Include="Engine\3D\SkyBox.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\SceneLoader.h">
@@ -468,7 +456,7 @@
     <ClInclude Include="Engine\CommonFiles\SRVManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Material.h">
+    <ClInclude Include="Engine\3D\Material.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Engine\GameManager.h">

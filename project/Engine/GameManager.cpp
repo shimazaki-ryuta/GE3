@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 #include"ConvertString.h"
-#include "../PostEffect.h"
+#include "2D/PostEffect.h"
 //static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 
 //Shader関係
@@ -18,9 +18,9 @@
 #include "TextureManager.h"
 #include "DeltaTime.h"
 //#include "Vector4.h"
-#include "Sprite.h"
-#include "Primitive3D.h"
-#include "SkyBox.h"
+#include "2D/Sprite.h"
+//#include "3D/Primitive3D.h"
+#include "3D/SkyBox.h"
 //入力
 #include "Input.h"
 //ImGui
@@ -28,18 +28,18 @@
 #include "../externals/imgui/imgui_impl_dx12.h"
 #include "../externals/imgui/imgui_impl_win32.h"
 
-#include "WorldTransform.h"
+#include "3D/WorldTransform.h"
 
 //音
 #include "Audio/AudioManager.h"
 
 //ファイル書き出し
-#include "GlobalVariables.h"
+#include "GlobalVariables/GlobalVariables.h"
 
-#include "Animation.h"
+#include "3D/Animation.h"
 
-#include "LoadModel.h"
-#include "Particle.h"
+#include "3D/LoadModel.h"
+#include "3D/Particle.h"
 
 #include "../GameScene.h"
 
@@ -91,7 +91,7 @@ void GameManager::Initialize() {
 	Material::SetDevice(dxCommon->GetDevice());
 	Model::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
-	Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
+	//Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	SkyBox::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight(), dxCommon->GetCommandList());
 	//DeltaTime::GetInstance();
 

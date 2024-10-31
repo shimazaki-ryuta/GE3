@@ -1,6 +1,6 @@
 #pragma once
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include "3D/ViewProjection.h"
+#include "3D/WorldTransform.h"
 class DebugCamera
 {
 public:

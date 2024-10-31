@@ -1,7 +1,7 @@
 #pragma once
-#include "Model.h"
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include "3D/Model.h"
+#include "3D/ViewProjection.h"
+#include "3D/WorldTransform.h"
 #include <vector>
 
 

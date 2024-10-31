@@ -3,7 +3,7 @@
 #include <cassert>
 #include <list>
 #include <fstream>
-#include  "Primitive3D.h"
+//#include  "Primitive3D.h"
 #include "Input.h"
 //ImGui
 #include "externals/imgui/imgui.h"

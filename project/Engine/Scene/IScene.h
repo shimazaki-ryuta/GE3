@@ -1,5 +1,5 @@
 #pragma once
-#include "Sprite.h"
+#include "2D/Sprite.h"
 #include "Scene/SceneLoader.h"
 #include "GameObject/GameObject.h"
 

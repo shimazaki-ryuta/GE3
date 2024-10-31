@@ -11,7 +11,7 @@
 #include <fstream>
 #include <thread>
 #include <memory>
-#include "Model.h"
+#include "3D/Model.h"
 #include "SceneStructs.h"
 #include "GameObject/GameObject.h"
 #include "Terrain/Terrain.h"

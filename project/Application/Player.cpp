@@ -11,7 +11,7 @@
 #include <cassert>
 #include <numbers>
 
-#include "GlobalVariables.h"
+#include "GlobalVariables/GlobalVariables.h"
 
 #include "CollisionManager.h"
 #include "RandomEngine.h"

@@ -1,13 +1,13 @@
 #pragma once
-#include "WorldTransform.h"
-#include "ViewProjection.h"
+#include "3D/WorldTransform.h"
+#include "3D/ViewProjection.h"
 #include "Input.h"
 #include "Enemy.h"
 #include "Player2.h"
 #include <memory>
 #include <list>
 #include "TextureManager.h"
-#include "Sprite.h"
+#include "2D/Sprite.h"
 class LockOn
 {
 public:

@@ -9,8 +9,8 @@
 
 #include "Input.h"
 
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include "3D/ViewProjection.h"
+#include "3D/WorldTransform.h"
 
 #include "DebugCamera.h"
 
@@ -22,13 +22,13 @@
 #include "Ground.h"
 #include "FollowCamera.h"
 #include "flooar.h"
-#include "Goal.h"
+//#include "3D/Goal.h"
 #include "MovingFlooar.h"
 #include <array>
 #include <memory>
 #include "LockOn.h"
-#include "Engine/Animation.h"
-#include "Engine/SkyBox.h"
+#include "3D/Animation.h"
+#include "3D/SkyBox.h"
 
 #include "Terrain/Terrain.h"
 

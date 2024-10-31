@@ -1,5 +1,5 @@
 #include "WinApp.h"
-#include"../ConvertString.h"
+#include"ConvertString.h"
 #include "../externals/imgui/imgui_impl_win32.h"
 
 #pragma comment(lib,"winmm.lib")

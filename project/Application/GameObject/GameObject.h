@@ -1,13 +1,13 @@
 #pragma once
-#include "WorldTransform.h"
-#include "ViewProjection.h"
+#include "3D/WorldTransform.h"
+#include "3D/ViewProjection.h"
 #include "Colider/Collider.h"
 #include <vector>
 #include <memory>
 #include <string>
 #include "Scene/SceneStructs.h"
-#include "Model.h"
-#include "Material.h"
+#include "3D/Model.h"
+#include "3D/Material.h"
 class GameObject
 {
 public:

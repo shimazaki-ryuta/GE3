@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/SceneStructs.h"
-#include "Model.h"
+#include "3D/Model.h"
 #include <memory>
 class Terrain
 {

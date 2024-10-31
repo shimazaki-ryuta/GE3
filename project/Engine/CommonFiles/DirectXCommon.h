@@ -6,7 +6,7 @@
 #include <dxgidebug.h>
 #include <wrl.h>
 #include "WinApp.h"
-#include "../FixFPS.h"
+#include "FixFPS.h"
 
 #include "../externals/DirectXTex/DirectXTex.h"
 #include "../externals/DirectXTex/d3dx12.h"

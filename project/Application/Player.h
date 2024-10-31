@@ -1,19 +1,19 @@
 #pragma once
 #include "Input.h"
-#include "Model.h"
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include "3D/Model.h"
+#include "3D/ViewProjection.h"
+#include "3D/WorldTransform.h"
 #include <vector>
 #include "BaseCharacter.h"
 #include <optional>
 #include "OBB.h"
 #include "Collider.h"
 #include "input.h"
-#include "Particle.h"
+#include "3D/Particle.h"
 #include "Bullet.h"
-#include "../Engine/Animation.h"
-#include "Skeleton.h"
-#include "Material.h"
+#include "3D/Animation.h"
+#include "3D/Skeleton.h"
+#include "3D/Material.h"
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 

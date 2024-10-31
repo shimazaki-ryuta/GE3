@@ -1,11 +1,11 @@
 #pragma once
-#include "Model.h"
-#include "Material.h"
-#include "WorldTransform.h"
+#include "3D/Model.h"
+#include "3D/Material.h"
+#include "3D/WorldTransform.h"
 
 #include <memory>
-#include "../Engine/Animation.h"
-#include "Skeleton.h"
+#include "3D/Animation.h"
+#include "3D/Skeleton.h"
 
 /// <summary>
 /// 地面

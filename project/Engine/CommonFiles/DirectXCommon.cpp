@@ -1,9 +1,9 @@
 #include "DirectXCommon.h"
-#include "../ConvertString.h"
+#include "ConvertString.h"
 #include <format>
 #include "../TextureManager.h"
 
-#include "../PostEffect.h"
+#include "2D/PostEffect.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")

@@ -4,7 +4,7 @@
 #include "Input.h"
 #include <algorithm>
 #include <numbers>
-#include "GlobalVariables.h"
+#include "GlobalVariables/GlobalVariables.h"
 #include "RandomEngine.h"
 void FollowCamera::Initialize()
 {
