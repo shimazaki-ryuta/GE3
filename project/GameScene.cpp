@@ -190,7 +190,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->InitializeFloatingGimmick();
 	player_->SetShadowTexture(toonShadowTextureHandle_);
 	player_->SetOutLineData(0.01f, { 0,0,1.0f,1.0f });
-	modelWepon_.reset(Model::CreateFromOBJ("hammer"));
 	//player_->SetWepon(modelWepon_.get());
 
 	player2_ = std::make_unique<Player2>();
@@ -277,9 +276,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player2_->ReStart();
 	Input::GetInstance()->GetJoystickState(0, preJoyState_);
 
-	pressATextureHandle_ = TextureManager::LoadTexture("pressa.png");
-	pressASprite_.reset(Sprite::Create(pressATextureHandle_, { 640.0f,600.0f }, { 128.0f * 2.0f,32.0f * 2.0f }, { 1.0f,1.0f,1.0f,1.0f }));
-
 	endCount_ = 0;
 
 	endTextureHandle_[0] = TextureManager::LoadTexture("win.png");
@@ -288,15 +284,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	buttonCount_ = 0;
 	isButtonDraw_ = false;
-
-	shotTextureHandle_ = TextureManager::LoadTexture("shot.png");
-	dashTextureHandle_ = TextureManager::LoadTexture("dash.png");
-	jumpTextureHandle_ = TextureManager::LoadTexture("jump.png");
-	shotSprite_.reset(Sprite::Create(shotTextureHandle_, { 300.0f,600.0f }, { 256.0f * 1.0f,32.0f * 1.0f }, { 1.0f,1.0f,1.0f,1.0f }));
-	dashSprite_.reset(Sprite::Create(dashTextureHandle_, { 640.0f,600.0f }, { 256.0f * 1.0f,32.0f * 1.0f }, { 1.0f,1.0f,1.0f,1.0f }));
-	jumpSprite_.reset(Sprite::Create(jumpTextureHandle_, { 980.0f,600.0f }, { 256.0f * 1.0f,32.0f * 1.0f }, { 1.0f,1.0f,1.0f,1.0f }));
-	titleTextureHandle_ = TextureManager::LoadTexture("title.png");
-	titleSprite_.reset(Sprite::Create(titleTextureHandle_, { 640.0f,320.0f }, { 256.0f * 3.0f,32.0f * 3.0f }, { 1.0f,1.0f,1.0f,1.0f }));
 
 	fadeSprite_.reset(Sprite::Create(TextureManager::LoadTexture("white2x2.png"), { 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f,0.0f,0.5f }));
 	fadeSprite_->SetAnchorPoint({ 0.0f,0.0f });
@@ -319,15 +306,20 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	hsvFilter_ = {0.0f,0.0f,0.0f,0.0f};
 }
 
-void GameScene::Update() {
-	XINPUT_STATE joyState;
-	Input::GetInstance()->GetJoystickState(0, joyState);
-
+void GameScene::FromBlenderUpdate() {
 #ifdef DEMO
 	sceneLoader_->CreateModelList(modelList_);
 	sceneLoader_->ApplyTerrainTransform(terrain_);
 	sceneLoader_->ApplyRecevedData(objects_);
 	sceneLoader_->ApplyTerrainVertices(terrain_);
+#endif // _DEBUG
+}
+
+void GameScene::Update() {
+	XINPUT_STATE joyState;
+	Input::GetInstance()->GetJoystickState(0, joyState);
+	FromBlenderUpdate();
+#ifdef DEMO
 
 	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
@@ -364,261 +356,11 @@ void GameScene::Update() {
 		flooars_[index]->Update();
 	}
 
-	switch (colorPhase_)
-	{
-	case 0:
-		//directinalLightData->color = Vector4{ 1.0f - color_,color_, 0.0f, 1.0f };
-		break;
-	case 1:
-		//directinalLightData->color = Vector4{ 0,1.0f - color_, color_, 1.0f };
-		break;
-	case 2:
-		//directinalLightData->color = Vector4{ color_,0, 1.0f - color_, 1.0f };
-		break;
-	default:
-		break;
-	}
-
-	color_ += 0.03f;
-	if (color_ > 1.0f) {
-		color_ = 0;
-		colorPhase_++;
-		if (colorPhase_ > 2) {
-			colorPhase_ = 0;
-		}
-	}
-
 	if (!isIngame_) {
-		grayScaleValue_ = 0.0f;
-		Vector3 offset = { 0.0f,2.0f,-15.0f };
-		viewProjection_.translation_ = Transform(offset, MakeRotateMatrix(viewProjection_.rotation_));
-		viewProjection_.rotation_.y += 0.01f;
-		viewProjection_.rotation_.x = 0.10f;
-		viewProjection_.UpdateMatrix();
-		if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
-			isStart_ = true;
-			isTransitionFade_ = false;
-		}
-		if (!isStart_) {
-			fadeAlpha_ -= 0.05f;
-			if (fadeAlpha_ < 0) {
-				fadeAlpha_ = 0;
-			}
-		}
-		else {
-			fadeAlpha_ += 0.05f;
-			if (fadeAlpha_ > 1.0f) {
-				fadeAlpha_ = 1.0f;
-				isIngame_ = true;
-			}
-		}
-
+		Idle();
 	}
 	else {
-		player_->Update();
-		if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
-			player_->ReStart();
-		}
-
-		ai_->Update();
-
-		player2_->SetData(ai_->GetData());
-		player2_->Update();
-		if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
-			player2_->ReStart();
-
-		}
-
-		followCamera_->Update();
-
-		//objectのコライダーリスト取得
-		std::list<Collider*> colliderList;
-		colliderList.clear();
-		for (std::unique_ptr<GameObject>& object : objects_) {
-			object->AppendColliderList(colliderList);
-		}
-
-		bool isCollision = false;
-		for (int index = 0; index < 1; index++) {
-			if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
-			{
-				player_->OnCollision(flooars_[index]->GetWorldTransform());
-				isCollision = true;
-			}
-		}
-		//objectとの当たり判定
-		
-		for (std::unique_ptr<GameObject>& object : objects_) {
-			if (object->GetCollider()) {
-				if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
-				{
-					player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
-				}
-			}
-		}
-
-		if (!isCollision) {
-			player_->OutCollision();
-		}
-
-		isCollision = false;
-		for (int index = 0; index < 1; index++) {
-			if (IsCollision(player2_->GetOBB(), flooars_[index]->GetOBB()))
-			{
-				player2_->OnCollision(flooars_[index]->GetWorldTransform());
-				isCollision = true;
-			}
-		}
-		if (!isCollision) {
-			player2_->OutCollision();
-		}
-
-		//クリア
-		if (!isEnd_) {
-			for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
-				if (IsCollision(player2_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
-					AudioManager::GetInstance()->PlayWave(audioHandle_);
-					Particle::ParticleData particleData;
-					for (uint32_t count = 0; count < 20; count++) {
-						particleData.transform.scale = { 0.5f,0.5f,0.5f };
-						particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-						particleData.transform.translate = player2_->GetWorldTransformBody()->GetWorldPosition();
-						particleData.velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-						particleData.color = { RandomEngine::GetRandom(0.0f,1.0f),0,0,1.0f };
-						particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
-						particleData.currentTime = 0;
-						particle->MakeNewParticle(particleData);
-					}
-					endSprite_->SetTextureHandle(endTextureHandle_[0]);
-					player2_->SetIsDead(true);
-					followCamera_->Shake();
-					followCamera_->SetTarget(player2_->GetWorldTransformBody());
-					isEnd_ = true;
-				}
-			}
-		}
-
-		//ゲームオーバー
-		if (!isEnd_) {
-			for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
-				if (IsCollision(player_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
-					AudioManager::GetInstance()->PlayWave(audioHandle_);
-					Particle::ParticleData particleData;
-					for (uint32_t count = 0; count < 20; count++) {
-						particleData.transform.scale = { 0.5f,0.5f,0.5f };
-						particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-						particleData.transform.translate = player_->GetWorldTransform()->GetWorldPosition();
-						particleData.transform.translate.y += 1.5f;
-						particleData.velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-						particleData.color = { RandomEngine::GetRandom(0.0f,1.0f),0,0,1.0f };
-						particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
-						particleData.currentTime = 0;
-						particle->MakeNewParticle(particleData);
-					}
-					endSprite_->SetTextureHandle(endTextureHandle_[1]);
-					player_->SetIsDead(true);
-					followCamera_->Shake();
-					isEnd_ = true;
-				}
-			}
-		}
-		if (isEnd_) {
-			//grayscale
-			if (player_->GetIsDead()) {
-				grayScaleValue_ += 0.01f;
-				if (grayScaleValue_ > 1.0f) {
-					grayScaleValue_ = 1.0f;
-				}
-			}
-			float alpha = float(endCount_) / 120.0f;
-			endSprite_->SetColor({ 1.0f,1.0f,1.0f,alpha });
-			endCount_++;
-			if (endCount_ > 120) {
-				endCount_ = 120;
-			}
-			if (endCount_ == 120) {
-				if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
-					isTransitionFade_ = true;
-				}
-			}
-		}
-
-
-		CollisionManager::GetInstance()->CheckAllCollisions();
-
-		//PointLight
-		for (uint32_t index = 0; index < pointLightMax_; ++index) {
-			pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-			pointLightData[index].position = { 0.0f,1.0f,0.0f };
-			pointLightData[index].intensity = 0.0f;
-			pointLightData[index].radius = 10.0f;
-			pointLightData[index].decay = 0.0f;
-			pointLightData[index].isUse_ = 0;
-		}
-		uint32_t count = 0;
-		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
-			if (count < pointLightMax_) {
-				pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
-				pointLightData[count].position = (*ite)->GetSphere().center;
-				pointLightData[count].intensity = 2.0f;
-				pointLightData[count].radius = 10.0f;
-				pointLightData[count].decay = 0.8f;
-				pointLightData[count].isUse_ = 1;
-				count++;
-			}
-		}
-		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
-			if (count < pointLightMax_) {
-				pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
-				pointLightData[count].position = (*ite)->GetSphere().center;
-				pointLightData[count].intensity = 2.0f;
-				pointLightData[count].radius = 10.0f;
-				pointLightData[count].decay = 0.8f;
-				pointLightData[count].isUse_ = 1;
-				count++;
-			}
-		}
-
-
-		{
-			viewProjection_.matView = followCamera_->GetViewProjection().matView;
-			viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-			viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
-		}
-		lockOn_->Update(player2_.get(), viewProjection_);
-		followCamera_->SetLockOnTarget(nullptr);
-		player_->SetTarget(lockOn_->GetTarget());
-		player2_->SetTarget(player_->GetWorldTransform());
-		if (!isTransitionFade_) {
-			fadeAlpha_ -= 0.05f;
-			if (fadeAlpha_ < 0) {
-				fadeAlpha_ = 0;
-			}
-		}
-		else {
-			fadeAlpha_ += 0.05f;
-			if (fadeAlpha_ > 1.0f) {
-				for (uint32_t index = 0; index < pointLightMax_; ++index) {
-					pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-					pointLightData[index].position = { 0.0f,1.0f,0.0f };
-					pointLightData[index].intensity = 0.0f;
-					pointLightData[index].radius = 10.0f;
-					pointLightData[index].decay = 0.0f;
-					pointLightData[index].isUse_ = 0;
-				}
-				fadeAlpha_ = 1.0f;
-				//isIngame_ = true;
-				isIngame_ = false;
-				isStart_ = false;
-				player_->ReStart();
-				player2_->ReStart();
-				followCamera_->Reset();
-				followCamera_->SetTarget(player_->GetWorldTransform());
-				ai_->Initialize();
-				endCount_ = 0;
-				isEnd_ = false;
-			}
-		}
+		Play();
 	}
 
 	particle->Updade();
@@ -634,6 +376,231 @@ void GameScene::Update() {
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+	}
+}
+
+void GameScene::Idle() {
+	XINPUT_STATE joyState;
+	Input::GetInstance()->GetJoystickState(0, joyState);
+	grayScaleValue_ = 0.0f;
+	Vector3 offset = { 0.0f,2.0f,-15.0f };
+	viewProjection_.translation_ = Transform(offset, MakeRotateMatrix(viewProjection_.rotation_));
+	viewProjection_.rotation_.y += 0.01f;
+	viewProjection_.rotation_.x = 0.10f;
+	viewProjection_.UpdateMatrix();
+	if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
+		isStart_ = true;
+		isTransitionFade_ = false;
+	}
+	if (!isStart_) {
+		fadeAlpha_ -= 0.05f;
+		if (fadeAlpha_ < 0) {
+			fadeAlpha_ = 0;
+		}
+	}
+	else {
+		fadeAlpha_ += 0.05f;
+		if (fadeAlpha_ > 1.0f) {
+			fadeAlpha_ = 1.0f;
+			isIngame_ = true;
+		}
+	}
+}
+
+void GameScene::Play() {
+	XINPUT_STATE joyState;
+	Input::GetInstance()->GetJoystickState(0, joyState);
+	player_->Update();
+	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player_->ReStart();
+	}
+
+	ai_->Update();
+
+	player2_->SetData(ai_->GetData());
+	player2_->Update();
+	if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player2_->ReStart();
+
+	}
+
+	followCamera_->Update();
+
+	//objectのコライダーリスト取得
+	std::list<Collider*> colliderList;
+	colliderList.clear();
+	for (std::unique_ptr<GameObject>& object : objects_) {
+		object->AppendColliderList(colliderList);
+	}
+
+	bool isCollision = false;
+	for (int index = 0; index < 1; index++) {
+		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
+		{
+			player_->OnCollision(flooars_[index]->GetWorldTransform());
+			isCollision = true;
+		}
+	}
+	//objectとの当たり判定
+
+	for (std::unique_ptr<GameObject>& object : objects_) {
+		if (object->GetCollider()) {
+			if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
+			{
+				player_->OnCollisionSphere(*object->GetWorldTransform(), object->GetCollider()->GetColliderShape().sphere);
+			}
+		}
+	}
+
+	if (!isCollision) {
+		player_->OutCollision();
+	}
+
+	isCollision = false;
+	for (int index = 0; index < 1; index++) {
+		if (IsCollision(player2_->GetOBB(), flooars_[index]->GetOBB()))
+		{
+			player2_->OnCollision(flooars_[index]->GetWorldTransform());
+			isCollision = true;
+		}
+	}
+	if (!isCollision) {
+		player2_->OutCollision();
+	}
+
+	//クリア
+	if (!isEnd_) {
+		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
+			if (IsCollision(player2_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
+				AudioManager::GetInstance()->PlayWave(audioHandle_);
+				endSprite_->SetTextureHandle(endTextureHandle_[0]);
+				player2_->SetIsDead(true);
+				followCamera_->Shake();
+				followCamera_->SetTarget(player2_->GetWorldTransformBody());
+				isEnd_ = true;
+			}
+		}
+	}
+
+	//ゲームオーバー
+	if (!isEnd_) {
+		for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
+			if (IsCollision(player_->GetOBB(), (*ite)->GetSphere()) && !(*ite)->GetIsDead()) {
+				AudioManager::GetInstance()->PlayWave(audioHandle_);
+				endSprite_->SetTextureHandle(endTextureHandle_[1]);
+				player_->SetIsDead(true);
+				followCamera_->Shake();
+				isEnd_ = true;
+			}
+		}
+	}
+	if (isEnd_) {
+		End();
+	}
+
+
+	CollisionManager::GetInstance()->CheckAllCollisions();
+
+	//PointLight
+	for (uint32_t index = 0; index < pointLightMax_; ++index) {
+		pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+		pointLightData[index].position = { 0.0f,1.0f,0.0f };
+		pointLightData[index].intensity = 0.0f;
+		pointLightData[index].radius = 10.0f;
+		pointLightData[index].decay = 0.0f;
+		pointLightData[index].isUse_ = 0;
+	}
+	uint32_t count = 0;
+	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
+		if (count < pointLightMax_) {
+			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
+			pointLightData[count].position = (*ite)->GetSphere().center;
+			pointLightData[count].intensity = 2.0f;
+			pointLightData[count].radius = 10.0f;
+			pointLightData[count].decay = 0.8f;
+			pointLightData[count].isUse_ = 1;
+			count++;
+		}
+	}
+	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
+		if (count < pointLightMax_) {
+			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
+			pointLightData[count].position = (*ite)->GetSphere().center;
+			pointLightData[count].intensity = 2.0f;
+			pointLightData[count].radius = 10.0f;
+			pointLightData[count].decay = 0.8f;
+			pointLightData[count].isUse_ = 1;
+			count++;
+		}
+	}
+
+
+	{
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
+	}
+	lockOn_->Update(player2_.get(), viewProjection_);
+	followCamera_->SetLockOnTarget(nullptr);
+	player_->SetTarget(lockOn_->GetTarget());
+	player2_->SetTarget(player_->GetWorldTransform());
+	Fade();
+}
+
+void GameScene::End() {
+	XINPUT_STATE joyState;
+	Input::GetInstance()->GetJoystickState(0, joyState);
+
+	//grayscale
+	if (player_->GetIsDead()) {
+		grayScaleValue_ += 0.01f;
+		if (grayScaleValue_ > 1.0f) {
+			grayScaleValue_ = 1.0f;
+		}
+	}
+	float alpha = float(endCount_) / 120.0f;
+	endSprite_->SetColor({ 1.0f,1.0f,1.0f,alpha });
+	endCount_++;
+	if (endCount_ > 120) {
+		endCount_ = 120;
+	}
+	if (endCount_ == 120) {
+		if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
+			isTransitionFade_ = true;
+		}
+	}
+}
+
+void GameScene::Fade() {
+	if (!isTransitionFade_) {
+		fadeAlpha_ -= 0.05f;
+		if (fadeAlpha_ < 0) {
+			fadeAlpha_ = 0;
+		}
+	}
+	else {
+		fadeAlpha_ += 0.05f;
+		if (fadeAlpha_ > 1.0f) {
+			for (uint32_t index = 0; index < pointLightMax_; ++index) {
+				pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+				pointLightData[index].position = { 0.0f,1.0f,0.0f };
+				pointLightData[index].intensity = 0.0f;
+				pointLightData[index].radius = 10.0f;
+				pointLightData[index].decay = 0.0f;
+				pointLightData[index].isUse_ = 0;
+			}
+			fadeAlpha_ = 1.0f;
+			//isIngame_ = true;
+			isIngame_ = false;
+			isStart_ = false;
+			player_->ReStart();
+			player2_->ReStart();
+			followCamera_->Reset();
+			followCamera_->SetTarget(player_->GetWorldTransform());
+			ai_->Initialize();
+			endCount_ = 0;
+			isEnd_ = false;
+		}
 	}
 }
 
