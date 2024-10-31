@@ -14,19 +14,18 @@
 
 #include "DebugCamera.h"
 
-#include "Player.h"
-#include "Player2.h"
-#include "PlayerAI.h"
-#include "Enemy.h"
-#include "Skydome.h"
+#include "Character/Player.h"
+#include "Character/Player2.h"
+#include "Character/PlayerAI.h"
+//#include "3D/Skydome.h"
 #include "Ground.h"
-#include "FollowCamera.h"
-#include "flooar.h"
+#include "Camera/FollowCamera.h"
+#include "GameObject/flooar.h"
 //#include "3D/Goal.h"
-#include "MovingFlooar.h"
+#include "GameObject/MovingFlooar.h"
 #include <array>
 #include <memory>
-#include "LockOn.h"
+#include "Camera/LockOn.h"
 #include "3D/Animation.h"
 #include "3D/SkyBox.h"
 

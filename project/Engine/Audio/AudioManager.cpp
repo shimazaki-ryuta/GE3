@@ -1,5 +1,5 @@
 #include "AudioManager.h"
-#include "../ConvertString.h"
+#include "ConvertString.h"
 #include <cassert>
 
 #pragma comment(lib,"Mf.lib")

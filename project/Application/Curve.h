@@ -4,7 +4,7 @@
 #include"VectorFunction.h"
 #include <math.h>
 #include <vector>
-#include "ViewProjection.h"
+#include "3D/ViewProjection.h"
 
 Vector3 CatmullRom(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Vector3& p3, float t);
 Vector3 CatmullRomComplement(std::vector<Vector3> controlPoints, float t);
