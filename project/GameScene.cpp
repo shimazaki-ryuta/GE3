@@ -298,12 +298,6 @@ void GameScene::Update() {
 		flooars_[index]->Update();
 	}
 
-	/*if (!isIngame_) {
-		Idle();
-	}
-	else {
-		Play();
-	}*/
 	state_();
 
 	particle->Updade();
@@ -316,15 +310,6 @@ void GameScene::Update() {
 	fadeSprite_->SetColor({ 0,0,0,fadeAlpha_ });
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
-	{
-		viewProjection_.matView = followCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
-	}
-	lockOn_->Update(player2_.get(), viewProjection_);
-	followCamera_->SetLockOnTarget(nullptr);
-	player_->SetTarget(lockOn_->GetTarget());
-	player2_->SetTarget(player_->GetWorldTransform());
 	followCamera_->Update();
 	Fade();
 
@@ -541,7 +526,15 @@ void GameScene::Play() {
 			count++;
 		}
 	}
-
+	{
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
+	}
+	lockOn_->Update(player2_.get(), viewProjection_);
+	followCamera_->SetLockOnTarget(nullptr);
+	player_->SetTarget(lockOn_->GetTarget());
+	player2_->SetTarget(player_->GetWorldTransform());
 }
 
 void GameScene::End() {
