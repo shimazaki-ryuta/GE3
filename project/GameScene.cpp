@@ -63,51 +63,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	debugCamera_->SetPosition({ 0.0f, 1.7f, -10.0f });
 #endif // _DEBUG
 
-	//srvの作成
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = 32;
-	srvDesc.Buffer.StructureByteStride = sizeof(PointLight);
-
-	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(PointLight) * pointLightMax_);
-
-	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-	for (uint32_t index = 0; index < pointLightMax_; ++index) {
-		pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-		pointLightData[index].position = { 0.0f,1.0f,0.0f };
-		pointLightData[index].intensity = 1.0f;
-		pointLightData[index].radius = 10.0f;
-		pointLightData[index].decay = 0.0f;
-		pointLightData[index].isUse_ = 0;
-	}
-
-	//D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU = GetCPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
-	//srvHandleGPU = GetGPUDescriptorHandle(dxCommon_->GetsrvDescriptorHeap(), dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV), uint32_t(512));
-
-	//dxCommon_->GetDevice()->CreateShaderResourceView(pointLightResource.Get(), &srvDesc, srvHandleCPU);
-	uint32_t handle = SRVManager::GetInstance()->CreateSRV(pointLightResource.Get(), &srvDesc);
-	srvHandleGPU = SRVManager::GetInstance()->GetGPUHandle(handle);
-
-	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(DirectionalLight));
-	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
-	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
-	directinalLightData->direction = Normalize(directinalLightData->direction);
-	directinalLightData->intensity = 0.6f;
-
-	//PointLight用のリソース
-	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon->GetDevice(), sizeof(SpotLight));
-	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
-	spotLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-	spotLightData->position = { 2.0f,1.25f,0.0f };
-	spotLightData->intensity = 0.0f;
-	spotLightData->direction = Normalize(Vector3{ -1.0f,-1.0f,0.0f });
-	spotLightData->distance = 7.0f;
-	spotLightData->decay = 2.0f;
-	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+	CreateLight();
 
 	//skybox
 	skyBox_.reset(new SkyBox);
@@ -229,13 +185,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 
 	//床
-	//flooar_.reset(new MovingFlooar);
-	//flooar_->Initialize();
-	/*
-	for (int index = 0; index < 5;index++) {
-		flooars_[index].reset(new MovingFlooar);
-		flooars_[index]->Initialize();
-	}*/
 	flooars_[0].reset(new Flooar);
 	flooars_[0]->Initialize();
 	flooars_[0]->SetOffset({ 0.0f,0.0f,0.0f });
@@ -304,15 +253,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	viewProjection_.Initialize();
 	hsvFilter_ = {0.0f,0.0f,0.0f,0.0f};
-}
 
-void GameScene::FromBlenderUpdate() {
-#ifdef DEMO
-	sceneLoader_->CreateModelList(modelList_);
-	sceneLoader_->ApplyTerrainTransform(terrain_);
-	sceneLoader_->ApplyRecevedData(objects_);
-	sceneLoader_->ApplyTerrainVertices(terrain_);
-#endif // _DEBUG
+	state_ = std::bind(&GameScene::Idle, this);
 }
 
 void GameScene::Update() {
@@ -356,12 +298,13 @@ void GameScene::Update() {
 		flooars_[index]->Update();
 	}
 
-	if (!isIngame_) {
+	/*if (!isIngame_) {
 		Idle();
 	}
 	else {
 		Play();
-	}
+	}*/
+	state_();
 
 	particle->Updade();
 	preJoyState_ = joyState;
@@ -372,11 +315,77 @@ void GameScene::Update() {
 	}
 	fadeSprite_->SetColor({ 0,0,0,fadeAlpha_ });
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
-	ground_->Update();
+
+	{
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
+	}
+	lockOn_->Update(player2_.get(), viewProjection_);
+	followCamera_->SetLockOnTarget(nullptr);
+	player_->SetTarget(lockOn_->GetTarget());
+	player2_->SetTarget(player_->GetWorldTransform());
+	followCamera_->Update();
+	Fade();
+
+	//デバッグカメラ
 	if (isDebugCameraActive_) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 	}
+}
+
+void GameScene::CreateLight() {
+	//srvの作成
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = 32;
+	srvDesc.Buffer.StructureByteStride = sizeof(PointLight);
+
+	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(PointLight) * pointLightMax_);
+
+	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
+	for (uint32_t index = 0; index < pointLightMax_; ++index) {
+		pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+		pointLightData[index].position = { 0.0f,1.0f,0.0f };
+		pointLightData[index].intensity = 1.0f;
+		pointLightData[index].radius = 10.0f;
+		pointLightData[index].decay = 0.0f;
+		pointLightData[index].isUse_ = 0;
+	}
+
+	uint32_t handle = SRVManager::GetInstance()->CreateSRV(pointLightResource.Get(), &srvDesc);
+	srvHandleGPU = SRVManager::GetInstance()->GetGPUHandle(handle);
+
+	directinalLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
+	directinalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directinalLightData));
+	directinalLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	directinalLightData->direction = { 0.6f,-1.0f,0.0f };
+	directinalLightData->direction = Normalize(directinalLightData->direction);
+	directinalLightData->intensity = 0.6f;
+
+	//PointLight用のリソース
+	spotLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(SpotLight));
+	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
+	spotLightData->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	spotLightData->position = { 2.0f,1.25f,0.0f };
+	spotLightData->intensity = 0.0f;
+	spotLightData->direction = Normalize(Vector3{ -1.0f,-1.0f,0.0f });
+	spotLightData->distance = 7.0f;
+	spotLightData->decay = 2.0f;
+	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
+}
+
+void GameScene::FromBlenderUpdate() {
+#ifdef DEMO
+	sceneLoader_->CreateModelList(modelList_);
+	sceneLoader_->ApplyTerrainTransform(terrain_);
+	sceneLoader_->ApplyRecevedData(objects_);
+	sceneLoader_->ApplyTerrainVertices(terrain_);
+#endif // _DEBUG
 }
 
 void GameScene::Idle() {
@@ -391,6 +400,7 @@ void GameScene::Idle() {
 	if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
 		isStart_ = true;
 		isTransitionFade_ = false;
+		state_ = std::bind(&GameScene::Play, this);
 	}
 	if (!isStart_) {
 		fadeAlpha_ -= 0.05f;
@@ -423,8 +433,6 @@ void GameScene::Play() {
 		player2_->ReStart();
 
 	}
-
-	followCamera_->Update();
 
 	//objectのコライダーリスト取得
 	std::list<Collider*> colliderList;
@@ -495,7 +503,7 @@ void GameScene::Play() {
 		}
 	}
 	if (isEnd_) {
-		End();
+		state_ = std::bind(&GameScene::End, this);
 	}
 
 
@@ -534,23 +542,24 @@ void GameScene::Play() {
 		}
 	}
 
-
-	{
-		viewProjection_.matView = followCamera_->GetViewProjection().matView;
-		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
-		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
-	}
-	lockOn_->Update(player2_.get(), viewProjection_);
-	followCamera_->SetLockOnTarget(nullptr);
-	player_->SetTarget(lockOn_->GetTarget());
-	player2_->SetTarget(player_->GetWorldTransform());
-	Fade();
 }
 
 void GameScene::End() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
+	player_->Update();
+	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player_->ReStart();
+	}
 
+	ai_->Update();
+
+	player2_->SetData(ai_->GetData());
+	player2_->Update();
+	if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+		player2_->ReStart();
+
+	}
 	//grayscale
 	if (player_->GetIsDead()) {
 		grayScaleValue_ += 0.01f;
@@ -600,6 +609,7 @@ void GameScene::Fade() {
 			ai_->Initialize();
 			endCount_ = 0;
 			isEnd_ = false;
+			state_ = std::bind(&GameScene::Idle, this);
 		}
 	}
 }
@@ -638,7 +648,7 @@ void GameScene::Draw3D() {
 	//skybox描画
 	skyBox_->Draw(worldTransformSkyBox_, viewProjection_);
 
-	if (isIngame_) {
+	if (isIngame_ || 1) {
 		Particle::PreDraw(dxCommon_->GetCommandList());
 		particle->Draw(viewProjection_);
 		Particle::PostDraw();

@@ -84,10 +84,16 @@ public:
 	void Draw2D() override;
 
 private:
-	//ステート
+
+	void CreateLight();
+
+	//ステート関数
 	void Idle();
 	void Play();
 	void End();
+
+	//ステート
+	std::function<void(void)> state_;
 
 	void Fade();
 
