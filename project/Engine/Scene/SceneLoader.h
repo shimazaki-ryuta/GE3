@@ -23,7 +23,7 @@ public:
 	//保持しているデータから必要なモデルを生成してリストに格納する
 	void CreateModelList(std::map<std::string,std::unique_ptr<Model>>& list);
 	void CreateObjects(std::vector<std::unique_ptr<GameObject>>& list);
-	void CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectData& data);
+	void CreateObject(std::unique_ptr<GameObject>& parent, GameObjectData& data);
 
 	//terrain
 	void CreateTerrain(std::unique_ptr<Terrain>& terrain);

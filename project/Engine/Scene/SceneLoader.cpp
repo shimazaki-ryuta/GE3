@@ -171,21 +171,21 @@ void SceneLoader::CreateObjects(std::vector<std::unique_ptr<GameObject>>& list) 
 		if (!object.children.empty()) {
 			for (GameObjectData& child : object.children) {
 
-				CreateObjects(instance,child);
+				CreateObject(instance,child);
 			}
 		}
 		list.push_back(std::move(instance));
 	}
 }
 
-void SceneLoader::CreateObjects(std::unique_ptr<GameObject>& parent, GameObjectData& data) {
+void SceneLoader::CreateObject(std::unique_ptr<GameObject>& parent, GameObjectData& data) {
 	std::unique_ptr<GameObject> instance;
 	instance.reset(new GameObject);
 	instance->Initialize(data);
 	if (!data.children.empty()) {
 		for (GameObjectData& child : data.children) {
 
-			CreateObjects(instance, child);
+			CreateObject(instance, child);
 		}
 	}
 	parent->AppendChildlen(std::move(instance));
@@ -353,7 +353,7 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 		if (!sceneData_->objects[index].children.empty()) {
 			for (GameObjectData& child : sceneData_->objects[index].children) {
 
-				CreateObjects(instance, child);
+				CreateObject(instance, child);
 			}
 		}
 		list.push_back(std::move(instance));
@@ -383,7 +383,7 @@ void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData
 
 	//子要素追加
 	for (index; index < datas.children.size(); index++) {
-		CreateObjects(object, datas.children[index]);
+		CreateObject(object, datas.children[index]);
 	}
 }
 
