@@ -30,6 +30,7 @@ public:
 	void ReadTerrainVertices(nlohmann::json& data);
 	void ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain);
 	void ApplyTerrainTransform(std::unique_ptr<Terrain>& terrain);
+	void ReadTerrainVerticesFromFile(std::unique_ptr<Terrain>& terrain,const std::string fileName);
 
 	///debug
 	void StartReceveJson();

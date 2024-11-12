@@ -22,8 +22,9 @@ void Terrain::Initialize(const GameObjectData& data) {
 	material_->ApplyParamater();
 
 	model_.reset(new Model);
-	model_->CreateTerrain("Resources/TerrainTest", "TerrainTest.obj");
-
+	model_->CreateTerrain("Resources/Models", "PlayerHead.obj");
+	//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
+	//vertices.clear();
 }
 
 void Terrain::SetTransformData(TerrainData& data) {
@@ -35,6 +36,19 @@ void Terrain::SetTransformData(TerrainData& data) {
 	
 }
 
+void Terrain::ResetMeshData(TerrainData& data) {
+	std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
+	vertices.clear();
+	for (TerrainVerticesData& vData : data.verticesDatas) {
+		VertexData* vertex;
+		vertices.emplace_back();
+		vertex = &vertices.back();
+		vertex->position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
+		vertex->normal = vData.normal;
+		vertex->texcoord = vData.uv;
+	}
+}
+
 void Terrain::SetMeshData(TerrainData& data) {
 	//worldtransform_.translation_ = data.object.transform.translate;
 	//worldtransform_.rotation_ = data.object.transform.rotate;
@@ -44,13 +58,19 @@ void Terrain::SetMeshData(TerrainData& data) {
 	std::vector<VertexData>& vertices =  model_->GetModelData().meshs.vertices;
 	//VertexData* vertices = model_->GetVertexData();
 	//一旦古いデータ全部消して一から(後で変える)
-	vertices.clear();
+	//vertices.clear();
 	for (TerrainVerticesData & vData : data.verticesDatas) {
-		vertices.emplace_back();
-		VertexData& vertex = vertices.back();
-		vertex.position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
-		vertex.normal = vData.normal;
-		vertex.texcoord = vData.uv;
+		VertexData* vertex;
+		if (vertices.size()>vData.id && !vertices.empty()) {
+			vertex = &vertices[vData.id];
+		}
+		else {
+			vertices.emplace_back();
+			vertex = &vertices.back();
+		}
+		vertex->position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
+		vertex->normal = vData.normal;
+		vertex->texcoord = vData.uv;
 		//vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
 		//vertices[vData.id].normal = vData.normal;
 		//vertices[vData.id].texcoord = vData.uv;

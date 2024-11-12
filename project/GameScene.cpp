@@ -53,6 +53,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	objects_.clear();
 	sceneLoader_->CreateObjects(objects_);
 	sceneLoader_->CreateTerrain(terrain_);
+	sceneLoader_->ReadTerrainVerticesFromFile(terrain_,"PlayerHead");
 #ifdef DEMO
 
 	sceneLoader_->StartReceveJson();

@@ -12,7 +12,7 @@ public:
 	
 	void SetTransformData(TerrainData& data);
 	void SetMeshData(TerrainData& data);
-	
+	void ResetMeshData(TerrainData& data);
 	~Terrain() {};
 
 private:

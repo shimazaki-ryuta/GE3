@@ -35,6 +35,24 @@ void SceneLoader::LoadFile(const std::string fileName) {
 	}
 }
 
+void SceneLoader::ReadTerrainVerticesFromFile(std::unique_ptr<Terrain>& terrain,const std::string fileName) {
+	const std::string fullpath = "Resources/TerrainTest/" + fileName + ".json";
+
+	std::ifstream file;
+
+	file.open(fullpath);
+	if (file.fail()) {
+		assert(0);
+	}
+
+	nlohmann::json deserialized;
+
+	file >> deserialized;
+
+	ReadTerrainVertices(deserialized);
+	terrain->ResetMeshData(*(terrainData_.get()));
+}
+
 void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 	std::string type = object["type"].get<std::string>();
 	if (type.compare("MESH") == 0) {
@@ -198,22 +216,22 @@ void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
 }
 
 void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
-	terrainData_->verticesDatas.clear();
-	for (nlohmann::json& object : data["meshDatas"]["vertices"]) {
+	//terrainData_->verticesDatas.clear();
+	for (nlohmann::json& object : data["m"]["v"]) {
+		TerrainVerticesData* datas;
 		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
-		TerrainVerticesData& datas = terrainData_->verticesDatas.back();
-		datas.id = object["id"];
-		//datas.id = 0;
-		datas.position.x = object["position"][0];
-		datas.position.y = object["position"][2];
-		datas.position.z = object["position"][1];
-		datas.normal.x = object["normal"][0];
-		datas.normal.y = object["normal"][2];
-		datas.normal.z = object["normal"][1];
+		datas = &terrainData_->verticesDatas.back();
+		datas->id = object["i"];
+		datas->position.x = float(object["p"][0]);
+		datas->position.y = object["p"][2];
+		datas->position.z = object["p"][1];
+		datas->normal.x = object["n"][0];
+		datas->normal.y = object["n"][2];
+		datas->normal.z = object["n"][1];
 
-		datas.uv.x = object["texcoord"][0];
-		datas.uv.y = object["texcoord"][1];
-		datas.uv.y *= -1.0f;
+		datas->uv.x = object["u"][0];
+		datas->uv.y = object["u"][1];
+		datas->uv.y *= -1.0f;
 	}
 }
 
@@ -294,7 +312,7 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		//分岐
-		if (jData.contains("meshDatas")) {
+		if (jData.contains("m")) {
 			ReadTerrainVertices(jData);
 			isRecevedTerrain_ = true;
 		}

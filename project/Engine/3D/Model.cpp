@@ -882,10 +882,12 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
 
 	//仮最大数
-	size_t vertMaxNum = 1024;
+	size_t vertMaxNum = 16384;
 
 	//頂点リソース
 	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertMaxNum > vertexNum ? vertMaxNum : vertexNum));
+	//一時的に最大数固定
+	//vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertMaxNum));
 
 	//頂点バッファ
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
@@ -896,7 +898,7 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	//VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
-
+	/*
 	//インデックスリソース
 	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
 
@@ -906,7 +908,7 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
 	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
-
+	*/
 	//マテリアル用のリソースを作成
 	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(MaterialParamater));
 	//Material* materialData = nullptr;
@@ -1018,7 +1020,7 @@ void Model::DrawTerrain(WorldTransform& worldTransform, const ViewProjection& vi
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(10, disolveMaskTextureHandle_);
 	sCommandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	sCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	sCommandList->IASetIndexBuffer(&indexBufferView_);
+	//sCommandList->IASetIndexBuffer(&indexBufferView_);
 
 	sCommandList->DrawInstanced(UINT(modelData_.meshs.vertices.size()), 1, 0, 0);
 	//sCommandList->DrawInstanced(UINT(vertexNum), 1, 0, 0);
