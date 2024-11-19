@@ -54,7 +54,7 @@ void Terrain::SetMeshData(TerrainData& data) {
 		return;
 	}
 	std::vector<VertexData>& vertices =  model_->GetModelData().meshs.vertices;
-	
+	vertices.clear();
 	for (TerrainVerticesData & vData : data.verticesDatas) {
 		VertexData* vertex;
 		if (vertices.size()>vData.id && !vertices.empty()) {
