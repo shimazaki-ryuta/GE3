@@ -161,13 +161,40 @@ class SendJson:
 class SendField:
     jData = "json"
     json_object_root = dict()
+    dumpJson = dict()
     def Send(self):
-    #def Send():
-
         message = self.jData + "\0"
-        #message = "{""name"": ""scene""}"
         if message != 'end':
-            sock.sendto(message.encode('utf-8'), serv_address)
+            #そうしん回数
+            sendDatas = list()
+            json_object = dict()
+            json_object["m"] = dict()
+            datas = json_object["m"]
+            datas["v"] = list()
+            datas["sflag"] = 1 #開始フラグ
+            datas["vNum"] = len(self.dumpJson["m"]["v"])#頂点数
+            index = 0
+            for object in self.dumpJson["m"]["v"]:
+                datas["v"].append(object)
+                if(index >= 256):
+                    index=0
+                    sendDatas.append(copy.deepcopy(json_object))
+                    json_object["m"].clear()
+                    datas = json_object["m"]
+                    datas["v"] = list()
+                else : 
+                    index += 1
+            if(len(json_object["m"]["v"]) != 0):
+                sendDatas.append(json_object.copy())
+            for i in range(0,len(sendDatas)):
+                if(i == len(sendDatas)-1):
+                    sendDatas[i]["m"]["sflag"] = -1
+                
+                json_text = json.dumps(sendDatas[i],ensure_ascii=False,cls=json.JSONEncoder)
+                message = json_text + "\0"
+                sock.sendto(message.encode('utf-8'), serv_address)
+                time.sleep(0.001)
+            self.dumpJson.clear()
 
     #id : ノードの各ステージないでの通し番号
     def parse_scene_recursive_json(self,data_parent,object,level,id):
@@ -211,21 +238,21 @@ class SendField:
                 uv = loop[uv_layer].uv
 
                 json_object = dict() 
-                json_object["id"] = id
-                json_object["position"] = (vertex.co.x,vertex.co.y,vertex.co.z)
-                json_object["texcoord"] = (uv.x,uv.y)
-                json_object["normal"] = (face.normal.x,face.normal.y,face.normal.z)
+                json_object["i"] = id
+                json_object["p"] = (float(format(vertex.co.x, '.2f')),float(format(vertex.co.y, '.2f')),float(format(vertex.co.z, '.2f')))
+                json_object["u"] = (float(format(uv.x, '.3f')),float(format(uv.y, '.3f')))
+                json_object["n"] = (float(format(face.normal.x, '.2f')),float(format(face.normal.y, '.2f')),float(format(face.normal.z, '.2f')))
                 
                 #まとめて一個分のjsonオブジェクトに登録
-                json["vertices"].append(json_object)
+                json["v"].append(json_object)
                 id = id + 1
 
     def export_json(self):
         """JSON形式で"""
         json_object = dict()
-        json_object["meshDatas"] = dict()
-        datas = json_object["meshDatas"]
-        datas["vertices"] = list()
+        json_object["m"] = dict()
+        datas = json_object["m"]
+        datas["v"] = list()
 
 
 
@@ -244,21 +271,22 @@ class SendField:
     def SendChangingData(self,old):
         index = 0
         json_object = dict()
-        json_object["meshDatas"] = dict()
-        datas = json_object["meshDatas"]
-        datas["vertices"] = list()
+        json_object["m"] = dict()
+        datas = json_object["m"]
+        datas["v"] = list()
         
-        for object in self.json_object_root["meshDatas"]["vertices"]:
-            if object != old["meshDatas"]["vertices"][index]:
-                datas["vertices"].append(object)
-            index = index + 1
+        #for object in self.json_object_root["m"]["v"]:
+        #    if object != old["m"]["v"][index]:
+        #        datas["v"].append(object)
+        #    index = index + 1
 
-        json_text = json.dumps(self.json_object_root,ensure_ascii=False,cls=json.JSONEncoder)
-        #コンソールに表示する
-        #print(json_text)
+        #self.dumpJson = json_object
+        self.dumpJson = self.json_object_root
+        #json_text = json.dumps(self.json_object_root,ensure_ascii=False,cls=json.JSONEncoder)
+        #json_text = json.dumps(json_object,ensure_ascii=False,cls=json.JSONEncoder)
 
         #classのデータにコピー
-        self.jData = json_text
+        #self.jData = json_text
 
 isSend = 0
 
@@ -442,6 +470,146 @@ class MYADDON_OT_export_scene(bpy.types.Operator,bpy_extras.io_utils.ExportHelpe
         
         json["vertices"] = json_object_f
 
+class MYADDON_OT_export_meshsyncobject(bpy.types.Operator,bpy_extras.io_utils.ExportHelper):
+    bl_idname = "myadddon.myaddon_ot_meshsyncobject"
+    bl_label = "MeshSyncオブジェクト出力"
+    bl_description = "MeshSyncオブジェクトをExportします"
+    #出力するファイルの拡張子
+    filename_ext = ".json"
+
+    def execute(self,context):
+        print("Exportします")
+        #print(bpy.context.scene.objects)
+
+        self.export_json()
+
+        print("Exportしました")
+
+        self.report({'INFO'},"Exportしました")
+
+        return {'FINISHED'}
+    
+    def write_and_print(self,file,str):
+        print(str)
+
+        file.write(str)
+        file.write('\n')
+
+    def prase_scene_recursive(self,file,object,level):
+        """シーン解析用再帰関数"""
+        
+        indent = ''
+        for i in range(level):
+            indent += "\t"
+
+        #オブジェクト名書き込み
+        self.write_and_print(file,indent + object.type)
+        trans, rot, scale = object.matrix_local.decompose()
+        #rot
+        rot = rot.to_euler()
+        rot.x = math.degrees(rot.x)
+        rot.y = math.degrees(rot.y)
+        rot.z = math.degrees(rot.z)
+        #draw
+        self.write_and_print(file,indent + "T %f %f %f" % (trans.x,trans.y,trans.z))
+        self.write_and_print(file,indent + "R %f %f %f" % (rot.x,rot.y,rot.z))
+        self.write_and_print(file,indent + "S %f %f %f" % (scale.x,scale.y,scale.z))
+        #カスタムプロパティ'file_name'
+        if "file_name" in object:
+            self.write_and_print(file,indent + "N %s" % object["file_name"])
+        #カスタムプロパティ'collider'
+        if "collider" in object:
+            self.write_and_print(file,indent + "C %s" % object["collider"])
+            temp_str = indent + "CC %f %f %f"
+            temp_str %= (object["collider_center"][0],object["collider_center"][1],object["collider_center"][2])
+            self.write_and_print(file,temp_str)
+            temp_str = indent + "CS %f %f %f"
+            temp_str %= (object["collider_size"][0],object["collider_size"][1],object["collider_size"][2],)
+            self.write_and_print(file,temp_str)
+        self.write_and_print(file,indent + 'END')
+        self.write_and_print(file,'')
+
+        for child in object.children:
+            self.prase_scene_recursive(file,child,level+1)
+            
+    def parse_scene_recursive_json(self,data_parent,object,level,id):
+
+        #シーンのオブジェクト一個分のjsonオブジェクト作成
+        json_object = dict()
+        #一個分のjsonオブジェクトを親オブジェクトに登録
+        #data_parent.append(json_object)
+
+        if object.name == "field":
+            self.export_field_vertex(object,data_parent)
+
+        #直接の子供リストを走査
+        if len(object.children) > 0:
+            #子ノードリストを作成
+            #子ノードへ進むs
+            for child in object.children:
+                self.parse_scene_recursive_json(data_parent,child,level + 1,0)
+                cid+=1
+
+    def export_field_vertex(self,object,json):
+        json_object_f = dict()
+        
+        #編集モードの変更を即座に反映
+        object.update_from_editmode()
+        #アクティブオブジェクト取得
+        me = object.data
+
+        # Get a BMesh representation
+        activeMesh = bmesh.new()   # create an empty BMesh
+        activeMesh.from_mesh(me)
+
+
+        id=0
+        mesh = object.data
+        uv_layer = activeMesh.loops.layers.uv.active
+        
+        for face in activeMesh.faces :
+            for loop in face.loops :
+                vertex = loop.vert
+                uv = loop[uv_layer].uv
+
+                json_object = dict() 
+                json_object["i"] = id
+                json_object["p"] = (float(format(vertex.co.x, '.2f')),float(format(vertex.co.y, '.2f')),float(format(vertex.co.z, '.2f')))
+                json_object["u"] = (float(format(uv.x, '.3f')),float(format(uv.y, '.3f')))
+                json_object["n"] = (float(format(face.normal.x, '.2f')),float(format(face.normal.y, '.2f')),float(format(face.normal.z, '.2f')))
+                
+                #まとめて一個分のjsonオブジェクトに登録
+                json["v"].append(json_object)
+                id = id + 1
+
+    def export_json(self):
+        """JSON形式で"""
+        json_object = dict()
+        json_object["m"] = dict()
+        datas = json_object["m"]
+        datas["v"] = list()
+
+        #シーン内の全オブジェクト走査してパック
+        #シーン内の全オブジェクトについて
+        id = 0
+        for object in bpy.context.scene.objects:
+            #親オブジェクトがあるものはスキップ 
+            if object.parent:
+                continue
+            #シーン直下のオブジェクトをルートノードとし再帰関数で走査
+            self.parse_scene_recursive_json(datas,object,0,id)
+            id+=1
+        self.json_object_root = json_object
+
+         #オブジェクトをJSON文字列にエンコード
+        json_text = json.dumps(json_object,ensure_ascii=False,cls=json.JSONEncoder,indent=4)
+        #コンソールに表示する
+        print(json_text)
+
+        #ファイルオープン
+        with open(self.filepath,"wt",encoding="utf-8") as file:
+            file.write(json_text)
+
 
 class TOPBAR_MT_my_menu(bpy.types.Menu):
     #Blenderがクラスを識別するための固有の文字列
@@ -456,6 +624,7 @@ class TOPBAR_MT_my_menu(bpy.types.Menu):
         self.layout.operator(MYADDON_OT_stretch_vertex.bl_idname, text=MYADDON_OT_stretch_vertex.bl_label)
         self.layout.operator(MYADDON_OT_create_ico_sphere.bl_idname, text=MYADDON_OT_create_ico_sphere.bl_label)
         self.layout.operator(MYADDON_OT_export_scene.bl_idname, text=MYADDON_OT_export_scene.bl_label)
+        self.layout.operator(MYADDON_OT_export_meshsyncobject.bl_idname, text=MYADDON_OT_export_meshsyncobject.bl_label)
     
     #既存メニューにサブメニューを追加
     def submenu(self,context):
@@ -523,6 +692,7 @@ classes = (
     MYADDON_OT_stretch_vertex,
     MYADDON_OT_create_ico_sphere,
     MYADDON_OT_export_scene,
+    MYADDON_OT_export_meshsyncobject,
     TOPBAR_MT_my_menu,
     MYADDON_OT_add_filename,
     OBJECT_PT_file_name,
@@ -711,8 +881,8 @@ def sendF():
         sjson.export_json()
         if jdata != sjson.json_object_root:
             sjson.SendChangingData(jdata)
-            sjson.Send()
             jdata = copy.deepcopy(sjson.json_object_root)
+            sjson.Send()
 
 #thread1 = threading.Thread()
 threads = []
