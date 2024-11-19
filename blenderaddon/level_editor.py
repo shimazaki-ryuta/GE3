@@ -233,19 +233,40 @@ class SendField:
         uv_layer = activeMesh.loops.layers.uv.active
         
         for face in activeMesh.faces :
-            for loop in face.loops :
-                vertex = loop.vert
-                uv = loop[uv_layer].uv
+            #三角面の時
+            if( len(face.loops) == 3):
+                for loop in face.loops :
+                    vertex = loop.vert
+                    uv = loop[uv_layer].uv
 
-                json_object = dict() 
-                json_object["i"] = id
-                json_object["p"] = (float(format(vertex.co.x, '.2f')),float(format(vertex.co.y, '.2f')),float(format(vertex.co.z, '.2f')))
-                json_object["u"] = (float(format(uv.x, '.3f')),float(format(uv.y, '.3f')))
-                json_object["n"] = (float(format(face.normal.x, '.2f')),float(format(face.normal.y, '.2f')),float(format(face.normal.z, '.2f')))
-                
-                #まとめて一個分のjsonオブジェクトに登録
-                json["v"].append(json_object)
-                id = id + 1
+                    json_object = dict() 
+                    json_object["i"] = id
+                    json_object["p"] = (float(format(vertex.co.x, '.2f')),float(format(vertex.co.y, '.2f')),float(format(vertex.co.z, '.2f')))
+                    json_object["u"] = (float(format(uv.x, '.3f')),float(format(uv.y, '.3f')))
+                    json_object["n"] = (float(format(face.normal.x, '.2f')),float(format(face.normal.y, '.2f')),float(format(face.normal.z, '.2f')))
+                    
+                    #まとめて一個分のjsonオブジェクトに登録
+                    json["v"].append(json_object)
+                    id = id + 1
+            #一旦四角面で対応できるか
+            else :
+                for i in range(0,len(face.loops)-2):
+                    for j in range(0,3) :
+                        loopIndex = i
+                        if(j==0):
+                            loopIndex = 0
+                        vertex = face.loops[j+loopIndex].vert
+                        uv = face.loops[j+loopIndex][uv_layer].uv
+
+                        json_object = dict() 
+                        json_object["i"] = id
+                        json_object["p"] = (float(format(vertex.co.x, '.2f')),float(format(vertex.co.y, '.2f')),float(format(vertex.co.z, '.2f')))
+                        json_object["u"] = (float(format(uv.x, '.3f')),float(format(uv.y, '.3f')))
+                        json_object["n"] = (float(format(face.normal.x, '.2f')),float(format(face.normal.y, '.2f')),float(format(face.normal.z, '.2f')))
+                        
+                        #まとめて一個分のjsonオブジェクトに登録
+                        json["v"].append(json_object)
+                        id = id + 1
 
     def export_json(self):
         """JSON形式で"""
