@@ -884,15 +884,18 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	//仮最大数
 	size_t vertMaxNum = 16384;
 
+	//余剰頂点数
+	size_t vertexAppendMax = 16384;
+
 	//頂点リソース
-	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertMaxNum > vertexNum ? vertMaxNum : vertexNum));
+	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertexNum + vertexAppendMax));
 	//一時的に最大数固定
 	//vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * (vertMaxNum));
 
 	//頂点バッファ
 	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * vertexNum);
+	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * (vertexNum + vertexAppendMax));
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	//VertexData* vertexData = nullptr;
