@@ -50,15 +50,11 @@ void Terrain::ResetMeshData(TerrainData& data) {
 }
 
 void Terrain::SetMeshData(TerrainData& data) {
-	//worldtransform_.translation_ = data.object.transform.translate;
-	//worldtransform_.rotation_ = data.object.transform.rotate;
-	//worldtransform_.scale_ = data.object.transform.scale;
-	//worldtransform_.UpdateMatrix();
-	//worldtransform_.matWorld_ *= MakeAffineMatrix(deltaTransform_.scale, deltaTransform_.rotate, deltaTransform_.translate);
+	if (data.vertexNum_== -1 || data.verticesDatas.size() < data.vertexNum_) {
+		return;
+	}
 	std::vector<VertexData>& vertices =  model_->GetModelData().meshs.vertices;
-	//VertexData* vertices = model_->GetVertexData();
-	//一旦古いデータ全部消して一から(後で変える)
-	//vertices.clear();
+	
 	for (TerrainVerticesData & vData : data.verticesDatas) {
 		VertexData* vertex;
 		if (vertices.size()>vData.id && !vertices.empty()) {
@@ -71,10 +67,17 @@ void Terrain::SetMeshData(TerrainData& data) {
 		vertex->position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
 		vertex->normal = vData.normal;
 		vertex->texcoord = vData.uv;
-		//vertices[vData.id].position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
-		//vertices[vData.id].normal = vData.normal;
-		//vertices[vData.id].texcoord = vData.uv;
+		
+		vData.id = -1;
 	}
+	data.verticesDatas.remove_if([](TerrainVerticesData& vData) {
+		if (vData.id<0) {
+			return true;
+		}
+		return false;
+		});
+	//data.verticesDatas.clear();
+	data.vertexNum_ = -1;
 }
 
 void Terrain::Update() {
@@ -85,6 +88,10 @@ void Terrain::Update() {
 	ImGui::DragFloat("EnvironmentSpecuraScale", &st, 0.01f, 0.0f, 2.0f);
 	ImGui::DragFloat("Disolve", &(material_->paramater_.disolveThreshold), 0.001f, 0.0f, 1.0f);
 	ImGui::ColorEdit3("DisolveColor", &(material_->paramater_.disolveColor.x));
+	if (ImGui::Button("ClearVertex")) {
+		std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
+		vertices.clear();
+	}
 	ImGui::End();
 	
 	material_->paramater_.environmentCoefficient = st;

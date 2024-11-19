@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <list>
 #include "ModelStruct.h"
 
 struct ColliderData {
@@ -29,13 +30,15 @@ struct TerrainVerticesData {
 	Vector3 position;
 	Vector3 normal;
 	Vector2 uv;
+	int16_t specialFlag;
 };
 
 //地形生成用データ
 struct TerrainData {
 	std::string fileName = "";
 	GameObjectData object;
-	std::vector<TerrainVerticesData> verticesDatas;
+	int32_t vertexNum_;
+	std::list<TerrainVerticesData> verticesDatas;
 };
 
 //シーンのオブジェクト配置のでーた

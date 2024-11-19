@@ -217,6 +217,10 @@ void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
 
 void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 	//terrainData_->verticesDatas.clear();
+	if (data["m"].contains("vNum")) {
+		terrainData_->vertexNum_ = data["m"]["vNum"];
+		terrainData_->verticesDatas.clear();
+	}
 	for (nlohmann::json& object : data["m"]["v"]) {
 		TerrainVerticesData* datas;
 		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
@@ -232,6 +236,14 @@ void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 		datas->uv.x = object["u"][0];
 		datas->uv.y = object["u"][1];
 		datas->uv.y *= -1.0f;
+
+		datas->specialFlag = 0;
+		if (data.contains("sflag")) {
+			datas->specialFlag = data["sflag"];
+		}
+		if (data["m"].contains("vNum")) {
+			terrainData_->vertexNum_ = data["m"]["vNum"];
+		}
 	}
 }
 
