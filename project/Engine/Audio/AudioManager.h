@@ -10,6 +10,8 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
+//オーディオ管理クラス
+
 class AudioManager
 {
 public:
@@ -35,13 +37,21 @@ public:
 		SoundData data;
 		std::string name;
 	};
+	//インスタンス取得
 	static AudioManager* GetInstance();
+	//初期化
 	void Initialize(std::string directoryPath = "Resources/Audio/");
+	//終了処理
 	void Finalize();
+	//wave読み込み
 	uint32_t LoadWave(const std::string& fileName);
+	//音リソース読み込み(microsoftfaundation利用)
 	uint32_t LoadAudio(const std::string& fileName);
+	//音リソース解放
 	void SoundUnLoad(SoundData* soundData);
+	//音リソース全解放
 	void UnLoadAll();
+	//再生
 	void PlayWave(uint32_t audioHandle);
 
 private:
