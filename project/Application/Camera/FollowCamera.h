@@ -1,6 +1,9 @@
 #pragma once
 #include "3D/ViewProjection.h"
 #include "3D/WorldTransform.h"
+
+//追従カメラ
+
 class FollowCamera
 {
 public:
@@ -13,14 +16,20 @@ public:
 	/// </summary>
 	void Update();
 
+	//グローバル変数適用
+	void ApplyGlobalVariables();
 
+	//リセット
+	void Reset();
+
+	//カメラシェイク
+	void Shake();
+
+	//Getter/Setter
 	inline void SetTarget(WorldTransform* target) { target_ = target; };
 	inline void SetLockOnTarget(WorldTransform* target) { lockOnTarget_ = target; };
-
 	inline const ViewProjection& GetViewProjection() { return viewProjection_; };
-	void Reset();
-	void ApplyGlobalVariables();
-	void Shake();
+
 private:
 	// ビュープロジェクション
 	ViewProjection viewProjection_;

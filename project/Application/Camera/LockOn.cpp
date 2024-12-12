@@ -13,11 +13,10 @@ void LockOn::Initialize() {
 void LockOn::Update(Player2* enemies, ViewProjection& viewProjection) {
 	
 
-	//if(isAutoLock_){
-		Search(enemies, viewProjection);
-		isForcus_ = false;
-	//}
+	Search(enemies, viewProjection);
+	isForcus_ = false;
 	
+	//ロックオン対象の補正
 	if (isLockOn_) {
 		Vector3 targetPos = target_->GetWorldTransformBody()->GetWorldPosition();
 		targetPos = targetPos *viewProjection.matView * viewProjection.matProjection;
@@ -25,10 +24,8 @@ void LockOn::Update(Player2* enemies, ViewProjection& viewProjection) {
 		AnchorSprite_->SetPosition({ targetPos.x ,targetPos.y });
 	}
 	else {
+		//仮想ターゲットを移動
 		Matrix4x4 cameraRotate = Inverse(viewProjection.matView);
-		//cameraRotate.m[3][0] = 0;
-		//cameraRotate.m[3][1] = 0;
-		//cameraRotate.m[3][2] = 0;
 		notTargetWorldTransform_.translation_ = Transform({0,0,200.0f},cameraRotate);
 		notTargetWorldTransform_.UpdateMatrix();
 		Vector3 targetPos = notTargetWorldTransform_.GetWorldPosition();
@@ -60,30 +57,23 @@ void LockOn::Search(Player2* enemy, ViewProjection& viewProjection) {
 	Player2* target;
 	isLockOn_ = false;
 	if (enemy) {
-	
-
-			//Vector3 targetPosition = target->GetWorldTransform()->GetWorldPosition();
-			Vector3 newEnemyPosition = enemy->GetWorldTransformBody()->GetWorldPosition();
-			Vector3 innerCameraPos = newEnemyPosition;
-			innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
+		Vector3 newEnemyPosition = enemy->GetWorldTransformBody()->GetWorldPosition();
+		Vector3 innerCameraPos = newEnemyPosition;
+		innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
 			
-			//float oldLength = Length(targetPosition - viewProjection.translation_);
-			float newLength = Length(newEnemyPosition - viewProjection.translation_);
-			bool modeCheck = true;
-			//modeCheck =  isInnerCamera(innerCameraPos)) || !isInnerCamera(oldCameraPos);
-			if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
-				modeCheck) {
-				target = enemy;
-				target_ = target;
-				isLockOn_ = true;
-			}
+		bool modeCheck = true;
+		//カメラ内か
+		if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
+			modeCheck) {
+			target = enemy;
+			target_ = target;
+			isLockOn_ = true;
+		}
 		
 	}
 	
 }
 
 void LockOn::Draw() {
-	//if (isLockOn_) {
-		AnchorSprite_->Draw();
-	//}
+	AnchorSprite_->Draw();
 }

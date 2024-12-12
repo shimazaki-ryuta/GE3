@@ -11,8 +11,9 @@ public:
 	static ID3D12Device* sDevice;
 	static void SetDevice(ID3D12Device* device);
 
+	//初期化
 	void Initialize();
-
+	//ライティングするか(0:しない 1:一部 2: 完全 )
 	void SetEnableLighting(int32_t enableLigthing) { materialData_->enableLighting = enableLigthing; };
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
 	void SetEnvironmentCoefficient(float scale) { materialData_->environmentCoefficient = scale; };

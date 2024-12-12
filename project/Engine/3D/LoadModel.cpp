@@ -104,8 +104,7 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 					std::getline(v, index, '/');
 					elementIndices[element] = std::stoi(index);
 				}
-				//VertexData vertex = {position,texcoord,normal};
-				//modelData.vertices.push_back(vertex);
+				
 				
 				meshd.indices.push_back(elementIndices[0] - 1);
 				VertexData data;
@@ -123,14 +122,10 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 			meshd.material = LoadMaterialTemplateFile(directoryPath, materialFirename);
 		}
 	}
-	//int i = 0;
-	for (Vector4& pos : positions) {
-		//int tIndex = 0;
-		//int nIndex = 0;
+	for (size_t i = 0; i < positions.size();i++) {
 		for (VertexData& vData : verticeslistes_) {
 				meshd.vertices.push_back(vData);
 		}
-		//i++;
 	}
 	modelData.meshs = meshd;
 	modelData.vertexNum = meshd.vertices.size();
@@ -294,7 +289,6 @@ Quaternion LoadModel::CalculateValue(const std::vector<KeyframeQuaternion>& keyf
 
 SkinCluster LoadModel::CreateSkinCluster(const SkeletonData& skeleton, const ModelData& modelData) {
 	SkinCluster skinCluster;
-	uint32_t descriptorSize = sDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	//palette
 	skinCluster.paletteResource = DirectXCommon::CreateBufferResource(sDevice,sizeof(WellForGPU) * skeleton.joints.size() );
 	WellForGPU* mappedPalette = nullptr;

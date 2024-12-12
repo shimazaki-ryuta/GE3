@@ -26,7 +26,7 @@ Microsoft::WRL::ComPtr<ID3D12PipelineState> Model::sPipelineStateSkinningOutLine
 //Model::leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 
 void Model::StaticInitialize(
-	ID3D12Device* device, int window_width, int window_height, const std::wstring& directoryPath)
+	ID3D12Device* device)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
@@ -249,7 +249,7 @@ void Model::StaticInitialize(
 	//ID3D12PipelineState* graphicsPipelineState = nullptr;
 	hr = sDevice->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&sPipelineState));
 	assert(SUCCEEDED(hr));
-	StaticInitializeOutLine(device, window_width, window_height);
+	StaticInitializeOutLine(device);
 	CreateRootSignatureSkinning();
 	CreateRootSignatureSkinningOutLine();
 }
@@ -648,7 +648,7 @@ void Model::CreateRootSignatureSkinningOutLine() {
 }
 
 void Model::StaticInitializeOutLine(
-	ID3D12Device* device, int window_width, int window_height)
+	ID3D12Device* device)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;
@@ -882,7 +882,7 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
 
 	//仮最大数
-	size_t vertMaxNum = 16384;
+	//size_t vertMaxNum = 16384;
 
 	//余剰頂点数
 	size_t vertexAppendMax = 16384;

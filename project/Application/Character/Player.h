@@ -14,6 +14,9 @@
 #include "3D/Animation.h"
 #include "3D/Skeleton.h"
 #include "3D/Material.h"
+
+//プレイヤーの制御、描画を行うクラス
+
 class Player : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -54,48 +57,34 @@ public:
 	void InitializeFloatingGimmick();
 	void UpdateFloatingGimmick();
 
+	//リセット
+	void ReStart();
 
-
-/*
-	inline WorldTransform* GetWorldTransform() { return &worldTransform_; };
-	*/
-	inline void SetViewProjection(const ViewProjection* viewProjection) {
-		viewProjection_ = viewProjection;
-	};
-	//inline void SetWepon(Model* model) { modelWepon_ = model; };
+	inline void SetViewProjection(const ViewProjection* viewProjection) {viewProjection_ = viewProjection;	};
 	
+	//グローバル変数適用
 	void ApplyGlobalVariables();
 
+	//衝突
 	void OnCollision(WorldTransform& parent);
-	void OutCollision();
-
 	void OnCollisionEnemy() { ReStart(); };
-
 	void OnCollisionSphere(WorldTransform& parent,Sphere partner);
 
-	OBB& GetOBB() { return obb_; };
+	//衝突解除時
+	void OutCollision();
 
-	void ReStart();
+	//Getter/Setter
+	OBB& GetOBB() { return obb_; };
 	void SetTarget(WorldTransform* target) { target_ = target; };
 	void SetParticle(Particle* particle) { particle_ = particle; };
 	void SetModelBullet(Model* model) { modelBullet_ = model; };
-
 	void SetFire(std::function<void()> func) { fire_ = func; };
-
 	std::list<std::unique_ptr<Bullet>>& GetBulletList() { return bullets_; };
 	void SetIsDead(bool is) { isDead_ = is; };
 	bool GetIsDead() { return isDead_; };
 	void SetBulletAnimation(Animation* animation) { bulletAnimation_ = animation; };
 private:
-	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
-	//Model* model_ = nullptr;
-	//Model* modelBody_  = nullptr;
-	//Model* modelHead_  = nullptr;
-	//Model* modelL_arm_ = nullptr;
-	//Model* modelR_arm_ = nullptr;
-	//std::vector<Model*> models_;
-	//std::vector <HierarchicalAnimation> models_;
 	WorldTransform worldTransformWepon_;
 	Model* modelWepon_;
 

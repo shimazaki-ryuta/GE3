@@ -14,6 +14,9 @@
 #include "3D/Animation.h"
 #include "3D/Skeleton.h"
 #include "3D/Material.h"
+
+//敵の制御、描画を行うクラス
+
 class Player2 : public BaseCharacter {
 public:
 	enum class Behavior { 
@@ -60,50 +63,32 @@ public:
 	void InitializeFloatingGimmick();
 	void UpdateFloatingGimmick();
 
-
-
-/*
-	inline WorldTransform* GetWorldTransform() { return &worldTransform_; };
-	*/
-	inline void SetViewProjection(const ViewProjection* viewProjection) {
-		viewProjection_ = viewProjection;
-	};
-	//inline void SetWepon(Model* model) { modelWepon_ = model; };
-	
+	//グローバル変数適用
 	void ApplyGlobalVariables();
 
+	//衝突時
 	void OnCollision(WorldTransform& parent);
 	void OutCollision();
-
 	void OnCollisionEnemy() { ReStart(); };
 
-	OBB& GetOBB() { return obb_; };
-
+	//リセット処理
 	void ReStart();
+
+	//Getter/Setter
+	inline void SetViewProjection(const ViewProjection* viewProjection) { viewProjection_ = viewProjection; };
+	OBB& GetOBB() { return obb_; };
 	void SetTarget(WorldTransform* target) { target_ = target; };
 	void SetParticle(Particle* particle) { particle_ = particle; };
 	void SetData(const ReceveData& d) {data_ = d;};
 	WorldTransform* GetWorldTransformBody() { return &models_[1].worldTransform_; };
-
 	Behavior GetBehavior() {return behavior_;};
 	void SetModelBullet(Model* model) { modelBullet_ = model; };
-
 	std::list<std::unique_ptr<Bullet>>& GetBulletList() { return bullets_; };
 	void SetIsDead(bool is) { isDead_ = is; };
 	bool GetIsDead() { return isDead_; };
 	void SetBulletAnimation(Animation* animation) { bulletAnimation_ = animation; };
 private:
-	//WorldTransform worldTransform_;
 	const ViewProjection* viewProjection_ = nullptr;
-	//Model* model_ = nullptr;
-	//Model* modelBody_  = nullptr;
-	//Model* modelHead_  = nullptr;
-	//Model* modelL_arm_ = nullptr;
-	//Model* modelR_arm_ = nullptr;
-	//std::vector<Model*> models_;
-	//std::vector <HierarchicalAnimation> models_;
-	//WorldTransform worldTransformWepon_;
-	//Model* modelWepon_;
 
 	uint32_t textureHandle_ = 0u;
 
@@ -142,11 +127,7 @@ private:
 	Vector3 acceleration_;
 	Vector3 kGravity;
 	Vector3 kJumpVelocity;
-	/*
-	std::unique_ptr<Model> obbModel_;
-	bool isDrawOBB_=false;
-	WorldTransform worldTtansformOBB_;
-	*/
+
 	XINPUT_STATE joyState_;
 	//1フレーム前の入力情報
 	XINPUT_STATE preJoyState_;

@@ -48,9 +48,9 @@ public:
 	void OnCollision();
 
 	//void SetType(const ColliderType&);
-	void SetSphere(Sphere& );
-	void SetAABB(AABB& );
-	void SetOBB(OBB& );
+	void SetSphere();
+	void SetAABB();
+	void SetOBB();
 	//virtual Vector3 GetWorldPosition()=0;
 	//virtual float GetRadius() = 0;
 

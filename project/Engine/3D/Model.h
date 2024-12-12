@@ -18,11 +18,7 @@
 class Model
 {
 public:
-	//static D3DResourceLeakChacker* leakchecker;
-	//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
-	//D3DResourceLeakChacker* leakchecker = D3DResourceLeakChacker::GetInstance();
-	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
-
+	
 	struct TransformationMatrix
 	{
 		Matrix4x4 WVP;
@@ -62,10 +58,9 @@ public:
 
 
 	static void StaticInitialize(
-		ID3D12Device* device, int window_width, int window_height,
-		const std::wstring& directoryPath = L"Resources/");
+		ID3D12Device* device);
 	static void StaticInitializeOutLine(
-		ID3D12Device* device, int window_width, int window_height);
+		ID3D12Device* device);
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	static void PreDrawOutLine(ID3D12GraphicsCommandList* cmdList);
 	static void PostDraw();
@@ -135,7 +130,7 @@ private:
 	CameraForGpu* cameraData_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> localMatrixResource_;
 	Matrix4x4* localMatrixData_ = nullptr;
-	WorldTransform worldTransform;
+	WorldTransform worldTransform_;
 	Vector2 position_;
 	Vector2 size_;
 	Vector4 color_;

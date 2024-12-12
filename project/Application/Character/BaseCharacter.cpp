@@ -17,14 +17,7 @@ void BaseCharacter::Draw(const ViewProjection& viewProjection)
 		model.model_->Draw(worldTransform_, viewProjection);
 	}
 }
-/*
-void BaseCharacter::DrawOutLine(const ViewProjection& viewProjection)
-{
-	for (HierarchicalAnimation& model : models_) {
-		model.model_->DrawOutLine(worldTransform_, viewProjection);
-	}
-}
-*/
+
 void BaseCharacter::SetShadowTexture(uint32_t handle) {
 	for (HierarchicalAnimation& model : models_) {
 		model.model_->SetEnableLighting(2);

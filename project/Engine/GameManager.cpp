@@ -89,7 +89,7 @@ void GameManager::Initialize() {
 	//Modelの初期化
 	LoadModel::SInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
 	Material::SetDevice(dxCommon->GetDevice());
-	Model::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
+	Model::StaticInitialize(dxCommon->GetDevice());
 	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
 	//Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	SkyBox::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight(), dxCommon->GetCommandList());

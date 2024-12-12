@@ -10,7 +10,7 @@
 void Ground::Initialize(Model* model, const Vector3& position) {
 	model_.reset(model);
 	worldTransform_.Initialize();
-	//worldTransform_.translation_ = position;
+	worldTransform_.translation_ = position;
 	worldTransform_.scale_ = {3.0f,3.0f,3.0f};
 	worldTransform_.translation_.y = 0.0f;
 	worldTransform_.UpdateMatrix();
@@ -59,9 +59,9 @@ void Ground::Draw(const ViewProjection& viewProjection) {
 	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
 	testSkeleton_->Update();
 	LoadModel::UpdateSkinCluster(cluster_,testSkeleton_->GetSkeletonData());
-	//model_->Draw(worldTransform_, viewProjection,cluster_);
+	model_->Draw(worldTransform_, viewProjection,cluster_);
 	//testSkeleton_->Draw(worldTransform_,viewProjection);
 }
 void Ground::DrawOutLine(const ViewProjection& viewProjection) {
-	//model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
+	model_->DrawOutLine(worldTransform_, viewProjection, cluster_);
 }

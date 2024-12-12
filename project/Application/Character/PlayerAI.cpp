@@ -16,7 +16,7 @@ void PlayerAI::Reset() {
 
 void PlayerAI::Update() {
 	data_.behavior = Player2::Behavior::kRoot;
-	if (/*p2_->GetBehavior() == Player2::Behavior::kDash || */ coolTime_ <= 0) {
+	if (coolTime_ <= 0) {
 		data_.behavior = Player2::Behavior::kAttack;
 	}
 	if (p2_->GetBehavior() == Player2::Behavior::kAttack) {
@@ -49,17 +49,7 @@ void PlayerAI::Update() {
 	move = Transform(move, DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(e-s)));
 
 	data_.move = move;
-	//data_.move = Normalize(move);
 
-	/*if (!isFirst_) {
-		fireAverage_ = AverageCalc();
-		if (frameCount_ - lastFire_ > fireAverage_ && fireAverage_ != 0) {
-			//lastFire_ -= frameCount_;
-			//frameCount_ = 0;
-			direction_ *= -1.0f;
-			avoid_ = true;
-		}
-	}*/
 	frameCount_++;
 	coolTime_--;
 }
@@ -87,15 +77,7 @@ int PlayerAI::AverageCalc() {
 }
 
 void PlayerAI::Fire() {
-	/*if (isFirst_) {
-		isFirst_ = false;
-		lastFire_ = 0;
-	}
-	else {
-		fireInterval_.push_back(frameCount_-lastFire_);
-		lastFire_ = frameCount_;
-		//frameCount_ = 0;
-	}*/
+	
 	float r = RandomEngine::GetRandom(0.0f, 1.0f);
 	if (r > 0.1f && p2_->GetBehavior() == Player2::Behavior::kRoot && coolTime_ <= 120) {
 		avoid_ = true;

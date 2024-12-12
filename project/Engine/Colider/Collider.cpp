@@ -32,15 +32,15 @@ void Collider::OnCollision(){
 	}*/
 }
 
-void Collider::SetSphere(Sphere& sphere) {
+void Collider::SetSphere() {
 	colliderType_ = ColliderType::Shpere;
 	//collider_.sphere = sphere;
 }
-void Collider::SetAABB(AABB& AABB) {
+void Collider::SetAABB() {
 	colliderType_ = ColliderType::AABB;
 	//collider_.aabb = AABB;
 }
-void Collider::SetOBB(OBB& OBB) {
+void Collider::SetOBB() {
 	colliderType_ = ColliderType::OBB;
 	//collider_.obb = OBB;
 }

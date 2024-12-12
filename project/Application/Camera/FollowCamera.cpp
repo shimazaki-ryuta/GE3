@@ -20,6 +20,7 @@ void FollowCamera::Update()
 	// ゲームパッドの状態をえる
 	XINPUT_STATE joyState;
 
+	//コントローラー入力による操作
 	if (Input::GetJoystickState(0, joyState))
 	{
 
@@ -32,6 +33,7 @@ void FollowCamera::Update()
 
 	Matrix4x4 rotateMatrix1 = MakeRotateMatrix(viewProjection_.rotation_);
 	rotateMatrix3_ = MakeIdentity4x4();
+	//ロックオン時の操作
 	if (target_)
 	{
 		Vector3 offset = { 0.0f,3.0f,-15.0f };
@@ -42,30 +44,17 @@ void FollowCamera::Update()
 			viewProjection_.rotation_.y = 0;
 			rotateMatrix1 = MakeRotateMatrix(viewProjection_.rotation_);
 
-			//Matrix4x4 rotateMatrix2;
 			Vector3 targetYMask = target_->GetWorldPosition();
 			targetYMask.y = 0;
 			Vector3 lockOnYMask = lockOnTarget_->GetWorldPosition();
 			lockOnYMask.y = 0;
-			//lockOnYMask.z = 1;
 			Vector3 toLockOn = lockOnYMask - targetYMask;
 			rotateMatrix2_ = DirectionToDIrection(Normalize({ 0,0.0f,1.0f }), Normalize(toLockOn));
 			toLockOn = lockOnTarget_->GetWorldPosition() - target_->GetWorldPosition();
-			//toLockOn.y /= Length(toLockOn);
-			//toLockOn.x = 0.0f;
-			//toLockOn.z = 1.0f;
-			//toLockOn.y /= Length(toLockOn);
-			//toLockOn.y = -std::abs(toLockOn.y);
+	
 
 			rotateMatrix3_ = DirectionToDIrection(Normalize({ toLockOn.x,0.0f,toLockOn.z }), Normalize(toLockOn));
-			//rotateMatrix2_.m[0][1] = 0;
-
-			//rotateMatrix2_.m[1][0] = 0;
-			//rotateMatrix2_.m[1][1] = 1;
-			//rotateMatrix2_.m[1][2] = 0;
-
-			//rotateMatrix2_.m[2][1] = 0;
-
+		
 			Vector3 axis;
 			for (int32_t index = 0; index < 3; index++) {
 				axis = { rotateMatrix3_.m[index][0],rotateMatrix3_.m[index][1],rotateMatrix3_.m[index][2] };
@@ -75,8 +64,8 @@ void FollowCamera::Update()
 				rotateMatrix3_.m[index][2] /= length;
 			}
 
-			//rotateMatrix_ = rotateMatrix1* rotateMatrix2_;
 		}
+		//各要素を合成
 		rotateMatrix_ = rotateMatrix1 * rotateMatrix2_ * rotateMatrix3_;
 		offset = TransformNormal(offset, rotateMatrix_);
 
@@ -95,7 +84,6 @@ void FollowCamera::Update()
 		}
 	}
 
-	//viewProjection_.UpdateMatrix();
 	viewProjection_.matView = Inverse(rotateMatrix_ * MakeTranslateMatrix(viewProjection_.translation_));
 	viewProjection_.matProjection = MakePerspectiveFovMatrix(viewProjection_.fovAngleY, viewProjection_.width / viewProjection_.height, viewProjection_.nearZ, viewProjection_.farZ);
 }

@@ -3,7 +3,7 @@
 #include "QuaternionFunction.h"
 void Skeleton::Initialize(Node& rootNode) {
 	data_ = LoadModel::CreateSkelton(rootNode);
-	for (Joint& joint : data_.joints) {
+	for (size_t i = 0; i < data_.joints.size(); i++) {
 		WorldTransform wt;
 		wt.Initialize();
 		jointTransforms_.push_back(wt);

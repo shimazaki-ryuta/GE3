@@ -4,6 +4,7 @@
 #include "3D/WorldTransform.h"
 #include <vector>
 
+//親子関係アニメーションさせたいオブジェクトに継承させるクラス
 
 struct HierarchicalAnimation {
 	Model* model_;
@@ -26,9 +27,9 @@ public:
 	/// 描画
 	/// </summary>
 	virtual void Draw(const ViewProjection& viewProjection);
-	//void DrawOutLine(const ViewProjection& viewProjection);
-	inline WorldTransform* GetWorldTransform() { return &worldTransform_; };
 
+	//Getter/Setter
+	inline WorldTransform* GetWorldTransform() { return &worldTransform_; };
 	void SetShadowTexture(uint32_t handle);
 	void SetOutLineData(float width,const Vector4& color);
 protected:

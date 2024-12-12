@@ -560,7 +560,7 @@ void Player::OutCollision() {
 void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
 	//if (worldTransform_.parent_ != &parent) {
 		//Vector3 point = GetClosestPoint(obb_,partner);
-		//PushBack(0,obb_,partner);
+		PushBack(0,obb_,partner);
 		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center);
 		if (worldTransform_.parent_) {
 			rocal *= (Inverse(parent.matWorld_));

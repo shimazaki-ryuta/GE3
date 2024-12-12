@@ -7,6 +7,9 @@
 #include <list>
 #include "TextureManager.h"
 #include "2D/Sprite.h"
+
+//敵のロックオン処理
+
 class LockOn
 {
 public:
@@ -14,13 +17,16 @@ public:
 	void Update(Player2* enemies,ViewProjection& viewProjection);
 	void Draw();
 
+	//対象を探す
 	void Search(Player2* enemies, ViewProjection& viewProjection);
+	
+	//ターゲット対象を変えす(対象なければ仮対象)
+	WorldTransform* GetTarget();
+
+	//Getter/Setter
+	bool isInnerCamera(const Vector3& );
 	bool IsLockOn() { return isLockOn_; };
 	bool IsForcus() { return isForcus_; };
-	//WorldTransform* GetTarget() { return target_->GetWorldTransform(); };
-	WorldTransform* GetTarget();
-	bool isInnerCamera(const Vector3& );
-	//void LockChange(std::list<std::unique_ptr<Enemy>>& enemies, ViewProjection& viewProjection,int LR);
 private:
 	uint32_t textureHandle_;
 	std::unique_ptr<Sprite> AnchorSprite_;
