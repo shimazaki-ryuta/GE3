@@ -186,11 +186,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 
 	//床
-	flooars_[0].reset(new Flooar);
-	flooars_[0]->Initialize();
-	flooars_[0]->SetOffset({ 0.0f,0.0f,0.0f });
-	flooars_[0]->SetSize({ 120.0f,0.0f,120.0f });
-	flooars_[0]->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
+	floors_[0].reset(new Floor);
+	floors_[0]->Initialize();
+	floors_[0]->SetOffset({ 0.0f,0.0f,0.0f });
+	floors_[0]->SetSize({ 120.0f,0.0f,120.0f });
+	floors_[0]->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 
 	// カメラ生成
 	followCamera_ = std::make_unique<FollowCamera>();
@@ -296,7 +296,7 @@ void GameScene::Update() {
 	terrain_->Update();
 
 	for (int index = 0; index < 1; index++) {
-		flooars_[index]->Update();
+		floors_[index]->Update();
 	}
 
 	state_();
@@ -429,9 +429,9 @@ void GameScene::Play() {
 
 	bool isCollision = false;
 	for (int index = 0; index < 1; index++) {
-		if (IsCollision(player_->GetOBB(), flooars_[index]->GetOBB()))
+		if (IsCollision(player_->GetOBB(), floors_[index]->GetOBB()))
 		{
-			player_->OnCollision(flooars_[index]->GetWorldTransform());
+			player_->OnCollision(floors_[index]->GetWorldTransform());
 			isCollision = true;
 		}
 	}
@@ -452,9 +452,9 @@ void GameScene::Play() {
 
 	isCollision = false;
 	for (int index = 0; index < 1; index++) {
-		if (IsCollision(player2_->GetOBB(), flooars_[index]->GetOBB()))
+		if (IsCollision(player2_->GetOBB(), floors_[index]->GetOBB()))
 		{
-			player2_->OnCollision(flooars_[index]->GetWorldTransform());
+			player2_->OnCollision(floors_[index]->GetWorldTransform());
 			isCollision = true;
 		}
 	}

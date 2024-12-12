@@ -5,12 +5,19 @@
 #include "OBB.h"
 #include <memory>
 
-class Flooar
+//床
+
+class Floor
 {
 public:
+	//初期化
 	virtual void Initialize();
+	//更新
 	virtual void Update();
+	//描画
 	void Draw(const ViewProjection& viewProjection);
+
+	//Getter/Setter
 	OBB& GetOBB() { return obb_; };
 	WorldTransform& GetWorldTransform() { return worldTransform_; };
 	void SetOffset(const Vector3& offset) { 
@@ -18,7 +25,6 @@ public:
 		worldTransform_.translation_ = offset; 
 	};
 	void SetSize(const Vector3& size) { size_ = size; };
-
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 protected:
 	WorldTransform worldTransform_;

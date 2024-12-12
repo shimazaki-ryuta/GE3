@@ -15,6 +15,7 @@ void PlayerAI::Reset() {
 }
 
 void PlayerAI::Update() {
+	//ビヘイビア設定
 	data_.behavior = Player2::Behavior::kRoot;
 	if (coolTime_ <= 0) {
 		data_.behavior = Player2::Behavior::kAttack;
@@ -22,6 +23,7 @@ void PlayerAI::Update() {
 	if (p2_->GetBehavior() == Player2::Behavior::kAttack) {
 		coolTime_ = 180;
 	}
+	//回避判定
 	if (avoid_) {
 		data_.behavior = Player2::Behavior::kDash;
 		float r = RandomEngine::GetRandom(0.0f,1.0f);
@@ -31,6 +33,7 @@ void PlayerAI::Update() {
 		}
 		avoid_ = false;
 	}
+	//入力の変わり
 	Vector3 move{0,0,0};
 
 	Vector3 s = p2_->GetWorldTransform()->GetWorldPosition();

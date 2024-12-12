@@ -20,7 +20,7 @@
 //#include "3D/Skydome.h"
 #include "Ground.h"
 #include "Camera/FollowCamera.h"
-#include "GameObject/flooar.h"
+#include "GameObject/Floor.h"
 //#include "3D/Goal.h"
 #include "GameObject/MovingFlooar.h"
 #include <array>
@@ -157,7 +157,7 @@ private:
 
 	//std::unique_ptr<Model> modelWepon_;
 
-	std::array<std::unique_ptr<Flooar>, size_t(5)> flooars_;
+	std::array<std::unique_ptr<Floor>, size_t(5)> floors_;
 
 	std::unique_ptr<FollowCamera> followCamera_;
 	std::unique_ptr<LockOn> lockOn_;

@@ -27,6 +27,7 @@ public:
 	void Draw(const ViewProjection& viewProjection);
 	void DrawOutLine(const ViewProjection& viewProjection);
 
+	//Setter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 
 private:

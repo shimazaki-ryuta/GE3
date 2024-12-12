@@ -8,7 +8,6 @@ void Bullet::Initialize() {
 	aliveTime_ = 180;
 	animation_.reset(new Animation);
 	animation_->Initialize();
-	//animation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
 	animation_->SetPlaySpeed(RandomEngine::GetRandom(0.5f,13.0f));
 }
 
@@ -16,7 +15,6 @@ void Bullet::Update() {
 
 	animation_->Update();
 	animation_->GetAnimationMatrix("center");
-	//model_->SetLocalMatrix(animation_->GetAnimationMatrix("center"));
 	
 	worldTransform_.translation_ += velocity_;
 	worldTransform_.UpdateMatrix();

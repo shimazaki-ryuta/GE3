@@ -205,9 +205,6 @@
     <ClCompile Include="Engine\3D\Animation.cpp">
       <Filter>Engine\3D</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameObject\Board.cpp">
-      <Filter>Application\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Camera\FollowCamera.cpp">
       <Filter>Application\Camera</Filter>
     </ClCompile>
@@ -220,7 +217,7 @@
     <ClCompile Include="Application\Ground.cpp">
       <Filter>Application\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameObject\flooar.cpp">
+    <ClCompile Include="Application\GameObject\Floor.cpp">
       <Filter>Application\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Application\Character\BaseCharacter.cpp">
@@ -399,9 +396,6 @@
     <ClInclude Include="Engine\CommonFiles\Input.h">
       <Filter>Engine\CommonFiles</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\Board.h">
-      <Filter>Application\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="Application\Camera\FollowCamera.h">
       <Filter>Application\Camera</Filter>
     </ClInclude>
@@ -414,7 +408,7 @@
     <ClInclude Include="Application\Ground.h">
       <Filter>Application\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameObject\flooar.h">
+    <ClInclude Include="Application\GameObject\Floor.h">
       <Filter>Application\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Application\Character\BaseCharacter.h">

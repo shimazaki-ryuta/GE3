@@ -13,11 +13,7 @@ void GameObject::Initialize(const GameObjectData& data) {
 
 	material_.reset(new Material);
 	material_->Initialize();
-	material_->paramater_.enableLighting = 2;
-	material_->paramater_.disolveThreshold = 0.0f;
-	material_->paramater_.disolveColor = Vector4{ 1.0f, 1.0f, 1.0f, 0.0f };
-	material_->ApplyParamater();
-
+	
 	//collider
 	if (!data.collider.type.empty()) {
 		collider_.reset(new Collider);

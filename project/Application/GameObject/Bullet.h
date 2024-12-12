@@ -5,13 +5,20 @@
 #include "Colider/Sphere.h"
 #include "3D/Particle.h"
 #include "3D/Animation.h"
+
+//プレイヤー(+敵)の発射する弾のクラス
+
 class Bullet
 {
 public:
+	//初期化
 	void Initialize();
+	//更新
 	void Update();
+	//描画
 	void Draw(const ViewProjection& viewProjection);
 
+	//Getter/Setter
 	void SetVelocity(const Vector3& vec) { velocity_ = vec; };
 	bool GetIsDead() { return isDead_; };
 	void SetIsDead(bool is) { isDead_ = is; };

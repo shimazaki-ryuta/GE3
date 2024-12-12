@@ -1,11 +1,11 @@
-#include "flooar.h"
+#include "Floor.h"
 
 //ImGui
 #include "../externals/imgui/imgui.h"
 #include "../externals/imgui/imgui_impl_dx12.h"
 #include "../externals/imgui/imgui_impl_win32.h"
 
-void Flooar::Initialize() {
+void Floor::Initialize() {
 	worldTransform_.Initialize();
 	modelWorldTransform_.Initialize();
 	modelWorldTransform_.parent_ = &worldTransform_;
@@ -19,11 +19,8 @@ void Flooar::Initialize() {
 	offset_ = {0.0f,0.0f,0.0f};
 }
 
-void Flooar::Update(){
-	/*ImGui::Begin("floor1");
-	ImGui::DragFloat3("position",&worldTransform_.translation_.x,0.1f);
-	ImGui::End();
-	*/
+void Floor::Update(){
+	
 	modelWorldTransform_.scale_.x = size_.x;
 	modelWorldTransform_.scale_.z = size_.z;
 
@@ -34,7 +31,7 @@ void Flooar::Update(){
 	modelWorldTransform_.UpdateMatrix();
 }
 
-void Flooar::Draw(const ViewProjection& viewProjection)
+void Floor::Draw(const ViewProjection& viewProjection)
 {
 	model_->Draw(modelWorldTransform_, viewProjection);
 }

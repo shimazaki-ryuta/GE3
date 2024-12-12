@@ -9,7 +9,7 @@
 
 
 void MovingFlooar::Initialize() {
-	Flooar::Initialize();
+	Floor::Initialize();
 	position_ = {0.0f,0.0f,0.0f};
 	velocity_ = {0.0f,0.0f,1.0f};
 	t = 0;
@@ -18,9 +18,7 @@ void MovingFlooar::Initialize() {
 }
 
 void MovingFlooar::Update() {
-	/*ImGui::Begin("movingfloor");
-	ImGui::DragFloat("width", &swingWidth, 0.1f);
-	ImGui::End();*/
+	
 	t += direction_/60.0f;
 	if (t>1.0f || t<0.0f) {
 		t = std::clamp(t,0.0f,1.0f);
@@ -28,5 +26,5 @@ void MovingFlooar::Update() {
 	}
 	position_.z =(t-0.5f)*2.0f * swingWidth;
 	worldTransform_.translation_ = offset_ + position_;
-	Flooar::Update();
+	Floor::Update();
 }

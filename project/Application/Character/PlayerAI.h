@@ -1,6 +1,9 @@
 #pragma once
 #include "Player.h"
 #include "Player2.h"
+
+//敵キャラクターの操作を行うクラス
+
 class PlayerAI
 {
 public:
