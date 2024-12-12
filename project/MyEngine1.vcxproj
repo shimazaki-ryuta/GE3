@@ -93,7 +93,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;DEMO;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -321,7 +321,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Character\BaseCharacter.cpp" />
     <ClCompile Include="Application\GameObject\Board.cpp" />
     <ClCompile Include="Application\GameObject\Bullet.cpp" />
-    <ClCompile Include="Application\Curve.cpp" />
     <ClCompile Include="Application\GameObject\flooar.cpp" />
     <ClCompile Include="Application\Camera\FollowCamera.cpp" />
     <ClCompile Include="Application\GameObject\GameObject.cpp" />
@@ -407,7 +406,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Character\BaseCharacter.h" />
     <ClInclude Include="Application\GameObject\Board.h" />
     <ClInclude Include="Application\GameObject\Bullet.h" />
-    <ClInclude Include="Application\Curve.h" />
     <ClInclude Include="Application\GameObject\flooar.h" />
     <ClInclude Include="Application\Camera\FollowCamera.h" />
     <ClInclude Include="Application\GameObject\GameObject.h" />

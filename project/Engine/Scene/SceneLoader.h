@@ -38,7 +38,7 @@ public:
 	void ReceveJsonData();
 
 	void ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& list);
-	void ScanChanged(std::unique_ptr<GameObject>& object, GameObjectData& datas, int32_t id);
+	void ScanChanged(std::unique_ptr<GameObject>& object, GameObjectData& datas);
 	
 	//変形したポリゴンのデータを作る
 	//void CreateTerrainData();

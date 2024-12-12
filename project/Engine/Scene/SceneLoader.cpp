@@ -313,7 +313,7 @@ void SceneLoader::ReceveJsonData() {
 
 		sData = rBuff;
 		nlohmann::json jData;
-		//toJson
+		//json解凍
 		try {
 			jData = nlohmann::json::parse(sData);
 		}
@@ -325,6 +325,7 @@ void SceneLoader::ReceveJsonData() {
 
 		//分岐
 		if (jData.contains("m")) {
+			//頂点データ
 			ReadTerrainVertices(jData);
 			isRecevedTerrain_ = true;
 		}
@@ -358,17 +359,17 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 	//ルート走査
 	size_t index = 0;
 	//削除チェック
-	std::erase_if(list, [&](std::unique_ptr<GameObject>& obj) {
+	/*std::erase_if(list, [&]() {
 		if (index++ < sceneData_->objects.size()) {
 			return false;
 		}
 		return true;
-	});
+	});*/
 	//変更チェック
 	index = 0;
 	for (std::unique_ptr<GameObject> &object : list) {
 		if (index < sceneData_->objects.size()) {
-			ScanChanged(object, sceneData_->objects[index], int32_t(index));
+			ScanChanged(object, sceneData_->objects[index]);
 		}
 		index++;
 	}
@@ -391,23 +392,23 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 	isRecevedData_ = false;
 }
 
-void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData& datas, int32_t id) {
+void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData& datas) {
 	//本体更新
 	object->SetParameter(datas);
 
 	size_t index = 0;
 	//子要素削除チェック
-	std::erase_if(*object->GetChildlen(), [&](std::unique_ptr<GameObject>& obj) {
+	/*std::erase_if(*object->GetChildlen(), [&]() {
 		if (index++ < datas.children.size()) {
 			return false;
 		}
 		return true;
-	});
+	});*/
 
 	//子要素変更チェック
 	index = 0;
 	for (std::unique_ptr<GameObject>& child : *object->GetChildlen()) {
-		ScanChanged(child, datas.children[index], int32_t(index));
+		ScanChanged(child, datas.children[index]);
 		index++;
 	}
 

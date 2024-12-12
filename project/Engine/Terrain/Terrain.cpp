@@ -23,6 +23,7 @@ void Terrain::Initialize(const GameObjectData& data) {
 
 	model_.reset(new Model);
 	model_->CreateTerrain("Resources/Models", "PlayerHead.obj");
+	//model_->CreateTerrain("Resources/TerrainTest", "TerrainTest.obj");
 	//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
 	//vertices.clear();
 }
@@ -50,6 +51,7 @@ void Terrain::ResetMeshData(TerrainData& data) {
 }
 
 void Terrain::SetMeshData(TerrainData& data) {
+	//総頂点数に満たすまで反映しない
 	if (data.vertexNum_== -1 || data.verticesDatas.size() < data.vertexNum_) {
 		return;
 	}
