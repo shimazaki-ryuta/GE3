@@ -24,7 +24,7 @@ ID3D12DescriptorHeap* Particle::srvDescriptorHeap_ = nullptr;
 size_t Particle::kSrvStructuredBufferUseBegin;
 
 void Particle::StaticInitialize(
-	ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap, const std::wstring& directoryPath)
+	ID3D12Device* device, ID3D12DescriptorHeap* descriptorHeap)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;

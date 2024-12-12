@@ -150,7 +150,7 @@ void DirectXCommon::PreDraw()
 	ImGui::Render();
 
 	//コマンドの確定
-	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
+	//UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
 	///

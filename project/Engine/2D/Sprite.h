@@ -11,6 +11,8 @@
 #include <string>
 #include <wrl.h>
 
+//2Dスプライトクラス
+
 class Sprite
 {
 public:
@@ -64,26 +66,29 @@ public:
 	//static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
 
 	static std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::CountofBlendMode)> sPipelineStates;
-
+	//静的初期化
 	static void StaticInitialize(
-		ID3D12Device* device, int window_width, int window_height,
-		const std::wstring& directoryPath = L"Resources/");
+		ID3D12Device* device);
 
+	//描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	//描画
 	void Draw();
+	//描画後処理
 	static void PostDraw();
 
+	//インスタンス作製
 	static Sprite* Create(
 		uint32_t textureHandle, Vector2 position, Vector2 size, Vector4 color = { 1, 1, 1, 1 });
 
+	//初期化
 	void Initialize();
 
 	//座標指定(スクリーン座標)
 	inline void SetPosition(const Vector2& pos) { position_ = pos; };
 
 	
-	//inline void SetWVP(const Matrix4x4& wvp) { wvp_ = wvp; };
-
+	
 	//カラー(RGBA)の設定
 	inline void SetColor(const Vector4& color) { materialData_->color = color; };
 	// アンカーポイントの設定
@@ -101,6 +106,7 @@ public:
 	//テクスチャの範囲切り出し
 	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
 
+	//テクスチャハンドルセット
 	void SetTextureHandle(uint32_t handle) { textureHandle_ = handle; };
 
 private:

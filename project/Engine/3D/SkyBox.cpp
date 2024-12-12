@@ -17,7 +17,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> SkyBox::sRootSignature;
 Microsoft::WRL::ComPtr<ID3D12PipelineState> SkyBox::sPipelineState;
 
 void SkyBox::StaticInitialize(
-	ID3D12Device* device, int window_width, int window_height, ID3D12GraphicsCommandList* cmdList)
+	ID3D12Device* device, ID3D12GraphicsCommandList* cmdList)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;

@@ -12,12 +12,20 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "ViewProjection.h"
+
+//スキンアニメーション用スケルトン
+
 class Skeleton {
 public:
+	//初期化
 	void Initialize(Node &rootNode);
+	//更新
 	void Update();
+	//アニメーション登録
 	void ApplyAnimation(const AnimationData& animation, float animationTime);
+	//Getter/Setter
 	SkeletonData& GetSkeletonData() { return data_; };
+	//デバッグ用描画
 	void Draw(const WorldTransform& worldTransform,const ViewProjection& viewProjection);
 private:
 	SkeletonData data_;

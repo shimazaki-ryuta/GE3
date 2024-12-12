@@ -11,7 +11,7 @@ Microsoft::WRL::ComPtr<ID3D12RootSignature> Sprite::sRootSignature;
 std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(Sprite::BlendMode::CountofBlendMode)> Sprite::sPipelineStates;
 
 void Sprite::StaticInitialize(
-	ID3D12Device* device, int window_width, int window_height, const std::wstring& directoryPath)
+	ID3D12Device* device)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	sDevice = device;

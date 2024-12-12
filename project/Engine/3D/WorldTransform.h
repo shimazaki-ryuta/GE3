@@ -4,6 +4,9 @@
 #include <d3d12.h>
 #include <string>
 #include <wrl.h>
+
+//worldTransformリソースクラス
+
 struct WorldTransform
 {
 	struct TransformationMatrix
@@ -27,9 +30,14 @@ struct WorldTransform
 
 	const WorldTransform* parent_ = nullptr;
 
+	//初期化
 	void Initialize();
+	//更新
 	void UpdateMatrix();
+	//ワールド行列取得
 	inline Matrix4x4 GetWorld() { return matWorld_; };
+	//ワールド座標取得
 	Vector3 GetWorldPosition();
+	//GPUリソース転送
 	void TransfarMatrix(const Matrix4x4&);
 };

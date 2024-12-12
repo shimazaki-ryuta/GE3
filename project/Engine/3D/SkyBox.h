@@ -13,6 +13,9 @@
 #include "ViewProjection.h"
 #include <memory>
 #include "ModelStruct.h"
+
+//キューブマップ使用スカイボックス
+
 class SkyBox
 {
 public:
@@ -51,16 +54,18 @@ public:
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState;
 
+	//静的初期化処理
 	static void StaticInitialize(
-		ID3D12Device* device, int window_width, int window_height,
+		ID3D12Device* device,
 		ID3D12GraphicsCommandList* cmdList);
-	//static void PreDraw(ID3D12GraphicsCommandList* cmdList);
-	//static void PostDraw();
-
+	
+	//初期化
 	void Initialize(uint32_t texturehandle_);
 
+	//描画
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection);
 	
+	//Getter/Setter
 	uint32_t GetTextureHandle() { return textureHandle_; };
 
 	void SetColor(const Vector4& color) {

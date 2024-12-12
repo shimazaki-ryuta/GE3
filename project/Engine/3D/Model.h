@@ -15,6 +15,9 @@
 //#include <stdfloat>
 #include "ModelStruct.h"
 #include "Material.h"
+
+//3Dモデルクラス
+
 class Model
 {
 public:
@@ -56,22 +59,29 @@ public:
 	// パイプラインステートオブジェクト
 	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineStateSkinningOutLine;
 
-
+	//静的初期化
 	static void StaticInitialize(
 		ID3D12Device* device);
+	//静的初期化(アウトライン関係)
 	static void StaticInitializeOutLine(
 		ID3D12Device* device);
+	//描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	//描画前処理(アウトライン)
 	static void PreDrawOutLine(ID3D12GraphicsCommandList* cmdList);
+	//描画後処理
 	static void PostDraw();
 
+	//初期化処理
 	void Create(const  std::string& directoryPath, const std::string& filename);
 
+	//初期化処理(meshSync用)
 	void CreateTerrain(const  std::string& directoryPath, const std::string& filename);
 
+	//objファイルから生成
 	static Model* CreateFromOBJ(const  std::string& directoryPath);
 
-
+	//描画
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
 
@@ -84,6 +94,7 @@ public:
 	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection);
 	void DrawOutLine(WorldTransform& worldTransform, const ViewProjection& viewProjection, SkinCluster& skinCluster);
 
+	//Getter/Setter
 	void SetEnableLighting(int32_t enableLigthing) {materialData_->enableLighting = enableLigthing;};
 	void SetShiniess(float shininess) { materialData_->shininess = shininess; };
 	void SetEnvironmentCoefficient(float scale) { materialData_->environmentCoefficient = scale; };
@@ -97,7 +108,6 @@ public:
 	void SetLocalMatrix(const Matrix4x4& newMatrix) { *localMatrixData_ = newMatrix; };
 	
 	Node& GetRootNode() { return modelData_.rootNode; };
-
 	ModelData& GetModelData(){ return modelData_; };
 
 	void SetPerspectivTextureHandle(uint32_t handle) { perspectivTextureHandle_ = handle; };

@@ -14,6 +14,9 @@
 #include "ViewProjection.h"
 #include <memory>
 #include <list>
+
+//平面パーティクルクラス
+
 class Particle
 {
 public:
@@ -76,19 +79,24 @@ public:
 
 	//static std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>, size_t(BlendMode::CountofBlendMode)> sPipelineStates;
 
+	//srvディスクリプタヒープ割り当て
 	static void SetsrvDescriptorHeap(ID3D12DescriptorHeap* descriptorHeap) { srvDescriptorHeap_ = descriptorHeap; };
 
 	static ID3D12DescriptorHeap* srvDescriptorHeap_;
 
+	//静的初期化
 	static void StaticInitialize(
 		ID3D12Device* device,
-		ID3D12DescriptorHeap* descriptorHeap,
-		const std::wstring& directoryPath = L"Resources/");
+		ID3D12DescriptorHeap* descriptorHeap);
 
+	//更新
 	void Updade();
 
+	//描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	//描画
 	void Draw(const ViewProjection& viewProjection);
+	//描画後処理
 	static void PostDraw();
 
 	/// <summary>
@@ -103,13 +111,13 @@ public:
 	/// <param name="numInstance">操作できるパーティクル最大数</param>
 	static Particle* Create(uint32_t numInstance);
 
+	//初期化
 	void Initialize(uint32_t numInstance);
+	
+	//Getter/Setter
 	void SetTextureHandle(uint32_t textureHandle) { textureHandle_ = textureHandle; };
 
 	inline void SetUVTransform(const Matrix4x4& uvTransform) { uvTransform_ = uvTransform; };
-
-	//inline void SetBlendMode(const BlendMode& blendmode) { blendMode_ = blendmode; };
-
 
 	//SRVディスクリプタヒープのストラクチャードバッファ使用領域の先頭
 	static size_t kSrvStructuredBufferUseBegin;
@@ -117,14 +125,14 @@ public:
 	//SRVディスクリプタヒープのストラクチャードバッファ使用領域の終端
 	static const size_t kSrvStructuredBufferUseEnd = DirectXCommon::kNumSrvDescriptors;
 
-	//static uint32_t CreateStructuredBuffer();
-
+	//ビルボード行うか
 	void UseBillboard(bool is) { isBillboard_ = is; };
 
 	//パーティクルを一つ生成する
 	void MakeNewParticle(const Vector3& translate);
 	void MakeNewParticle(const ParticleData& particleData);
 
+	//パーティクル発生
 	void Emit(const Emitter& emitter);
 
 	std::vector<ParticleData>* GetParticleDate(){ return &particleData_; };

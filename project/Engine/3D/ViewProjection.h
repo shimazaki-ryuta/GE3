@@ -1,5 +1,8 @@
 #pragma once
 #include "Matrix.h"
+
+//viewProjection行列リソースクラス
+
 struct ViewProjection
 {
 	Matrix4x4 matView;
@@ -12,8 +15,10 @@ struct ViewProjection
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	Vector3 translation_ = { 0.0f,0.0f,0.0f };
 	
+	//初期化
 	void Initialize();
 	void Initialize(int kClientWidth, int kClientHeight);
 
+	//更新
 	void UpdateMatrix();
 };

@@ -82,7 +82,7 @@ void GameManager::Initialize() {
 
 
 	//Spriteの初期化
-	Sprite::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
+	Sprite::StaticInitialize(dxCommon->GetDevice());
 	PostEffect::SetDevice(dxCommon->GetDevice());
 	//PostEffect::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
 	dxCommon->CreatePostEffectSprite();
@@ -92,7 +92,7 @@ void GameManager::Initialize() {
 	Model::StaticInitialize(dxCommon->GetDevice());
 	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
 	//Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
-	SkyBox::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight(), dxCommon->GetCommandList());
+	SkyBox::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList());
 	//DeltaTime::GetInstance();
 
 	//音関係初期化

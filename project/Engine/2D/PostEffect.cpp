@@ -14,7 +14,7 @@ void PostEffect::SetDevice(ID3D12Device* device) {
 	sDevice = device;
 }
 
-void PostEffect::StaticInitialize(int window_width, int window_height ,const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath)
+void PostEffect::StaticInitialize(const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath)
 {
 	//leakchecker.reset(D3DResourceLeakChacker::GetInstance());
 	//sDevice = device;
@@ -217,7 +217,7 @@ void PostEffect::Initialize(const std::wstring& vertexShaderPath, const std::wst
 {
 //	resourceDesc_ = TextureManager::GetInstance()->GetResoureDesc(textureHandle_);
 
-	StaticInitialize(1280,720,vertexShaderPath,pixelShaderPath);
+	StaticInitialize(vertexShaderPath,pixelShaderPath);
 
 	//Sprite用のリソースを作る
 	vertexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(VertexData) * 4);

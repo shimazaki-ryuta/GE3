@@ -12,6 +12,8 @@
 #include <wrl.h>
 #include <array>
 
+//ポストエフェクト用リソース管理クラス
+
 class PostEffect
 {
 public:
@@ -68,16 +70,21 @@ public:
 
 	 static void SetDevice(ID3D12Device* device);
 
+	//静的初期化 
 	void StaticInitialize(
-		int window_width, int window_height,
 		const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath);
 
+	//描画前処理
 	void PreDraw(ID3D12GraphicsCommandList* cmdList);
+	//描画
 	void Draw(ID3D12DescriptorHeap* srvDescriptorHeap, D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU, D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGPU2);
+	//描画後処理
 	void PostDraw();
 
+	//内部インスタンス作製
 	static PostEffect* Create(Vector2 position, Vector2 size, Vector4 color = { 1, 1, 1, 1 });
 
+	//初期化
 	void Initialize(const std::wstring& vertexShaderPath, const std::wstring& pixelShaderPath);
 
 	//座標指定(スクリーン座標)
@@ -102,8 +109,6 @@ public:
 
 	//テクスチャの範囲切り出し
 	void SetRange(const Vector2& leftTop, const Vector2& rightDown);
-
-	void SetTextureHandle(uint32_t handle) { textureHandle_ = handle; };
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;

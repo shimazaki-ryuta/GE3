@@ -21,6 +21,8 @@ struct AnimationData {
 	std::map<std::string, NodeAnimation> nodeAnimations;
 };
 
+//アニメーションの再生を行うクラス
+
 class Animation
 {
 public:
@@ -31,19 +33,24 @@ public:
 		ONE
 	};
 
+	//初期化
 	void Initialize();
+	//gltf読み込み
 	void LoadAnimationFile(const std::string& directoryPath, const std::string& filename);
 
+	//更新
 	void Update();
 
+	//Getter/Setter
 	void SetTime(float t) { time = t; };
-
 	float GetTime() { return time; };
+	void SetPlayType(PlayType type) { playType_ = type; };
+	void SetPlaySpeed(float t) { playSpeed_ = t; };
+	std::shared_ptr<AnimationData> GetAnimationData() { return data_; };
 
 	//アニメーション適応行列を取得する
 	Matrix4x4 GetAnimationMatrix(const std::string& nodename);
 
-	std::shared_ptr<AnimationData> GetAnimationData() { return data_; };
 
 	//読み込み済みのアニメーションデータのポインタをセットする
 	void SetAnimationData(std::shared_ptr<AnimationData> data) { 
@@ -51,15 +58,13 @@ public:
 		isLoadingAnimation_ = true;
 	};
 
-	void SetPlayType(PlayType type) { playType_ = type; };
-
-	void SetPlaySpeed(float t) { playSpeed_ = t; };
-
 	// デバイス
 	static ID3D12Device* sDevice;
 
+	//DirectX12デバイスセット
 	static void SetDevice(ID3D12Device* device);
 
+	//DirectX用行列リソース取得
 	ID3D12Resource* GetMatrixResource() {return matrixResource_.Get(); };
 
 private:
@@ -69,9 +74,7 @@ private:
 	float playSpeed_=1.0f;//再生速度
 	PlayType playType_ = LOOP;
 
-	//Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
-	//Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
-
+	
 	Microsoft::WRL::ComPtr<ID3D12Resource> matrixResource_;
 	Matrix4x4* matrixData_ = nullptr;
 };
