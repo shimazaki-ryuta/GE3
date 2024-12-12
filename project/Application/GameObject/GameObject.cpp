@@ -49,12 +49,14 @@ void GameObject::Update() {
 }
 
 void GameObject::Draw(const ViewProjection& viewProjection, std::map<std::string, std::unique_ptr<Model>>& modelList) {
+	//リストから一致するモデルを見つけたら描画
 	auto it = modelList.find(fileName);
 	if (it == modelList.end()) {
 		return;
 	}
 	it->second->SetMaterial(material_.get());
 	it->second->Draw(worldtransform_,viewProjection);
+	//子の描画
 	if (!childlen_.empty()) {
 		for (std::unique_ptr<GameObject>& child : childlen_) {
 			child->Draw(viewProjection,modelList);
@@ -72,6 +74,7 @@ void GameObject::AppendColliderList(std::list<Collider*>& list) {
 			list.push_back(collider_.get());
 		}
 	}
+	//子
 	if (!childlen_.empty()) {
 		for (std::unique_ptr<GameObject>& child : childlen_) {
 			child->AppendColliderList(list);

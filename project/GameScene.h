@@ -17,11 +17,9 @@
 #include "Character/Player.h"
 #include "Character/Player2.h"
 #include "Character/PlayerAI.h"
-//#include "3D/Skydome.h"
 #include "Ground.h"
 #include "Camera/FollowCamera.h"
 #include "GameObject/Floor.h"
-//#include "3D/Goal.h"
 #include "GameObject/MovingFlooar.h"
 #include <array>
 #include <memory>
@@ -30,6 +28,8 @@
 #include "3D/SkyBox.h"
 
 #include "Terrain/Terrain.h"
+
+//ゲームシーンクラス
 
 class GameScene : public IScene
 {
@@ -78,26 +78,34 @@ public:
 
 	GameScene();
 	~GameScene();
+	//初期化
 	void Initialize(DirectXCommon* dxCommon) override;
+	//更新
 	void Update() override;
+	//3D描画
 	void Draw3D() override;
+	//2D描画
 	void Draw2D() override;
 
 private:
 
+	//ライト生成
 	void CreateLight();
 
 	//ステート関数
 	void Idle();
+	//プレイ時
 	void Play();
+	//クリア/ゲームオーバー時
 	void End();
 
 	//ステート
 	std::function<void(void)> state_;
 
+	//フェード処理
 	void Fade();
 
-	//Blender同期
+	//Blender同期更新処理(Demoのみ)
 	void FromBlenderUpdate();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> directinalLightResource;

@@ -3,7 +3,6 @@
 #include <cassert>
 #include <list>
 #include <fstream>
-//#include  "Primitive3D.h"
 #include "Input.h"
 //ImGui
 #include "externals/imgui/imgui.h"
@@ -41,10 +40,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	debugCamera_.reset(new DebugCamera);
 	debugCamera_->Initialize();
 
-	//audioHandle_ = AudioManager::GetInstance()->LoadWave("Alarm01.wav");
 	audioHandle_ = AudioManager::GetInstance()->LoadAudio("1.mp3");
-	//AudioManager::GetInstance()->PlayWave(audioHandle_);
-
+	
 
 	sceneLoader_.reset(new SceneLoader);
 	sceneLoader_->LoadFile("testScene");
@@ -138,7 +135,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 
 	viewProjection_.Initialize();
-	viewProjection_.rotation_.x = 1.0f;
 	viewProjection_.UpdateMatrix();
 	//debugCamera_ = new DebugCamera(1280, 720);
 	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png");
@@ -294,8 +290,8 @@ void GameScene::Update() {
 		object->Update();
 	}
 	terrain_->Update();
-
-	for (int index = 0; index < 1; index++) {
+	static const int kMaxFloorNum = 1;
+	for (int index = 0; index < kMaxFloorNum; index++) {
 		floors_[index]->Update();
 	}
 
@@ -303,11 +299,7 @@ void GameScene::Update() {
 
 	particle->Updade();
 	preJoyState_ = joyState;
-	buttonCount_++;
-	if (buttonCount_ > 30) {
-		buttonCount_ = 0;
-		isButtonDraw_ = !isButtonDraw_;
-	}
+	
 	fadeSprite_->SetColor({ 0,0,0,fadeAlpha_ });
 	dxCommon_->SetGraiScaleStrength(grayScaleValue_);
 
@@ -322,13 +314,14 @@ void GameScene::Update() {
 }
 
 void GameScene::CreateLight() {
+	const uint32_t kMaxInstance = 32;
 	//srvの作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
-	srvDesc.Buffer.NumElements = 32;
+	srvDesc.Buffer.NumElements = kMaxInstance;
 	srvDesc.Buffer.StructureByteStride = sizeof(PointLight);
 
 	pointLightResource = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(PointLight) * pointLightMax_);
@@ -539,6 +532,9 @@ void GameScene::Play() {
 }
 
 void GameScene::End() {
+
+	const uint32_t kEndLength = 120;
+
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	player_->Update();
@@ -561,13 +557,13 @@ void GameScene::End() {
 			grayScaleValue_ = 1.0f;
 		}
 	}
-	float alpha = float(endCount_) / 120.0f;
+	float alpha = float(endCount_) / float(kEndLength);
 	endSprite_->SetColor({ 1.0f,1.0f,1.0f,alpha });
 	endCount_++;
-	if (endCount_ > 120) {
-		endCount_ = 120;
+	if (endCount_ > kEndLength) {
+		endCount_ = kEndLength;
 	}
-	if (endCount_ == 120) {
+	if (endCount_ == kEndLength) {
 		if (((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A)) || input_->GetKeyDown(DIK_SPACE)) {
 			isTransitionFade_ = true;
 		}
