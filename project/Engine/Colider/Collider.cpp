@@ -14,10 +14,6 @@ void Collider::Inirialize(ColliderData data) {
 	}
 }
 
-/*
-void Collider::SetOnCollisionEvent(std::function<void(Collider&)> event_) {
-	onCollisionEvent = event_;
-}*/
 
 void Collider::SetOnCollisionEvent(std::function<void()> event_) {
 	onCollisionEvent = event_;
@@ -27,9 +23,7 @@ void Collider::OnCollision(){
 	if (onCollisionEvent) {
 		onCollisionEvent();
 	}
-	/*else if (onCollisionEventNULL) {
-		onCollisionEventNULL();
-	}*/
+	
 }
 
 void Collider::SetSphere() {

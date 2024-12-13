@@ -13,6 +13,8 @@
 #include "3D/WorldTransform.h"
 struct Vector3;
 
+//コールバック用関数を持ち呼び出しを行うコライダークラス
+
 class Collider
 {
 public:
@@ -39,21 +41,21 @@ public:
 
 	Collider();
 
+	//初期化
 	void Inirialize(ColliderData data);
 
 	//OnCollisionがよばれたときに実行するイベントをセットする
-	//void SetOnCollisionEvent(std::function<void(Collider&)>);
 	void SetOnCollisionEvent(std::function<void()>);
 
+	//衝突(Managerが呼び出す)
 	void OnCollision();
 
-	//void SetType(const ColliderType&);
+	//形状セット
 	void SetSphere();
 	void SetAABB();
 	void SetOBB();
-	//virtual Vector3 GetWorldPosition()=0;
-	//virtual float GetRadius() = 0;
-
+	
+	//Gettrer/Setter
 	inline uint32_t GetCollisionAttribute() { return collisionAttribute_; };
 	inline void SetCollisionAttribute(uint32_t collisionAttribute) {
 		collisionAttribute_ = collisionAttribute;
