@@ -349,16 +349,7 @@ Matrix4x4 Inverse(Matrix4x4 m)
 	Matrix4x4 result;
 	Matrix2x2 matrix = { 0 };
 	double determinant = CofactorExpansion(m);
-	/*if (size>2)
-	{
-		matrix = CofactorExpansion(m);
-		determinant = (matrix.m[0][0] * matrix.m[1][1] - matrix.m[0][1] * matrix.m[1][0]);
-	}
-	else
-	{
-		determinant = (m.m[0][0] * m.m[1][1] - m.m[0][1] * m.m[1][0]);
-	}*/
-	//double determinant = (matrix.m[0][0] * matrix.m[1][1] - matrix.m[0][1] * matrix.m[1][0]);
+	
 	Matrix4x4 adjugateMatrix = Adjoint(m);
 
 

@@ -4,63 +4,39 @@
 #include <math.h>
 #include <assert.h>
 #include <cmath>
-/*
 
-Matrix4x4 Add(Matrix4x4 matrix1, Matrix4x4 matrix2);
+//行列計算関数群
 
-Matrix4x4 Subtract(Matrix4x4 matrix1, Matrix4x4 matrix2);
-
-Matrix4x4 Multiply(Matrix4x4 matrix1, Matrix4x4 matrix2);
-
-Matrix4x4 Inverse(Matrix4x4 matrix);
-
-Matrix4x4 Transpose(Matrix4x4 matrix);
-
-Matrix4x4 Scalar(double k, Matrix4x4 matrix);
-void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix);
-*/
-/*template<typename MatrixSize>
-int ColumnSize(MatrixSize m)
-{
-	return sizeof(m.m[0]) / sizeof(int);
-}
-
-template<typename MatrixSize>
-int RowSize(MatrixSize m)
-{
-	return sizeof(m.m) / sizeof(m.m[0]);
-}*/
-
+//加算
 Matrix4x4 Add(Matrix4x4 m1, Matrix4x4 m2);
 
-
+//減算
 Matrix4x4 Subtract(Matrix4x4 m1, Matrix4x4 m2);
 
-
+//乗算
 Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2);
 
-
-//Matrix4x4 Scalar(double k, Matrix4x4 m);
+//余因子展開
 auto CofactorExpansion(Matrix2x2 m);
 auto CofactorExpansion(Matrix3x3 m);
-
-
 double CofactorExpansion(Matrix4x4 m);
 
-
+//転置行列
 Matrix4x4 Transpose(Matrix4x4 m);
 
 Matrix3x3 Transpose(Matrix3x3 m);
 
 Matrix2x2 Transpose(Matrix2x2 m);
 
+//余因子行列を求める(Inverseの内部で使用)
 Matrix4x4 Adjoint(Matrix4x4 m);
 Matrix3x3 Adjoint(Matrix3x3 m);
 Matrix2x2 Adjoint(Matrix2x2 m);
 
-
+//逆行列を求める
 Matrix4x4 Inverse(Matrix4x4 m);
 
+//4x4単位行列
 Matrix4x4 MakeIdentity4x4();
 
 //アフィン変換関係
@@ -89,11 +65,14 @@ Matrix4x4 MakeOrthographicMatrix(float l, float t, float r, float b, float zn, f
 //ビューポート変換行列
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minD, float maxD);
 
+//平行移動成分を無視したトランスフォーム適用
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
+//クロス積行列を作る
 Matrix4x4 MakeCrossMatrix(const Vector3& vector);
 Matrix4x4 MakeRotateAxisAngle(const Vector3& axis,float angle);
 
+//二つの方向ベクトルから回転行列を作る
 Matrix4x4 DirectionToDIrection(const Vector3& from, const Vector3& to);
 
 Matrix4x4 operator+(Matrix4x4 m1, Matrix4x4 m2);

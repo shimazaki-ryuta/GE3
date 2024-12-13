@@ -1,5 +1,6 @@
 #include "QuaternionFunction.h"
 #include "VectorFunction.h"
+#include "MatrixFunction.h"
 #include <cmath>
 
 Quaternion Add(const Quaternion& q, const Quaternion& r) {
