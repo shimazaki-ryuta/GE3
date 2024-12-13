@@ -1,3 +1,5 @@
+[![DebugBuild](https://github.com/shimazaki-ryuta/GE3/actions/workflows/DebugBuild.yml/badge.svg)](https://github.com/shimazaki-ryuta/GE3/actions/workflows/DebugBuild.yml)
+
 # 工夫した機能
 ## オブジェクト配置およびメッシュの同期機能。
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/meshsync.png)
