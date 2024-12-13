@@ -17,6 +17,8 @@
 #include <wrl.h>
 #include <d3d12.h>
 
+//モデル関係の構造体用ファイル
+
 struct EulerTransform {
 	Vector3 scale;
 	Vector3 rotate;

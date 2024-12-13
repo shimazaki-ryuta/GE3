@@ -9,6 +9,8 @@
 #include "Scene/IScene.h"
 //#include "../GameScene.h"
 
+//ゲームループ管理クラス
+
 class GameManager
 {
 public:
@@ -17,15 +19,20 @@ public:
 	~GameManager() {
 		delete dxCommon;
 #ifdef _DEBUG
+		//デバッグカメラの解放
 		debugController->Release();
 
 #endif // _DEBUG
+		//ウィンドウ解放
 		CloseWindow(mainWindow->GetHwnd());
 
 		CoUninitialize();
 	};
 
+	//初期化
 	void Initialize();
+
+	//メインループ
 	void Run();
 
 private:

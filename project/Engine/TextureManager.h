@@ -7,6 +7,9 @@
 #include <array>
 #include <string>
 #include <wrl.h>
+
+//テクスチャ管理クラス
+
 class TextureManager
 {
 public:
@@ -20,8 +23,12 @@ public:
 		std::string name;
 	};
 
+	//インスタンス取得
 	static TextureManager* GetInstance();
+	//初期化
 	void Initialize(ID3D12Device*, std::string directoryPath = "Resources/");
+	
+	//GetterSetter
 	inline void SetCommandQueue(ID3D12CommandQueue* commandQueue) {  commandQueue_ = commandQueue; };
 	inline void SetCommandAllocator(ID3D12CommandAllocator* commandAllocator) { commandAllocator_ = commandAllocator; };
 	inline void SetCommandList(ID3D12GraphicsCommandList* commandList) { commandList_ = commandList; };
@@ -33,8 +40,10 @@ public:
 	const D3D12_RESOURCE_DESC GetResoureDesc(uint32_t textureHandle);
 	ID3D12Resource* GetResoure(uint32_t textureHandle);
 
+	//テクスチャ読み込み
 	static uint32_t LoadTexture(const std::string&);
 
+	//テクスチャ読み込み(LoadTextureの内部)
 	uint32_t Load(const std::string&);
 
 	//SRVディスクリプタヒープのテクスチャ領域の終端
