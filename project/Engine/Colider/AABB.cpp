@@ -1,6 +1,8 @@
 #include "AABB.h"
 //#include <Novice.h>
 #include "MatrixFunction.h"
+#include <algorithm>
+#include <functional>
 #include <cmath>
 
 AABB Normalize(const AABB& aabb)
