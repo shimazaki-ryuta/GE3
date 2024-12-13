@@ -29,7 +29,7 @@ void Window::CreateGameWindow(const std::string& title, int32_t kClientWidth, in
 	kClientHeight_ =  kClientHeight;
 
 	wc_.lpfnWndProc = WindowProc;
-	wc_.lpszClassName = L"CG2WindowClass";
+	wc_.lpszClassName = L"MainWindow";
 	wc_.hInstance = GetModuleHandle(nullptr);
 	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	RegisterClass(&wc_);

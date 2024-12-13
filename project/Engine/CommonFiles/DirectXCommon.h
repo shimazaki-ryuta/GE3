@@ -12,8 +12,11 @@
 #include "../externals/DirectXTex/d3dx12.h"
 #include <memory>
 #include "Vector4.h"
-//#include <list>
+
 class PostEffect;
+
+//DirectX基盤処理クラス
+
 class DirectXCommon
 {
 public:
@@ -40,6 +43,7 @@ public:
 	//画像データをGPUに送信する
 	void  UploadTextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
+	//Getter/Setter
 	inline ID3D12Device* GetDevice() { return device_.Get(); };
 	inline ID3D12GraphicsCommandList* GetCommandList() { return commandList_.Get(); };
 	inline ID3D12CommandQueue* GetCommandQueue() { return commandQueue_.Get(); };
@@ -69,15 +73,18 @@ public:
 	/// RTV生成
 	/// </summary>
 	void CreateRenderTargetView();
-	//void SetRenderTarget(int handles[]);
+	//ポストエフェクト用Spriteインスタンス作製
 	void CreatePostEffectSprite();
 	PostEffect* postEffect;//縦gauss
 	PostEffect* postEffect2;//grayscale
 	PostEffect* postEffect3;//横gauss
 	PostEffect* postEffect4;//hsvFilter
+	//ポストエフェクト用Spriteインスタンス解放
 	void DeletePostEffect();
 
+	//グレースケール強度セット(0~1)
 	void SetGraiScaleStrength(float strength) ;
+	//HSVフィルタ
 	void SetHSVFilter(const Vector4& filter);
 
 private:
@@ -100,18 +107,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 
-	/*enum RenderTargetName
-	{
-		kSwap0,
-		kSwap1,
-		kSorce3D,
-		kSorce2D,
-		kPost3D,
-		kGaussBlumeVert,
-		kGaussBlumeHori,
-		kGrayScale,
-		kCountOfRenderTarget
-	};*/
 
 	static const size_t kCountOfRenderTarget = 10;
 
@@ -130,9 +125,11 @@ private:
 	uint64_t fenceValue_ = 0;
 	//TransitionBarrier
 	D3D12_RESOURCE_BARRIER barrier_{};
-
+	//指定番号のレンダーターゲットクリア
 	void ClearRenderTarget(size_t renderTargetNum,const Vector4& ClearColor);
+	//指定番号のレンダーターゲットにバリアを張る
 	void ResourceBarrier(size_t renderTargetHandle, D3D12_RESOURCE_STATES beforState, D3D12_RESOURCE_STATES afterState);
+	//レンダーターゲット設定
 	void SetRenderTarget(size_t numRenderTargets,size_t* renderTargetHandles, size_t dsvNum);
 	void SetRenderTarget(size_t renderTargetHandles, size_t dsvNum);
 

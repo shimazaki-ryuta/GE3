@@ -3,9 +3,12 @@
 #include <cstdint>
 #include <string>
 
+//ウィンドウクラス
+
 class Window
 {
 public:
+	//ウィンドウコールバック関数
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 	/// <summary>
@@ -24,6 +27,7 @@ public:
 	/// </summary>
 	inline HWND GetHwnd() { return hwnd_; };
 
+	//Getter/Setter
 	inline int32_t GetClientWidth() { return kClientWidth_; };
 	inline int32_t GetClientHeight() { return kClientHeight_; };
 

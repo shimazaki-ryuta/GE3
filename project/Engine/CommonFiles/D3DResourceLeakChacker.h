@@ -4,16 +4,13 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <wrl.h>
+
+//メモリリーク検知構造体(破棄時にレポート)
+
 struct D3DResourceLeakChacker
 {
 public:
-	/*static D3DResourceLeakChacker* GetInstance()
-	{
-		static D3DResourceLeakChacker instance;
-		return &instance;
 
-	};*/
-	//D3DResourceLeakChacker() = default;
 	~D3DResourceLeakChacker()
 	{
 		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
@@ -25,11 +22,6 @@ public:
 			debug->Release();
 		}
 	};
-	//private:
-	//	D3DResourceLeakChacker() = default;
-	//	//~D3DResourceLeakChacker() = default;
-	//	D3DResourceLeakChacker(const D3DResourceLeakChacker&) = delete;
-	//	D3DResourceLeakChacker operator=(const D3DResourceLeakChacker&) = delete;
 };
 
 struct LeackChecker {

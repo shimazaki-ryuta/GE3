@@ -1,12 +1,20 @@
 #pragma once
 #include <intsafe.h>
+
+//デルタタイム計算クラス
+
 class DeltaTime
 {
 public:
+	//インスタンス取得
 	static DeltaTime* GetInstance();
+	//ゲームループ開始
 	static void GameLoopStart();
+	//フレーム長計測開始
 	static void FrameStart();
+	//フレーム毎秒を返す
 	static float GetFramePerSecond();
+	//デルタタイム取得
 	static float GetDeltaTime();
 
 private:

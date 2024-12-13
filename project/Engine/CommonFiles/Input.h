@@ -9,17 +9,24 @@
 #pragma comment(lib,"xinput.lib")
 #include <wrl.h>
 
+//入力クラス(キーボード、コントローラー)
+
 class Input
 {
 public:
+	//インスタンス取得
 	static Input* GetInstance();
+	//初期化
 	void Initialize(HWND hwnd);
+	//キーボード情報更新
 	void KeyboardUpdate();
 
+	//指定キー入力の有無
 	static bool GetKey(uint8_t);
 	static bool GetKeyDown(uint8_t);
 	static bool GetKeyUp(uint8_t);
 
+	//コントローラーの入力情報を得る
 	static bool GetJoystickState(uint8_t stickNo, XINPUT_STATE& out);
 
 

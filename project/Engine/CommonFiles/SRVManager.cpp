@@ -13,7 +13,7 @@ void SRVManager::Initialize(ID3D12Device* device,ID3D12DescriptorHeap* descripto
 	}
 }
 
-uint32_t SRVManager::CreateSRV(ID3D12Resource* pResource, const D3D12_SHADER_RESOURCE_VIEW_DESC* pDesc) {
+int32_t SRVManager::CreateSRV(ID3D12Resource* pResource, const D3D12_SHADER_RESOURCE_VIEW_DESC* pDesc) {
 	uint32_t handle = 0;
 	for (handle = 1; handle < kNumSrvDescriptors; handle++) {
 		if (isUses[handle] == false) {
