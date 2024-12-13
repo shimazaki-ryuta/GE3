@@ -557,8 +557,9 @@ void GameScene::End() {
 
 	}
 	//grayscale
+	const float grayScaleStep = 0.01f;
 	if (player_->GetIsDead()) {
-		grayScaleValue_ += 0.01f;
+		grayScaleValue_ += grayScaleStep;
 		if (grayScaleValue_ > 1.0f) {
 			grayScaleValue_ = 1.0f;
 		}
