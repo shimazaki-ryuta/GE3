@@ -6,6 +6,8 @@
 #include <list>
 #include "ModelStruct.h"
 
+//シーン読み込み用構造体
+
 struct ColliderData {
 	//std::string name="";
 	std::string type = "";
