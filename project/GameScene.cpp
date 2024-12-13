@@ -22,6 +22,10 @@
 #include "GetDescriptorHandle.h"
 #include "ConvertString.h"
 #include "CommonFiles/SRVManager.h"
+
+const float kFallOutLimit = -20.0f;
+const float kFadeStep = 0.05f;
+
 GameScene::GameScene() {
 
 }
@@ -382,13 +386,13 @@ void GameScene::Idle() {
 		state_ = std::bind(&GameScene::Play, this);
 	}
 	if (!isStart_) {
-		fadeAlpha_ -= 0.05f;
+		fadeAlpha_ -= kFadeStep;
 		if (fadeAlpha_ < 0) {
 			fadeAlpha_ = 0;
 		}
 	}
 	else {
-		fadeAlpha_ += 0.05f;
+		fadeAlpha_ += kFadeStep;
 		if (fadeAlpha_ > 1.0f) {
 			fadeAlpha_ = 1.0f;
 			isIngame_ = true;
@@ -400,7 +404,8 @@ void GameScene::Play() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	player_->Update();
-	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+
+	if (player_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
 		player_->ReStart();
 	}
 
@@ -408,7 +413,7 @@ void GameScene::Play() {
 
 	player2_->SetData(ai_->GetData());
 	player2_->Update();
-	if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+	if (player2_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
 		player2_->ReStart();
 
 	}
@@ -538,7 +543,8 @@ void GameScene::End() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	player_->Update();
-	if (player_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+
+	if (player_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
 		player_->ReStart();
 	}
 
@@ -546,7 +552,7 @@ void GameScene::End() {
 
 	player2_->SetData(ai_->GetData());
 	player2_->Update();
-	if (player2_->GetWorldTransform()->GetWorldPosition().y < -20.0f) {
+	if (player2_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
 		player2_->ReStart();
 
 	}
@@ -572,13 +578,13 @@ void GameScene::End() {
 
 void GameScene::Fade() {
 	if (!isTransitionFade_) {
-		fadeAlpha_ -= 0.05f;
+		fadeAlpha_ -= kFadeStep;
 		if (fadeAlpha_ < 0) {
 			fadeAlpha_ = 0;
 		}
 	}
 	else {
-		fadeAlpha_ += 0.05f;
+		fadeAlpha_ += kFadeStep;
 		if (fadeAlpha_ > 1.0f) {
 			for (uint32_t index = 0; index < pointLightMax_; ++index) {
 				pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -638,10 +644,8 @@ void GameScene::Draw3D() {
 	//skybox描画
 	skyBox_->Draw(worldTransformSkyBox_, viewProjection_);
 
-	if (isIngame_ || 1) {
 		Particle::PreDraw(dxCommon_->GetCommandList());
 		particle->Draw(viewProjection_);
 		Particle::PostDraw();
-	}
 
 }

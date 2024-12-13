@@ -19,6 +19,14 @@
 
 class Player : public BaseCharacter {
 public:
+
+	enum PlayerPart {
+		kBody,
+		kHead,
+		kLArm,
+		kRArm,
+	};
+
 	enum class Behavior { 
 		kRoot,
 		kAttack,

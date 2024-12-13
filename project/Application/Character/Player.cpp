@@ -54,11 +54,11 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	worldTransformWepon_.Initialize();
 	worldTransformWepon_.parent_ = &worldTransform_;
 
-	grovalVariables->AddItem(groupName, "Head Translation", models_[1].worldTransform_.translation_);
+	grovalVariables->AddItem(groupName, "Head Translation", models_[kHead].worldTransform_.translation_);
 	grovalVariables->AddItem(
-	    groupName, "ArmL Translation", models_[2].worldTransform_.translation_);
+	    groupName, "ArmL Translation", models_[kLArm].worldTransform_.translation_);
 	grovalVariables->AddItem(
-	    groupName, "ArmR Translation", models_[3].worldTransform_.translation_);
+	    groupName, "ArmR Translation", models_[kRArm].worldTransform_.translation_);
 	
 	grovalVariables->AddItem(groupName, "DashSpeed", dashSpeed_);
 	grovalVariables->AddtValue(groupName, "DashLength", dashLength_);
@@ -90,8 +90,8 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	testAnimation_->LoadAnimationFile("Resources/Player", "player.gltf");
 	testAnimation_->SetPlaySpeed(3.0f);
 	testSkeleton_.reset(new Skeleton);
-	testSkeleton_->Initialize(models_[1].model_->GetRootNode());
-	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(), models_[1].model_->GetModelData());
+	testSkeleton_->Initialize(models_[kHead].model_->GetRootNode());
+	cluster_ = LoadModel::CreateSkinCluster(testSkeleton_->GetSkeletonData(), models_[kHead].model_->GetModelData());
 
 	material_.reset(new Material);
 	material_->Initialize();
@@ -117,7 +117,7 @@ void Player::ReStart() {
 	if (worldTransform_.parent_) {
 		worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
 	}
-	models_[0].worldTransform_.rotation_ = { 0,0,0 };
+	models_[kBody].worldTransform_.rotation_ = { 0,0,0 };
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
 	}
@@ -133,19 +133,19 @@ void Player::ReStart() {
 
 void Player::BehaviorRootInitialize() {
 	InitializeFloatingGimmick();
-	models_[2].worldTransform_.parent_ = &models_[0].worldTransform_;
-	models_[3].worldTransform_.parent_ = &models_[0].worldTransform_;
-	models_[2].worldTransform_.translation_.x = -0.5f;
-	models_[2].worldTransform_.translation_.y = 1.5f;
-	models_[2].worldTransform_.translation_.z = 0.0f;
-	models_[3].worldTransform_.translation_.x = 0.5f;
-	models_[3].worldTransform_.translation_.y = 1.5f;
-	models_[3].worldTransform_.translation_.z = 0.0f;
+	models_[kLArm].worldTransform_.parent_ = &models_[kBody].worldTransform_;
+	models_[kRArm].worldTransform_.parent_ = &models_[kBody].worldTransform_;
+	models_[kLArm].worldTransform_.translation_.x = -0.5f;
+	models_[kLArm].worldTransform_.translation_.y = 1.5f;
+	models_[kLArm].worldTransform_.translation_.z = 0.0f;
+	models_[kRArm].worldTransform_.translation_.x = 0.5f;
+	models_[kRArm].worldTransform_.translation_.y = 1.5f;
+	models_[kRArm].worldTransform_.translation_.z = 0.0f;
 
-	models_[2].worldTransform_.rotation_.x = 0.0f;
-	models_[2].worldTransform_.rotation_.y = 0.0f;
-	models_[3].worldTransform_.rotation_.x = 0.0f;
-	models_[3].worldTransform_.rotation_.y = 0.0f;
+	models_[kLArm].worldTransform_.rotation_.x = 0.0f;
+	models_[kLArm].worldTransform_.rotation_.y = 0.0f;
+	models_[kRArm].worldTransform_.rotation_.x = 0.0f;
+	models_[kRArm].worldTransform_.rotation_.y = 0.0f;
 	comboNum_ = 0;
 }
 
@@ -155,19 +155,19 @@ void Player::BehaviorAttackInitialize() {
 	worldTransformWepon_.rotation_.x = 0.0f;
 	worldTransformWepon_.rotation_.z = -1.57f;
 
-	models_[2].worldTransform_.translation_.x = 0.009f;
-	models_[2].worldTransform_.translation_.y = 2.528f;
-	models_[2].worldTransform_.translation_.z = -1.20f;
-	models_[3].worldTransform_.translation_.x = -0.009f;
-	models_[3].worldTransform_.translation_.y = 2.00f;
-	models_[3].worldTransform_.translation_.z = -1.20f;
+	models_[kLArm].worldTransform_.translation_.x = 0.009f;
+	models_[kLArm].worldTransform_.translation_.y = 2.528f;
+	models_[kLArm].worldTransform_.translation_.z = -1.20f;
+	models_[kRArm].worldTransform_.translation_.x = -0.009f;
+	models_[kRArm].worldTransform_.translation_.y = 2.00f;
+	models_[kRArm].worldTransform_.translation_.z = -1.20f;
 	
-	models_[2].worldTransform_.rotation_.x = -1.57f;
-	models_[2].worldTransform_.rotation_.y = 0.600f;
-	models_[3].worldTransform_.rotation_.x = -1.57f;
-	models_[3].worldTransform_.rotation_.y = -0.600f;
+	models_[kLArm].worldTransform_.rotation_.x = -1.57f;
+	models_[kLArm].worldTransform_.rotation_.y = 0.600f;
+	models_[kRArm].worldTransform_.rotation_.x = -1.57f;
+	models_[kRArm].worldTransform_.rotation_.y = -0.600f;
 
-	//models_[3].worldTransform_.rotation_.x = -float(std::numbers::pi);
+	//models_[kRArm].worldTransform_.rotation_.x = -float(std::numbers::pi);
 	attackBehavior_ = AttackBehavior::kPre;
 	//weaponCollider_.SetIsCollision(true);
 	velocity_ = { 0,0,0 };
@@ -245,13 +245,16 @@ void Player::Update() {
 		}*/
 	}
 	else {
+		const float kDisolveStep = 0.005f;
+		const float kRotateStep = 0.05f;
+		const float kRotateLimit = -3.14f / 2.0f;
 
 		if (material_->paramater_.disolveThreshold < 1.0f) {
-			material_->paramater_.disolveThreshold += 0.005f;
+			material_->paramater_.disolveThreshold += kDisolveStep;
 		}
 
-		if (models_[0].worldTransform_.rotation_.x > -3.14f/2.0f) {
-			models_[0].worldTransform_.rotation_.x -= 0.05f;
+		if (models_[0].worldTransform_.rotation_.x > kRotateLimit) {
+			models_[0].worldTransform_.rotation_.x -= kRotateStep;
 		}
 	}
 	// 行列更新
@@ -277,7 +280,6 @@ void Player::Update() {
 
 	obb_.center = worldTransform_.GetWorldPosition();
 	obb_.size = { 1.0f,1.0f,1.0f };
-	//obb_.center.y += obb_.size.y / 2.0f;
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
@@ -386,7 +388,8 @@ void Player::BehaviorAttackUpdate()
 
 	static float frontLength = 5.0f;
 	
-	
+	const float kVelocityCefficent = 1.5f;
+
 	if (frameCount_ == endFrame) {
 		// behavior_ = Behavior::kRoot;
 		//weaponCollider_.SetIsCollision(false);
@@ -394,15 +397,15 @@ void Player::BehaviorAttackUpdate()
 	}
 	
 	if (target_) {
-		Vector3 toTarget = target_->GetWorldPosition() - models_[1].worldTransform_.GetWorldPosition();
+		Vector3 toTarget = target_->GetWorldPosition() - models_[kHead].worldTransform_.GetWorldPosition();
 		if (frameCount_ == 0) {
 			//shot
 			std::unique_ptr<Bullet> bullet;
 			bullet.reset(new Bullet());
 			bullet->Initialize();
-			bullet->SetPosition(models_[1].worldTransform_.GetWorldPosition());
+			bullet->SetPosition(models_[kHead].worldTransform_.GetWorldPosition());
 			bullet->SetModel(modelBullet_);
-			Vector3 velocity = Normalize(toTarget) * 1.5f;
+			Vector3 velocity = Normalize(toTarget) * kVelocityCefficent;
 			bullet->SetVelocity(velocity);
 			bullet->SetParticle(particle_);
 			bullet->SetAnimation(bulletAnimation_);
@@ -454,7 +457,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	}*/
 	for (uint32_t index = 0; index < models_.size();index++) {
 		models_[index].model_->SetMaterial(material_.get());
-		if (index == 1) {
+		if (index == kHead) {
 			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection,cluster_);
 		}
 		else {
@@ -472,7 +475,7 @@ void Player::DrawOutLine(const ViewProjection& viewProjection)
 {
 	if (material_->paramater_.disolveThreshold == 0.0f) {
 		for (uint32_t index = 0; index < models_.size(); index++) {
-			if (index == 1) {
+			if (index == kHead) {
 				models_[index].model_->DrawOutLine(models_[index].worldTransform_, viewProjection, cluster_);
 			}
 			else {
@@ -498,33 +501,20 @@ void Player::UpdateFloatingGimmick()
 	floatingParameter_ = std::fmod(floatingParameter_, 2.0f * float(std::numbers::pi));
 
 	static float floatingAmplitude = 0.5;
-	models_[0].worldTransform_.translation_.y = std::sin(floatingParameter_) * floatingAmplitude;
-	models_[2].worldTransform_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude;
-	models_[3].worldTransform_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude;
+	models_[kBody].worldTransform_.translation_.y = std::sin(floatingParameter_) * floatingAmplitude;
+	models_[kLArm].worldTransform_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude;
+	models_[kRArm].worldTransform_.rotation_.x = std::cos(floatingParameter_) * floatingAmplitude;
 
-	/*
-	#ifdef _DEBUG
-	ImGui::Begin("Player");
-	ImGui::SliderFloat3("Head Transform", &models_[1].worldTransform_.translation_.x,-10.0f,10.0f);
-	ImGui::SliderFloat3(
-	    "ArmL Transform", &models_[2].worldTransform_.translation_.x, -10.0f, 10.0f);
-	ImGui::SliderFloat3(
-	    "ArmR Transform", &models_[3].worldTransform_.translation_.x, -10.0f, 10.0f);
-	ImGui::SliderInt("Period", (reinterpret_cast<int*>(&period)), 1, 180);
-	ImGui::SliderFloat("Ampritude", &floatingAmplitude,0.0f,10.0f);
-	ImGui::End();
-#endif // _DEBUG
-*/
 }
 
 void Player::ApplyGlobalVariables()
 {
 	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
-	models_[1].worldTransform_.translation_ = globalVariables->GetVector3Value(groupName, "Head Translation");
-	models_[2].worldTransform_.translation_ =
+	models_[kHead].worldTransform_.translation_ = globalVariables->GetVector3Value(groupName, "Head Translation");
+	models_[kLArm].worldTransform_.translation_ =
 	    globalVariables->GetVector3Value(groupName, "ArmL Translation");
-	models_[3].worldTransform_.translation_ =
+	models_[kRArm].worldTransform_.translation_ =
 	    globalVariables->GetVector3Value(groupName, "ArmR Translation");
 	dashSpeed_ = globalVariables->GetFloatValue(groupName,"DashSpeed");
 	dashLength_ = globalVariables->GetIntValue(groupName, "DashLength");
