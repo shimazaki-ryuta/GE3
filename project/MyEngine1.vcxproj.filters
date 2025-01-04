@@ -82,9 +82,6 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Application\TimedCall.cpp">
       <Filter>Application</Filter>
     </ClCompile>
@@ -262,11 +259,11 @@
     <ClCompile Include="Engine\2D\PostEffect.cpp">
       <Filter>Engine\2D</Filter>
     </ClCompile>
+    <ClCompile Include="Application\GameScene.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Application\TimedCall.h">
       <Filter>Application</Filter>
     </ClInclude>
@@ -473,6 +470,9 @@
     </ClInclude>
     <ClInclude Include="Engine\3D\Skeleton.h">
       <Filter>Engine\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\GameScene.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

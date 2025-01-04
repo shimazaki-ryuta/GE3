@@ -5,9 +5,9 @@
 #include <fstream>
 #include "Input.h"
 //ImGui
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
+#include "../externals/imgui/imgui.h"
+#include "../externals/imgui/imgui_impl_dx12.h"
+#include "../externals/imgui/imgui_impl_win32.h"
 #include <cassert>
 #include <list>
 #include <numbers>
@@ -18,7 +18,7 @@
 #include "VectorFunction.h"
 #include "MatrixFunction.h"
 #include "RandomEngine.h"
-#include "Engine/Audio/AudioManager.h"
+#include "../Engine/Audio/AudioManager.h"
 #include "GetDescriptorHandle.h"
 #include "ConvertString.h"
 #include "CommonFiles/SRVManager.h"

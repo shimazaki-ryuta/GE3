@@ -41,7 +41,7 @@
 #include "3D/LoadModel.h"
 #include "3D/Particle.h"
 
-#include "../GameScene.h"
+#include "../Application/GameScene.h"
 
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
