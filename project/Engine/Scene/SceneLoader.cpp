@@ -60,7 +60,7 @@ void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 		GameObjectData* objectData = nullptr;
 		//要素追加
 
-
+		//terrainの方に格納
 		if (object["name"] == "field") {
 			objectData = &terrainData_->object;
 		}
@@ -218,9 +218,11 @@ void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
 void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
 	//terrainData_->verticesDatas.clear();
 	if (data["m"].contains("vNum")) {
+		//頂点数変更
 		terrainData_->vertexNum_ = data["m"]["vNum"];
 		terrainData_->verticesDatas.clear();
 	}
+	//頂点情報を格納
 	for (nlohmann::json& object : data["m"]["v"]) {
 		TerrainVerticesData* datas;
 		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
@@ -302,8 +304,7 @@ void SceneLoader::ReceveJsonData() {
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
-		//recevedata
-		//strcpy(rBuff,"\0");
+		//受信
 		recvfrom(socket_, rBuff, buffSize -1, 0, (sockaddr*)&from, &sockaddr_in_size);
 
 		//end
@@ -339,9 +340,6 @@ void SceneLoader::ReceveJsonData() {
 			}
 			isRecevedData_ = true;
 		}
-		while (isRecevedData_ || isRecevedTerrain_) {
-
-		}
 	}
 	closesocket(socket_);
 	isEnd = true;
@@ -351,20 +349,11 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 	if (!isRecevedData_) {
 		return;
 	}
-	/*list.clear();
-	CreateObjects(list);
-	isRecevedData_ = false;
-	return;*/
-
+	
 	//ルート走査
 	size_t index = 0;
 	//削除チェック
-	/*std::erase_if(list, [&]() {
-		if (index++ < sceneData_->objects.size()) {
-			return false;
-		}
-		return true;
-	});*/
+	
 	//変更チェック
 	index = 0;
 	for (std::unique_ptr<GameObject> &object : list) {
