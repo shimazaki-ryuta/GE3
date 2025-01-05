@@ -2,7 +2,7 @@
 #include "3D/WorldTransform.h"
 #include "3D/ViewProjection.h"
 #include "Input.h"
-#include "Character/Player2.h"
+#include "Character/Enemy.h"
 #include <memory>
 #include <list>
 #include "TextureManager.h"
@@ -14,11 +14,11 @@ class LockOn
 {
 public:
 	void Initialize();
-	void Update(Player2* enemies,ViewProjection& viewProjection);
+	void Update(Enemy* enemies,ViewProjection& viewProjection);
 	void Draw();
 
 	//対象を探す
-	void Search(Player2* enemies, ViewProjection& viewProjection);
+	void Search(Enemy* enemies, ViewProjection& viewProjection);
 	
 	//ターゲット対象を変えす(対象なければ仮対象)
 	WorldTransform* GetTarget();
@@ -30,7 +30,7 @@ public:
 private:
 	uint32_t textureHandle_;
 	std::unique_ptr<Sprite> AnchorSprite_;
-	Player2* target_;
+	Enemy* target_;
 	bool isLockOn_;
 	bool isAutoLock_;
 	bool isForcus_;

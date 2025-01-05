@@ -13,12 +13,14 @@ void BaseCharacter::Update()
 
 void BaseCharacter::Draw(const ViewProjection& viewProjection) 
 {
+	//内包する全モデルを描画する
 	for (HierarchicalAnimation& model : models_) {
 		model.model_->Draw(worldTransform_, viewProjection);
 	}
 }
 
 void BaseCharacter::SetShadowTexture(uint32_t handle) {
+	//内包する全モデルに影用テクスチャをセットする
 	for (HierarchicalAnimation& model : models_) {
 		model.model_->SetEnableLighting(2);
 		model.model_->SetToonShadowTextureHandle(handle);

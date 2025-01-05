@@ -223,7 +223,7 @@
     <ClCompile Include="Application\Character\PlayerAI.cpp">
       <Filter>Application\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Character\Player2.cpp">
+    <ClCompile Include="Application\Character\Enemy.cpp">
       <Filter>Application\Character</Filter>
     </ClCompile>
     <ClCompile Include="Application\Character\Player.cpp">
@@ -414,7 +414,7 @@
     <ClInclude Include="Application\Character\Player.h">
       <Filter>Application\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Character\Player2.h">
+    <ClInclude Include="Application\Character\Enemy.h">
       <Filter>Application\Character</Filter>
     </ClInclude>
     <ClInclude Include="Application\Character\PlayerAI.h">

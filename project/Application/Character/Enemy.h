@@ -17,7 +17,7 @@
 
 //敵の制御、描画を行うクラス
 
-class Player2 : public BaseCharacter {
+class Enemy : public BaseCharacter {
 public:
 
 	enum PlayerPart {

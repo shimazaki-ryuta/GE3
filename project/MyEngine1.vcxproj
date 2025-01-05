@@ -327,7 +327,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Camera\LockOn.cpp" />
     <ClCompile Include="Application\GameObject\MovingFlooar.cpp" />
     <ClCompile Include="Application\Character\Player.cpp" />
-    <ClCompile Include="Application\Character\Player2.cpp" />
+    <ClCompile Include="Application\Character\Enemy.cpp" />
     <ClCompile Include="Application\Character\PlayerAI.cpp" />
     <ClCompile Include="Application\GameObject\Skydome.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
@@ -411,7 +411,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Camera\LockOn.h" />
     <ClInclude Include="Application\GameObject\MovingFlooar.h" />
     <ClInclude Include="Application\Character\Player.h" />
-    <ClInclude Include="Application\Character\Player2.h" />
+    <ClInclude Include="Application\Character\Enemy.h" />
     <ClInclude Include="Application\Character\PlayerAI.h" />
     <ClInclude Include="Application\GameObject\Skydome.h" />
     <ClInclude Include="Application\TimedCall.h" />

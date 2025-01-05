@@ -1,6 +1,6 @@
 #pragma once
 #include "Player.h"
-#include "Player2.h"
+#include "Enemy.h"
 
 //敵キャラクターの操作を行うクラス
 
@@ -21,11 +21,11 @@ public:
 	void Reset();
 
 	//Getter/Setter
-	Player2::ReceveData& GetData() { return data_; };
+	Enemy::ReceveData& GetData() { return data_; };
 	void SetPlayer1(Player* p) { p1_ = p; };
-	void SetPlayer2(Player2* p) { p2_ = p; };
+	void SetPlayer2(Enemy* p) { p2_ = p; };
 private:
-	Player2::ReceveData data_;
+	Enemy::ReceveData data_;
 	Vector3 direction_;
 	int fireAverage_;
 	int lastFire_;
@@ -35,6 +35,6 @@ private:
 	std::list<int> fireInterval_;
 	bool isFirst_;
 	Player* p1_;
-	Player2* p2_;
+	Enemy* p2_;
 };
 

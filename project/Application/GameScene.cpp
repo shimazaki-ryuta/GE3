@@ -56,7 +56,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	sceneLoader_->CreateTerrain(terrain_);
 	sceneLoader_->ReadTerrainVerticesFromFile(terrain_,"PlayerHead");
 #ifdef DEMO
-
+	//受信用スレッド起動
 	sceneLoader_->StartReceveJson();
 
 	isDebugCameraActive_ = false;
@@ -149,7 +149,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->SetOutLineData(0.01f, { 0,0,1.0f,1.0f });
 	//player_->SetWepon(modelWepon_.get());
 
-	player2_ = std::make_unique<Player2>();
+	player2_ = std::make_unique<Enemy>();
 	player2_->Initialize(animationPlayer2);
 	player2_->InitializeFloatingGimmick();
 	player2_->SetShadowTexture(toonShadowTextureHandle_);
@@ -170,11 +170,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player2_->SetModelBullet(modelBullet_.get());
 	player_->SetBulletAnimation(bulletAnimation_.get());
 	player2_->SetBulletAnimation(bulletAnimation_.get());
-	// 天球
-	//modelSkydome_ = Model::CreateFromOBJ("skydome");
-	//skydome_.reset(new Skydome);
-	//skydome_->Initialize(modelSkydome_, Vector3(0.0f, 0.0f, 0.0f));
-
+	
 	// 地面
 	modelGround_ = new Model();
 	modelGround_->Create("Resources/human", "walk.gltf");
@@ -259,11 +255,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 }
 
 void GameScene::Update() {
+	//入力情報取得
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	FromBlenderUpdate();
 #ifdef DEMO
-
+	//デバッグ表示
 	if (Input::GetKeyDown(DIK_RSHIFT)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 		debugCamera_->SetUses(isDebugCameraActive_);
@@ -290,6 +287,7 @@ void GameScene::Update() {
 	dxCommon_->SetHSVFilter(hsvFilter_);
 #endif // _DEBUG
 
+	//更新処理
 	for (std::unique_ptr<GameObject>& object : objects_) {
 		object->Update();
 	}
@@ -362,6 +360,42 @@ void GameScene::CreateLight() {
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 }
 
+
+void GameScene::UpdateLight() {
+	//PointLight
+	for (uint32_t index = 0; index < pointLightMax_; ++index) {
+		pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
+		pointLightData[index].position = { 0.0f,1.0f,0.0f };
+		pointLightData[index].intensity = 0.0f;
+		pointLightData[index].radius = 10.0f;
+		pointLightData[index].decay = 0.0f;
+		pointLightData[index].isUse_ = 0;
+	}
+	uint32_t count = 0;
+	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
+		if (count < pointLightMax_) {
+			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
+			pointLightData[count].position = (*ite)->GetSphere().center;
+			pointLightData[count].intensity = 2.0f;
+			pointLightData[count].radius = 10.0f;
+			pointLightData[count].decay = 0.8f;
+			pointLightData[count].isUse_ = 1;
+			count++;
+		}
+	}
+	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
+		if (count < pointLightMax_) {
+			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
+			pointLightData[count].position = (*ite)->GetSphere().center;
+			pointLightData[count].intensity = 2.0f;
+			pointLightData[count].radius = 10.0f;
+			pointLightData[count].decay = 0.8f;
+			pointLightData[count].isUse_ = 1;
+			count++;
+		}
+	}
+}
+
 void GameScene::FromBlenderUpdate() {
 #ifdef DEMO
 	sceneLoader_->CreateModelList(modelList_);
@@ -375,6 +409,9 @@ void GameScene::Idle() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
 	grayScaleValue_ = 0.0f;
+
+
+	//カメラ回転
 	Vector3 offset = { 0.0f,2.0f,-15.0f };
 	viewProjection_.translation_ = Transform(offset, MakeRotateMatrix(viewProjection_.rotation_));
 	viewProjection_.rotation_.y += 0.01f;
@@ -385,6 +422,9 @@ void GameScene::Idle() {
 		isTransitionFade_ = false;
 		state_ = std::bind(&GameScene::Play, this);
 	}
+
+
+	//フェード
 	if (!isStart_) {
 		fadeAlpha_ -= kFadeStep;
 		if (fadeAlpha_ < 0) {
@@ -403,6 +443,8 @@ void GameScene::Idle() {
 void GameScene::Play() {
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
+
+	//更新処理
 	player_->Update();
 
 	if (player_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
@@ -434,7 +476,6 @@ void GameScene::Play() {
 		}
 	}
 	//objectとの当たり判定
-
 	for (std::unique_ptr<GameObject>& object : objects_) {
 		if (object->GetCollider()) {
 			if (IsCollision(player_->GetOBB(), object->GetCollider()->GetColliderShape().sphere))
@@ -493,43 +534,16 @@ void GameScene::Play() {
 
 	CollisionManager::GetInstance()->CheckAllCollisions();
 
-	//PointLight
-	for (uint32_t index = 0; index < pointLightMax_; ++index) {
-		pointLightData[index].color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
-		pointLightData[index].position = { 0.0f,1.0f,0.0f };
-		pointLightData[index].intensity = 0.0f;
-		pointLightData[index].radius = 10.0f;
-		pointLightData[index].decay = 0.0f;
-		pointLightData[index].isUse_ = 0;
-	}
-	uint32_t count = 0;
-	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player_->GetBulletList().begin(); ite != player_->GetBulletList().end(); ite++) {
-		if (count < pointLightMax_) {
-			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
-			pointLightData[count].position = (*ite)->GetSphere().center;
-			pointLightData[count].intensity = 2.0f;
-			pointLightData[count].radius = 10.0f;
-			pointLightData[count].decay = 0.8f;
-			pointLightData[count].isUse_ = 1;
-			count++;
-		}
-	}
-	for (std::list<std::unique_ptr<Bullet>>::iterator ite = player2_->GetBulletList().begin(); ite != player2_->GetBulletList().end(); ite++) {
-		if (count < pointLightMax_) {
-			pointLightData[count].color = Vector4{ 1.0f, 0.6f, 0.2f, 1.0f };
-			pointLightData[count].position = (*ite)->GetSphere().center;
-			pointLightData[count].intensity = 2.0f;
-			pointLightData[count].radius = 10.0f;
-			pointLightData[count].decay = 0.8f;
-			pointLightData[count].isUse_ = 1;
-			count++;
-		}
-	}
+	UpdateLight();
+
+	//FollowCameraから描画用行列取得
 	{
 		viewProjection_.matView = followCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 		viewProjection_.translation_ = followCamera_->GetViewProjection().translation_;
 	}
+
+	//ロックオン処理
 	lockOn_->Update(player2_.get(), viewProjection_);
 	followCamera_->SetLockOnTarget(nullptr);
 	player_->SetTarget(lockOn_->GetTarget());
@@ -542,6 +556,8 @@ void GameScene::End() {
 
 	XINPUT_STATE joyState;
 	Input::GetInstance()->GetJoystickState(0, joyState);
+
+	//更新処理
 	player_->Update();
 
 	if (player_->GetWorldTransform()->GetWorldPosition().y < kFallOutLimit) {
@@ -564,6 +580,7 @@ void GameScene::End() {
 			grayScaleValue_ = 1.0f;
 		}
 	}
+	//フェード
 	float alpha = float(endCount_) / float(kEndLength);
 	endSprite_->SetColor({ 1.0f,1.0f,1.0f,alpha });
 	endCount_++;
@@ -595,6 +612,7 @@ void GameScene::Fade() {
 				pointLightData[index].decay = 0.0f;
 				pointLightData[index].isUse_ = 0;
 			}
+			//初期画面に戻る
 			fadeAlpha_ = 1.0f;
 			//isIngame_ = true;
 			isIngame_ = false;
@@ -626,13 +644,9 @@ void GameScene::Draw3D() {
 		object->Draw(viewProjection_, modelList_);
 	}
 	terrain_->Draw(viewProjection_);
-
-	for (int index = 0; index < 1; index++) {
-		//flooars_[index]->Draw(viewProjection_);
-	}
 	player_->Draw(viewProjection_);
 	player2_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
 
 	Model::PostDraw();
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
@@ -645,8 +659,8 @@ void GameScene::Draw3D() {
 	//skybox描画
 	skyBox_->Draw(worldTransformSkyBox_, viewProjection_);
 
-		Particle::PreDraw(dxCommon_->GetCommandList());
-		particle->Draw(viewProjection_);
-		Particle::PostDraw();
+	Particle::PreDraw(dxCommon_->GetCommandList());
+	particle->Draw(viewProjection_);
+	Particle::PostDraw();
 
 }

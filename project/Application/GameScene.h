@@ -15,7 +15,7 @@
 #include "DebugCamera.h"
 
 #include "Character/Player.h"
-#include "Character/Player2.h"
+#include "Character/Enemy.h"
 #include "Character/PlayerAI.h"
 #include "Ground.h"
 #include "Camera/FollowCamera.h"
@@ -92,6 +92,9 @@ private:
 	//ライト生成
 	void CreateLight();
 
+	//ライト更新
+	void UpdateLight();
+
 	//ステート関数
 	void Idle();
 	//プレイ時
@@ -151,7 +154,7 @@ private:
 
 	// 自キャラ
 	std::unique_ptr<Player> player_;
-	std::unique_ptr<Player2> player2_;
+	std::unique_ptr<Enemy> player2_;
 
 	std::unique_ptr<Model> modelPlayerBody_;
 	std::unique_ptr<Model> modelPlayerHead_;

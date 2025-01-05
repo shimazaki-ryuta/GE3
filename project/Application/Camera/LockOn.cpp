@@ -10,7 +10,7 @@ void LockOn::Initialize() {
 	notTargetWorldTransform_.Initialize();
 }
 
-void LockOn::Update(Player2* enemies, ViewProjection& viewProjection) {
+void LockOn::Update(Enemy* enemies, ViewProjection& viewProjection) {
 	
 
 	Search(enemies, viewProjection);
@@ -45,18 +45,21 @@ WorldTransform* LockOn::GetTarget() {
 }
 
 bool LockOn::isInnerCamera(const Vector3& vector) {
+	//一点がカメラ内に入ってるか判定する
 	if (std::abs(vector.x) <=1.0f && std::abs(vector.y) <= 1.0f && vector.z > 0.0f){
 		return true;
 	}
 	return false;
 }
 
-void LockOn::Search(Player2* enemy, ViewProjection& viewProjection) {
+void LockOn::Search(Enemy* enemy, ViewProjection& viewProjection) {
 	
 	
-	Player2* target;
+	Enemy* target;
 	isLockOn_ = false;
+	//ターゲットが存在したら判定を取る
 	if (enemy) {
+		//ターゲットの座標をスクリーン座標に変換
 		Vector3 newEnemyPosition = enemy->GetWorldTransformBody()->GetWorldPosition();
 		Vector3 innerCameraPos = newEnemyPosition;
 		innerCameraPos = innerCameraPos * viewProjection.matView * viewProjection.matProjection;
@@ -65,6 +68,7 @@ void LockOn::Search(Player2* enemy, ViewProjection& viewProjection) {
 		//カメラ内か
 		if (std::abs(innerCameraPos.x) <= 1.0f && std::abs(innerCameraPos.y) <= 1.0f && innerCameraPos.z > 0.0f &&
 			modeCheck) {
+			//新しいターゲットをセット
 			target = enemy;
 			target_ = target;
 			isLockOn_ = true;

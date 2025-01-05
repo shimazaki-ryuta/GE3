@@ -187,14 +187,17 @@ void Player::Update() {
 	ApplyGlobalVariables();
 	if (!isDead_) {
 
-
+		//弾削除
 		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
 			if (bullet->GetIsDead()) {
 				return true;
 			}
 			return false;
 			});
+
 		Input::GetInstance()->GetJoystickState(0, joyState_);
+
+		//ビヘイビアセット
 		if (behaviorRequest_) {
 			behavior_ = behaviorRequest_.value();
 			frameCount_ = 0;
@@ -215,8 +218,8 @@ void Player::Update() {
 			}
 			behaviorRequest_ = std::nullopt;
 		}
-		//BehaviorRootUpdate();
-		//BehaviorAttackUpdate();
+		
+		//親があったら落下を止める
 		if (worldTransform_.parent_) {
 			if (worldTransform_.translation_.y < 0.0f) {
 				worldTransform_.translation_.y = 0.0f;
@@ -224,7 +227,7 @@ void Player::Update() {
 
 		}
 
-
+		//ビヘイビア実行
 		switch (behavior_) {
 		case Player::Behavior::kRoot:
 			BehaviorRootUpdate();
@@ -239,12 +242,12 @@ void Player::Update() {
 			BehaviorJumpUpdate();
 			break;
 		}
-		/*
-		if (worldTransform_.translation_.y < -10.0f) {
-			//ReStart();
-		}*/
+		
 	}
 	else {
+
+		//死亡時アニメーション
+
 		const float kDisolveStep = 0.005f;
 		const float kRotateStep = 0.05f;
 		const float kRotateLimit = -3.14f / 2.0f;
@@ -258,7 +261,6 @@ void Player::Update() {
 		}
 	}
 	// 行列更新
-	//worldTransform_.UpdateMatrix();
 	worldTransform_.matWorld_ = MakeScaleMatrix(worldTransform_.scale_) * directionMatrix_ * MakeTranslateMatrix(worldTransform_.translation_);
 	if (worldTransform_.parent_){
 		worldTransform_.matWorld_ *= worldTransform_.parent_->matWorld_;
@@ -267,20 +269,13 @@ void Player::Update() {
 	float* slider3[3] = {
 	    &worldTransform_.translation_.x, &worldTransform_.translation_.y,
 	    &worldTransform_.translation_.z};
-	/*
-#ifdef _DEBUG
-	ImGui::Begin("Player");
-	ImGui::SliderFloat3("", *slider3, -100.0f, 100.0f);
-	ImGui::SliderInt("Attack", &attackFrame, 1, 240);
-	ImGui::SliderInt("Rigd", &rigidityFrame, 1, 240);
-	ImGui::SliderInt("End", &endFrame, 1, 240);
-	ImGui::End();
-#endif // _DEBUG
-*/
 
+	//当たり判定更新
 	obb_.center = worldTransform_.GetWorldPosition();
 	obb_.size = { 1.0f,1.0f,1.0f };
 	SetOridentatios(obb_, MakeRotateMatrix(worldTransform_.rotation_));
+
+	//更新処理
 	for (HierarchicalAnimation& model : models_) {
 		model.worldTransform_.UpdateMatrix();
 	}
@@ -302,14 +297,14 @@ void Player::BehaviorRootUpdate()
 	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
 		return;
 	}
+
+	//ステート変更
 	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) 
 	{
-		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kAttack;
 	}
 	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X))
 	{
-		//behavior_ = Behavior::kAttack;
 		behaviorRequest_ = Behavior::kDash;
 	}
 	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) && 
@@ -318,49 +313,45 @@ void Player::BehaviorRootUpdate()
 		behaviorRequest_ = Behavior::kJump;
 	}
 
+	//移動処理
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 
 		const float kCharacterSpeed = 0.3f;
 
+		//カメラ方向から移動向きを補正
 		Vector3 move = {
 		    float(joyState.Gamepad.sThumbLX) / SHRT_MAX, 0,
 		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
-		//Matrix4x4 newrotation = DirectionToDIrection({0,0.0f,1.0f}, {0, 0.0f, -1.0f});
 		move = Normalize(move) * kCharacterSpeed;
-		//Vector3 cameraDirectionYcorection = {0.0f, viewProjection_->matView.m[1][0] * viewProjection_->matView.m[1][0]* viewProjection_->matView.m[1][2], 0.0f};
 		Matrix4x4 cameraRotateY = Inverse(viewProjection_->matView);
-		//cameraRotateY.m[0][0] = 1;
 		cameraRotateY.m[0][1] = 0;
-		//cameraRotateY.m[0][2] = 0;
-
 		cameraRotateY.m[1][0] = 0;
 		cameraRotateY.m[1][1] = 1;
 		cameraRotateY.m[1][2] = 0;
-
-
-		//cameraRotateY.m[2][0] = 0;
 		cameraRotateY.m[2][1] = 0;
-		//cameraRotateY.m[2][2] = 1;
-		
 		cameraRotateY.m[3][0] = 0;
 		cameraRotateY.m[3][1] = 0;
 		cameraRotateY.m[3][2] = 0;
-		//cameraRotateY = Inverse(cameraRotateY);
 		move = Transform(move, cameraRotateY);
+
+		//移動方向に向きを合わせる
 		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
-			//worldTransform_.rotation_.y = std::atan2(move.x, move.z);
 			Matrix4x4 newDirection = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(move));
 			directionMatrix_ = newDirection;
-			//worldTransform_.matWorld_ *= newDirection;
-			//worldTransform_.rotation_.y = newDirection.m[1][0] * newDirection.m[1][1] * newDirection.m[1][2];
 			direction_ = move;
 		}
+
+		//敵の方を向く
 		if (target_) {
 			Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
 			toTarget.y = 0;
 			directionMatrix_=DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 		}
+
+		//最終的な移動量を足す
 		worldTransform_.translation_ += move;
+
+		//移動時パーティクル発生
 		if (worldTransform_.parent_ && particle_ && Length(move) !=0.0f) {
 			Particle::ParticleData particleData;
 			for (uint32_t count = 0; count < emitter.count; count++) {
@@ -379,6 +370,8 @@ void Player::BehaviorRootUpdate()
 		velocity_ += kGravity;
 	}
 	worldTransform_.translation_ += velocity_;
+
+	//アニメーション
 	UpdateFloatingGimmick();
 }
 
@@ -390,12 +383,12 @@ void Player::BehaviorAttackUpdate()
 	
 	const float kVelocityCefficent = 1.5f;
 
+	//待機状態に戻る
 	if (frameCount_ == endFrame) {
-		// behavior_ = Behavior::kRoot;
-		//weaponCollider_.SetIsCollision(false);
 		behaviorRequest_ = Behavior::kRoot;
 	}
 	
+	//敵に向けて射撃する
 	if (target_) {
 		Vector3 toTarget = target_->GetWorldPosition() - models_[kHead].worldTransform_.GetWorldPosition();
 		if (frameCount_ == 0) {
@@ -420,18 +413,23 @@ void Player::BehaviorAttackUpdate()
 }
 
 void Player::BehaviorDashUpdate() {
-	//const float kCharacterSpeed = 0.3f;
+	
 
 	Vector3 move = {0,0,dashSpeed_};
+	//回避方向を向く
 	Matrix4x4 rotate = worldTransform_.matWorld_;
 	rotate.m[3][0] = 0;
 	rotate.m[3][1] = 0;
 	rotate.m[3][2] = 0;
+	//敵の方を向く
 	if (target_) {
 		rotate = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(direction_));
 	}
+	//移動方向補正
 	move = Transform(move, rotate);
 	worldTransform_.translation_ += move;
+
+	//待機状態に戻る
 	if (frameCount_ >= dashLength_) {
 		behaviorRequest_ = Behavior::kRoot;
 	}
@@ -444,18 +442,17 @@ void Player::BehaviorJumpUpdate() {
 }
 
 void Player::Draw(const ViewProjection& viewProjection) {
-	//model_->Draw(worldTransform_, viewProjection);
+	//アニメーション適用
 	if (!isDead_) {
 		testAnimation_->Update();
 	}
 	testSkeleton_->ApplyAnimation(*testAnimation_->GetAnimationData().get(), testAnimation_->GetTime());
 	testSkeleton_->Update();
 	LoadModel::UpdateSkinCluster(cluster_, testSkeleton_->GetSkeletonData());
-	/*for (HierarchicalAnimation& model : models_)
-	{
-		model.model_->Draw(model.worldTransform_, viewProjection);
-	}*/
+	
+	//各要素描画
 	for (uint32_t index = 0; index < models_.size();index++) {
+
 		models_[index].model_->SetMaterial(material_.get());
 		if (index == kHead) {
 			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection,cluster_);
@@ -464,7 +461,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 			models_[index].model_->Draw(models_[index].worldTransform_, viewProjection);
 		}
 	}
-	//testSkeleton_->Draw(worldTransform_, viewProjection);
+	//自身の持つ弾を描画
 	for (std::list<std::unique_ptr<Bullet>>::iterator iterator = bullets_.begin();
 		iterator != bullets_.end(); iterator++) {
 		(*iterator)->Draw(viewProjection);
@@ -548,20 +545,17 @@ void Player::OutCollision() {
 }
 
 void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
-	//if (worldTransform_.parent_ != &parent) {
-		//Vector3 point = GetClosestPoint(obb_,partner);
-		PushBack(0,obb_,partner);
-		Matrix4x4 rocal = MakeTranslateMatrix(obb_.center);
-		if (worldTransform_.parent_) {
-			rocal *= (Inverse(parent.matWorld_));
-		}
-		worldTransform_.translation_.x = rocal.m[3][0];
-		worldTransform_.translation_.y = rocal.m[3][1];
-		worldTransform_.translation_.z = rocal.m[3][2];
+	PushBack(0,obb_,partner);
+	Matrix4x4 rocal = MakeTranslateMatrix(obb_.center);
+	if (worldTransform_.parent_) {
+		rocal *= (Inverse(parent.matWorld_));
+	}
+	worldTransform_.translation_.x = rocal.m[3][0];
+	worldTransform_.translation_.y = rocal.m[3][1];
+	worldTransform_.translation_.z = rocal.m[3][2];
 
-		worldTransform_.parent_ = &parent;
-		worldTransform_.UpdateMatrix();
-		velocity_ = { 0,0,0 };
-		isFlooar_ = true;
-	//}
+	worldTransform_.parent_ = &parent;
+	worldTransform_.UpdateMatrix();
+	velocity_ = { 0,0,0 };
+	isFlooar_ = true;
 }

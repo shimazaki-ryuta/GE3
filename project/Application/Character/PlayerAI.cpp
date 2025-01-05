@@ -16,24 +16,24 @@ void PlayerAI::Reset() {
 
 void PlayerAI::Update() {
 	//ビヘイビア設定
-	data_.behavior = Player2::Behavior::kRoot;
+	data_.behavior = Enemy::Behavior::kRoot;
 	if (coolTime_ <= 0) {
-		data_.behavior = Player2::Behavior::kAttack;
+		data_.behavior = Enemy::Behavior::kAttack;
 	}
-	if (p2_->GetBehavior() == Player2::Behavior::kAttack) {
+	if (p2_->GetBehavior() == Enemy::Behavior::kAttack) {
 		coolTime_ = 180;
 	}
 	//回避判定
 	if (avoid_) {
-		data_.behavior = Player2::Behavior::kDash;
+		data_.behavior = Enemy::Behavior::kDash;
 		float r = RandomEngine::GetRandom(0.0f,1.0f);
 		if (r > 0.5f) {
 			direction_ *= -1.0f;
-			data_.behavior = Player2::Behavior::kJump;
+			data_.behavior = Enemy::Behavior::kJump;
 		}
 		avoid_ = false;
 	}
-	//入力の変わり
+	//入力のかわり
 	Vector3 move{0,0,0};
 
 	Vector3 s = p2_->GetWorldTransform()->GetWorldPosition();
@@ -81,8 +81,9 @@ int PlayerAI::AverageCalc() {
 
 void PlayerAI::Fire() {
 	
+	//待機状態だったら回避する
 	float r = RandomEngine::GetRandom(0.0f, 1.0f);
-	if (r > 0.1f && p2_->GetBehavior() == Player2::Behavior::kRoot && coolTime_ <= 120) {
+	if (r > 0.1f && p2_->GetBehavior() == Enemy::Behavior::kRoot && coolTime_ <= 120) {
 		avoid_ = true;
 	}
 }
