@@ -88,8 +88,6 @@ public:
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);
 
-	void DrawTerrain(WorldTransform& worldTransform, const ViewProjection& viewProjection);
-
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, ID3D12Resource* animationMatrixResource);
 
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection, SkinCluster& skinCluster);
