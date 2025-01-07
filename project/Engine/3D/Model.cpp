@@ -901,7 +901,13 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 	//VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * vertexNum);
-	/*
+
+	//インデックスバッファーを同じだけ作る
+	modelData_.meshs.indices.clear();
+	for (uint32_t i = 0; i < vertexNum + vertexAppendMax;i++) {
+		modelData_.meshs.indices.push_back(i);
+	}
+
 	//インデックスリソース
 	indexResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(uint32_t) * modelData_.meshs.indices.size());
 
@@ -911,7 +917,7 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
 	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
-	*/
+	
 	//マテリアル用のリソースを作成
 	materialResource_ = DirectXCommon::CreateBufferResource(sDevice, sizeof(MaterialParamater));
 	//Material* materialData = nullptr;

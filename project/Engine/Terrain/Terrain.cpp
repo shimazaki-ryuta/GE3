@@ -84,7 +84,7 @@ void Terrain::SetMeshData(TerrainData& data) {
 
 void Terrain::Update() {
 	static float st;
-	ImGui::Begin("meshShink");
+	ImGui::Begin("meshSync");
 	ImGui::DragInt("shadeType", &(material_->paramater_.shadingType), 1, 0, 1);
 	ImGui::DragFloat("Shiness", &(material_->paramater_.shininess), 0.1f, 0.0f, 100.0f);
 	ImGui::DragFloat("EnvironmentSpecuraScale", &st, 0.01f, 0.0f, 2.0f);
@@ -108,5 +108,5 @@ void Terrain::Update() {
 void Terrain::Draw(const ViewProjection& viewProjection) {
 	
 	model_->SetMaterial(material_.get());
-	model_->DrawTerrain(worldtransform_, viewProjection);
+	model_->Draw(worldtransform_, viewProjection);
 }
