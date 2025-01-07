@@ -81,6 +81,9 @@ public:
 	//objファイルから生成
 	static Model* CreateFromOBJ(const  std::string& directoryPath);
 
+	//頂点,インデックスバッファーにデータ転送
+	void TransferBuffer();
+
 	//描画
 	void Draw(WorldTransform& worldTransform,const ViewProjection& viewProjection);
 	void Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection,uint32_t textureHandle);

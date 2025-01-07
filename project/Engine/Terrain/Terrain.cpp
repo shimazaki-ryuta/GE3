@@ -72,6 +72,12 @@ void Terrain::SetMeshData(TerrainData& data) {
 		
 		vData.id = -1;
 	}
+	//
+	model_->GetModelData().meshs.indices.clear();
+	for (uint32_t i = 0; i < vertices.size(); i++) {
+		model_->GetModelData().meshs.indices.push_back(i);
+	}
+
 	data.verticesDatas.remove_if([](TerrainVerticesData& vData) {
 		if (vData.id<0) {
 			return true;
@@ -108,5 +114,6 @@ void Terrain::Update() {
 void Terrain::Draw(const ViewProjection& viewProjection) {
 	
 	model_->SetMaterial(material_.get());
+	model_->TransferBuffer();
 	model_->Draw(worldtransform_, viewProjection);
 }

@@ -1036,6 +1036,11 @@ void Model::DrawTerrain(WorldTransform& worldTransform, const ViewProjection& vi
 	
 }
 
+void Model::TransferBuffer() {
+	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * modelData_.meshs.vertices.size());
+	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
+}
+
 void Model::Draw(WorldTransform& worldTransform, const ViewProjection& viewProjection) {
 	// パイプラインステートの設定
 	sCommandList->SetPipelineState(sPipelineState.Get());
