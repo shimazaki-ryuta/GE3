@@ -25,6 +25,8 @@ void Ground::Initialize(Model* model, const Vector3& position) {
 	material_->Initialize();
 	material_->paramater_.enableLighting = 2;
 	material_->paramater_.disolveColor = Vector4{ 5.2f, 0.2f, 0.2f, 0.0f };
+	material_->outline_.color = { 0.0f,1.0f,0.0f,1.0f };
+	material_->outline_.scale = { width,width ,width };
 	//model_->SetGrowStrength(0.5f);
 	testAnimation_.reset(new Animation);
 	testAnimation_->Initialize();

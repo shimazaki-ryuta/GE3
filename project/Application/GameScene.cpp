@@ -82,7 +82,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	ground_.reset(new Ground);
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
-
+	terrain_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 	CollisionManager::GetInstance()->ClearList();
 
 	CollisionManager::GetInstance()->ClearList();
@@ -285,6 +285,8 @@ void GameScene::Update() {
 	skyBox_->SetColor(skyColor_);
 	skyBox_->SetExpornentiation(skyExpornent_);
 	dxCommon_->SetHSVFilter(hsvFilter_);
+
+	ground_->Update();
 #endif // _DEBUG
 
 	//更新処理
@@ -652,7 +654,7 @@ void GameScene::Draw3D() {
 	Model::PreDrawOutLine(dxCommon_->GetCommandList());
 	player_->DrawOutLine(viewProjection_);
 	player2_->DrawOutLine(viewProjection_);
-	ground_->DrawOutLine(viewProjection_);
+	//ground_->DrawOutLine(viewProjection_);
 	Model::PostDraw();
 
 

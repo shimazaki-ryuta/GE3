@@ -25,6 +25,8 @@ public:
 	void ResetMeshData(TerrainData& data);
 	~Terrain() {};
 
+	//setter
+	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 private:
 
 	std::unique_ptr<Model> model_;

@@ -202,7 +202,7 @@ void DirectXCommon::End3DSorceDraw() {
 
 	ResourceBarrier(2, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	//grayscale
+	
 	SetRenderTarget(3, 0);
 	ClearRenderTarget(3, Vector4{ 0.0f,0.0f,0.0f,1.0f });
 
@@ -216,6 +216,7 @@ void DirectXCommon::End3DSorceDraw() {
 	SetRenderTarget(2, 0);
 	ClearRenderTarget(2, Vector4{ 0.0f,0.0f,0.0f,1.0f });
 
+	//grayscale
 	postEffect2->PreDraw(commandList_.Get());
 	postEffect2->Draw(srvDescriptorHeap_.Get(), renderSrvHandles_[3], renderSrvHandles_[3]);
 	postEffect2->PostDraw();

@@ -165,7 +165,6 @@ class SendField:
     def Send(self):
         message = self.jData + "\0"
         if message != 'end':
-            #そうしん回数
             sendDatas = list()
             json_object = dict()
             json_object["m"] = dict()
@@ -174,8 +173,10 @@ class SendField:
             datas["sflag"] = 1 #開始フラグ
             datas["vNum"] = len(self.dumpJson["m"]["v"])#頂点数
             index = 0
+            #送信頂点データ追加処理
             for object in self.dumpJson["m"]["v"]:
                 datas["v"].append(object)
+                #256頂点でデータ分割
                 if(index >= 256):
                     index=0
                     sendDatas.append(copy.deepcopy(json_object))
@@ -186,10 +187,11 @@ class SendField:
                     index += 1
             if(len(json_object["m"]["v"]) != 0):
                 sendDatas.append(json_object.copy())
+            #送信回数分送信
             for i in range(0,len(sendDatas)):
+                #最後の送信時に終了フラグ(-1)をつける
                 if(i == len(sendDatas)-1):
                     sendDatas[i]["m"]["sflag"] = -1
-                
                 json_text = json.dumps(sendDatas[i],ensure_ascii=False,cls=json.JSONEncoder)
                 message = json_text + "\0"
                 sock.sendto(message.encode('utf-8'), serv_address)
@@ -223,13 +225,12 @@ class SendField:
         #アクティブオブジェクト取得
         me = object.data
 
-        # Get a BMesh representation
-        activeMesh = bmesh.new()   # create an empty BMesh
+        # 有効なbmeshをblenderから取得する
+        activeMesh = bmesh.new()
         activeMesh.from_mesh(me)
 
-
         id=0
-        mesh = object.data
+        #mesh = object.data
         uv_layer = activeMesh.loops.layers.uv.active
         
         for face in activeMesh.faces :
@@ -248,7 +249,7 @@ class SendField:
                     #まとめて一個分のjsonオブジェクトに登録
                     json["v"].append(json_object)
                     id = id + 1
-            #一旦四角面で対応できるか
+            #四角以上の凸面
             else :
                 for i in range(0,len(face.loops)-2):
                     for j in range(0,3) :
