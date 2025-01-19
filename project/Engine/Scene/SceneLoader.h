@@ -59,6 +59,8 @@ public:
 	//変形したポリゴンのデータを作る
 	//void CreateTerrainData();
 
+	void SetVertexData(VertexData* vData) { vData_ = vData; };
+
 private:
 	//オブジェクト一個の解析
 	void PraceObject(nlohmann::json& object,GameObjectData* parent=nullptr);
@@ -71,5 +73,7 @@ private:
 
 	std::thread receveJsonDataThread;
 	SOCKET socket_;
+	//バイナリテスト用
+	VertexData* vData_;
 };
 

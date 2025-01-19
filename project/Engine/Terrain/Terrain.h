@@ -27,6 +27,9 @@ public:
 
 	//setter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
+
+	VertexData* GetvertexData() { return model_->GetVertexData(); };
+
 private:
 
 	std::unique_ptr<Model> model_;

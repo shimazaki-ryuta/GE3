@@ -300,7 +300,7 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 32768;
+	const static uint32_t buffSize = 1249;
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
@@ -312,7 +312,12 @@ void SceneLoader::ReceveJsonData() {
 			break;
 		}
 
-		sData = rBuff;
+		//バイナリ実験
+		//float test[4];
+		memcpy(vData_,rBuff, sizeof(VertexData) * 24);
+		
+		
+		/*sData = rBuff;
 		nlohmann::json jData;
 		//json解凍
 		try {
@@ -321,9 +326,9 @@ void SceneLoader::ReceveJsonData() {
 		catch (...) {
 			//Log(e.what());
 			//continue;
-			break;
+			//break;
 		}
-
+		
 		//分岐
 		if (jData.contains("m")) {
 			//頂点データ
@@ -339,7 +344,7 @@ void SceneLoader::ReceveJsonData() {
 
 			}
 			isRecevedData_ = true;
-		}
+		}*/
 	}
 	closesocket(socket_);
 	isEnd = true;

@@ -22,7 +22,7 @@ void Terrain::Initialize(const GameObjectData& data) {
 	material_->ApplyParamater();
 
 	model_.reset(new Model);
-	model_->CreateTerrain("Resources/Models", "PlayerHead.obj");
+	model_->CreateTerrain("Resources/Models", "uvSphere.obj");
 	//model_->CreateTerrain("Resources/TerrainTest", "TerrainTest.obj");
 	//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
 	//vertices.clear();
@@ -88,6 +88,8 @@ void Terrain::SetMeshData(TerrainData& data) {
 	data.vertexNum_ = -1;
 }
 
+static int num = 0;
+
 void Terrain::Update() {
 	static float st;
 	ImGui::Begin("meshSync");
@@ -97,8 +99,13 @@ void Terrain::Update() {
 	ImGui::DragFloat("Disolve", &(material_->paramater_.disolveThreshold), 0.001f, 0.0f, 1.0f);
 	ImGui::ColorEdit3("DisolveColor", &(material_->paramater_.disolveColor.x));
 	if (ImGui::Button("ClearVertex")) {
-		std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
-		vertices.clear();
+		//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
+		//vertices.clear();
+	}
+	ImGui::DragInt("VertexNum",&num);
+	model_->GetModelData().meshs.indices.clear();
+	for (int i = 0; i < num;i++) {
+		model_->GetModelData().meshs.indices.push_back(uint32_t(i));
 	}
 	ImGui::End();
 	

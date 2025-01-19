@@ -1000,7 +1000,7 @@ void Model::PostDraw() {
 }
 
 void Model::TransferBuffer() {
-	std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * modelData_.meshs.vertices.size());
+	//std::memcpy(vertexData_, modelData_.meshs.vertices.data(), sizeof(VertexData) * modelData_.meshs.vertices.size());
 	std::memcpy(indexData_, modelData_.meshs.indices.data(), sizeof(uint32_t) * modelData_.meshs.indices.size());
 }
 

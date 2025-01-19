@@ -55,6 +55,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	sceneLoader_->CreateObjects(objects_);
 	sceneLoader_->CreateTerrain(terrain_);
 	sceneLoader_->ReadTerrainVerticesFromFile(terrain_,"PlayerHead");
+	sceneLoader_->SetVertexData(terrain_->GetvertexData());
 #ifdef DEMO
 	//受信用スレッド起動
 	sceneLoader_->StartReceveJson();
@@ -403,7 +404,7 @@ void GameScene::FromBlenderUpdate() {
 	sceneLoader_->CreateModelList(modelList_);
 	sceneLoader_->ApplyTerrainTransform(terrain_);
 	sceneLoader_->ApplyRecevedData(objects_);
-	sceneLoader_->ApplyTerrainVertices(terrain_);
+	//sceneLoader_->ApplyTerrainVertices(terrain_);
 #endif // _DEBUG
 }
 
