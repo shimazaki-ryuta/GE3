@@ -27,7 +27,7 @@
 #include "3D/Animation.h"
 #include "3D/SkyBox.h"
 
-#include "Terrain/Terrain.h"
+#include "MeshSyncObject/MeshSyncObject.h"
 
 //ゲームシーンクラス
 
@@ -203,7 +203,7 @@ private:
 	Vector4 hsvFilter_;
 
 	//メッシュシンク用テストオブジェクト
-	std::unique_ptr<Terrain> terrain_;
+	std::unique_ptr<MeshSyncObject> terrain_;
 
 	//skyboxcolor
 	Vector4 skyColor_ = {0.45f,0.45f,0.45f,1.0f};

@@ -1,10 +1,10 @@
-#include "Terrain.h"
+#include "MeshSyncObject.h"
 #include "MatrixFunction.h"
 //ImGui
 #include "../externals/imgui/imgui.h"
 #include "../externals/imgui/imgui_impl_dx12.h"
 #include "../externals/imgui/imgui_impl_win32.h"
-void Terrain::Initialize(const GameObjectData& data) {
+void MeshSyncObject::Initialize(const GameObjectData& data) {
 	worldtransform_.Initialize();
 	worldtransform_.translation_ = data.transform.translate;
 	worldtransform_.rotation_ = data.transform.rotate;
@@ -23,12 +23,12 @@ void Terrain::Initialize(const GameObjectData& data) {
 
 	model_.reset(new Model);
 	model_->CreateTerrain("Resources/Models", "uvSphere.obj");
-	//model_->CreateTerrain("Resources/TerrainTest", "TerrainTest.obj");
+	//model_->CreateMeshSyncObject("Resources/MeshSyncObjectTest", "MeshSyncObjectTest.obj");
 	//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
 	//vertices.clear();
 }
 
-void Terrain::SetTransformData(TerrainData& data) {
+void MeshSyncObject::SetTransformData(TerrainData& data) {
 	worldtransform_.translation_ = data.object.transform.translate;
 	worldtransform_.rotation_ = data.object.transform.rotate;
 	worldtransform_.scale_ = data.object.transform.scale;
@@ -37,7 +37,7 @@ void Terrain::SetTransformData(TerrainData& data) {
 	
 }
 
-void Terrain::ResetMeshData(TerrainData& data) {
+void MeshSyncObject::ResetMeshData(TerrainData& data) {
 	std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
 	vertices.clear();
 	for (TerrainVerticesData& vData : data.verticesDatas) {
@@ -50,47 +50,7 @@ void Terrain::ResetMeshData(TerrainData& data) {
 	}
 }
 
-void Terrain::SetMeshData(TerrainData& data) {
-	//総頂点数に満たすまで反映しない
-	if (data.vertexNum_== -1 || data.verticesDatas.size() < data.vertexNum_) {
-		return;
-	}
-	std::vector<VertexData>& vertices =  model_->GetModelData().meshs.vertices;
-	vertices.clear();
-	for (TerrainVerticesData & vData : data.verticesDatas) {
-		VertexData* vertex;
-		if (vertices.size()>vData.id && !vertices.empty()) {
-			vertex = &vertices[vData.id];
-		}
-		else {
-			vertices.emplace_back();
-			vertex = &vertices.back();
-		}
-		vertex->position = { vData.position.x,vData.position.y,vData.position.z,1.0f };
-		vertex->normal = vData.normal;
-		vertex->texcoord = vData.uv;
-		
-		vData.id = -1;
-	}
-	//
-	model_->GetModelData().meshs.indices.clear();
-	for (uint32_t i = 0; i < vertices.size(); i++) {
-		model_->GetModelData().meshs.indices.push_back(i);
-	}
-
-	data.verticesDatas.remove_if([](TerrainVerticesData& vData) {
-		if (vData.id<0) {
-			return true;
-		}
-		return false;
-		});
-	//data.verticesDatas.clear();
-	data.vertexNum_ = -1;
-}
-
-//static int num = 0;
-
-void Terrain::Update() {
+void MeshSyncObject::Update() {
 	static float st;
 	ImGui::Begin("meshSync");
 	ImGui::DragInt("shadeType", &(material_->paramater_.shadingType), 1, 0, 1);
@@ -98,11 +58,6 @@ void Terrain::Update() {
 	ImGui::DragFloat("EnvironmentSpecuraScale", &st, 0.01f, 0.0f, 2.0f);
 	ImGui::DragFloat("Disolve", &(material_->paramater_.disolveThreshold), 0.001f, 0.0f, 1.0f);
 	ImGui::ColorEdit3("DisolveColor", &(material_->paramater_.disolveColor.x));
-	if (ImGui::Button("ClearVertex")) {
-		//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
-		//vertices.clear();
-	}
-	//ImGui::DragInt("VertexNum",&num);
 	ImGui::End();
 	
 	material_->paramater_.environmentCoefficient = st;
@@ -114,14 +69,14 @@ void Terrain::Update() {
 	
 }
 
-void Terrain::Draw(const ViewProjection& viewProjection) {
+void MeshSyncObject::Draw(const ViewProjection& viewProjection) {
 	
 	model_->SetMaterial(material_.get());
 	model_->TransferBuffer();
 	model_->Draw(worldtransform_, viewProjection);
 }
 
-void Terrain::SetVerticesNum(size_t num) {
+void MeshSyncObject::SetVerticesNum(size_t num) {
 	if (verticesNum_ != num) {
 		verticesNum_ = num;
 		model_->GetModelData().meshs.indicesNum = uint32_t(num);

@@ -3,9 +3,19 @@
 #include "3D/Model.h"
 #include <memory>
 
+//通信ヘッダー情報
+
+struct MeshSyncHeader
+{
+	size_t verticesNum;//総頂点数
+	size_t verticesOffset;//頂点オフセット
+	//bool isLastData;//最後のデータか
+};
+
+
 //MeshSync対応オブジェクトクラス
 
-class Terrain
+class MeshSyncObject
 {
 public:
 	//初期化
@@ -23,7 +33,7 @@ public:
 
 	//モデルの頂点情報をクリアし頂点数を0にする
 	void ResetMeshData(TerrainData& data);
-	~Terrain() {};
+	~MeshSyncObject() {};
 
 	//gettersetter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };

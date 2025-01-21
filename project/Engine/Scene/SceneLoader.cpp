@@ -35,24 +35,6 @@ void SceneLoader::LoadFile(const std::string fileName) {
 	}
 }
 
-void SceneLoader::ReadTerrainVerticesFromFile(std::unique_ptr<Terrain>& terrain,const std::string fileName) {
-	const std::string fullpath = "Resources/TerrainTest/" + fileName + ".json";
-
-	std::ifstream file;
-
-	file.open(fullpath);
-	if (file.fail()) {
-		assert(0);
-	}
-
-	nlohmann::json deserialized;
-
-	file >> deserialized;
-
-	ReadTerrainVertices(deserialized);
-	terrain->ResetMeshData(*(terrainData_.get()));
-}
-
 void SceneLoader::PraceObject(nlohmann::json& object, GameObjectData* parent) {
 	std::string type = object["type"].get<std::string>();
 	if (type.compare("MESH") == 0) {
@@ -209,59 +191,17 @@ void SceneLoader::CreateObject(std::unique_ptr<GameObject>& parent, GameObjectDa
 	parent->AppendChildlen(std::move(instance));
 }
 
-void SceneLoader::CreateTerrain(std::unique_ptr<Terrain>& terrain) {
+void SceneLoader::CreateTerrain(std::unique_ptr<MeshSyncObject>& terrain) {
 	
-	terrain.reset(new Terrain);
+	terrain.reset(new MeshSyncObject);
 	terrain->Initialize(terrainData_->object);
 }
 
-void SceneLoader::ReadTerrainVertices(nlohmann::json& data) {
-	//terrainData_->verticesDatas.clear();
-	if (data["m"].contains("vNum")) {
-		//頂点数変更
-		terrainData_->vertexNum_ = data["m"]["vNum"];
-		terrainData_->verticesDatas.clear();
-	}
-	//頂点情報を格納
-	for (nlohmann::json& object : data["m"]["v"]) {
-		TerrainVerticesData* datas;
-		terrainData_->verticesDatas.emplace_back(TerrainVerticesData{});
-		datas = &terrainData_->verticesDatas.back();
-		datas->id = object["i"];
-		datas->position.x = float(object["p"][0]);
-		datas->position.y = object["p"][2];
-		datas->position.z = object["p"][1];
-		datas->normal.x = object["n"][0];
-		datas->normal.y = object["n"][2];
-		datas->normal.z = object["n"][1];
-
-		datas->uv.x = object["u"][0];
-		datas->uv.y = object["u"][1];
-		datas->uv.y *= -1.0f;
-
-		datas->specialFlag = 0;
-		if (data.contains("sflag")) {
-			datas->specialFlag = data["sflag"];
-		}
-		if (data["m"].contains("vNum")) {
-			terrainData_->vertexNum_ = data["m"]["vNum"];
-		}
-	}
-}
-
-void SceneLoader::ApplyTerrainTransform(std::unique_ptr<Terrain>& terrain) {
+void SceneLoader::ApplyTerrainTransform(std::unique_ptr<MeshSyncObject>& terrain) {
 	if (!isRecevedData_) {
 		return;
 	}
 	terrain->SetTransformData(*(terrainData_.get()));
-}
-
-void SceneLoader::ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain) {
-	if (!isRecevedTerrain_) {
-		return;
-	}
-	terrain->SetMeshData(*(terrainData_.get()));
-	isRecevedTerrain_ = false;
 }
 
 //debug
@@ -412,10 +352,17 @@ void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData
 
 void SceneLoader::ApplyVertexFromBinary(char* binData) {
 	
+	//通信ヘッダー
+	MeshSyncHeader header;
+
 	//頂点数取得
-	memcpy(&verticesNum_, binData, sizeof(verticesNum_));
+	memcpy(&header, binData, sizeof(MeshSyncHeader));
+
+	if (/*header.isLastData || */ verticesNum_ < header.verticesNum) {
+		verticesNum_ = header.verticesNum;
+	}
 
 	//ヘッダー分のオフセット
-	const static size_t headerSize = 8;
-	memcpy(vData_, binData + headerSize, sizeof(VertexData) * verticesNum_);
+	const static size_t headerSize = sizeof(MeshSyncHeader);
+	memcpy(vData_ + header.verticesOffset, binData + headerSize, sizeof(VertexData) * (header.verticesNum - header.verticesOffset));
 }

@@ -14,7 +14,7 @@
 #include "3D/Model.h"
 #include "SceneStructs.h"
 #include "GameObject/GameObject.h"
-#include "Terrain/Terrain.h"
+#include "MeshSyncObject/MeshSyncObject.h"
 
 //シーン読み込みクラス
 
@@ -32,15 +32,9 @@ public:
 
 	//MeshSync
 	//オブジェクトを生成する
-	void CreateTerrain(std::unique_ptr<Terrain>& terrain);
-	//受信Jsonから頂点情報を読む
-	void ReadTerrainVertices(nlohmann::json& data);
-	//頂点情報をモデルに適用する
-	void ApplyTerrainVertices(std::unique_ptr<Terrain>& terrain);
+	void CreateTerrain(std::unique_ptr<MeshSyncObject>& terrain);
 	//トランスフォーム情報をモデルに適用する
-	void ApplyTerrainTransform(std::unique_ptr<Terrain>& terrain);
-	//jsonファイルから頂点情報を読む
-	void ReadTerrainVerticesFromFile(std::unique_ptr<Terrain>& terrain,const std::string fileName);
+	void ApplyTerrainTransform(std::unique_ptr<MeshSyncObject>& terrain);
 	//バイナリデータを頂点に
 	void ApplyVertexFromBinary(char* binData);
 

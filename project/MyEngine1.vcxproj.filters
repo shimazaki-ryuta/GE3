@@ -193,7 +193,7 @@
     <ClCompile Include="Engine\3D\Material.cpp">
       <Filter>Engine\3D</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Terrain\Terrain.cpp">
+    <ClCompile Include="Engine\MeshSyncObject\MeshSyncObject.cpp">
       <Filter>Engine\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="Engine\CommonFiles\Input.cpp">
@@ -453,7 +453,7 @@
     <ClInclude Include="Engine\Scene\IScene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Terrain\Terrain.h">
+    <ClInclude Include="Engine\MeshSyncObject\MeshSyncObject.h">
       <Filter>Engine\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2D\PostEffect.h">

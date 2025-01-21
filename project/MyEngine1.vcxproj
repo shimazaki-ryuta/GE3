@@ -366,7 +366,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\3D\Skeleton.cpp" />
     <ClCompile Include="Engine\3D\SkyBox.cpp" />
     <ClCompile Include="Engine\2D\Sprite.cpp" />
-    <ClCompile Include="Engine\Terrain\Terrain.cpp" />
+    <ClCompile Include="Engine\MeshSyncObject\MeshSyncObject.cpp" />
     <ClCompile Include="Engine\TextureManager.cpp" />
     <ClCompile Include="Engine\3D\ViewProjection.cpp" />
     <ClCompile Include="Engine\3D\WorldTransform.cpp" />
@@ -459,7 +459,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\3D\Skeleton.h" />
     <ClInclude Include="Engine\3D\SkyBox.h" />
     <ClInclude Include="Engine\2D\Sprite.h" />
-    <ClInclude Include="Engine\Terrain\Terrain.h" />
+    <ClInclude Include="Engine\MeshSyncObject\MeshSyncObject.h" />
     <ClInclude Include="Engine\TextureManager.h" />
     <ClInclude Include="Engine\3D\ViewProjection.h" />
     <ClInclude Include="Engine\3D\WorldTransform.h" />

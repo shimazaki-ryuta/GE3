@@ -54,7 +54,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	objects_.clear();
 	sceneLoader_->CreateObjects(objects_);
 	sceneLoader_->CreateTerrain(terrain_);
-	sceneLoader_->ReadTerrainVerticesFromFile(terrain_,"PlayerHead");
+	//sceneLoader_->ReadTerrainVerticesFromFile(terrain_,"PlayerHead");
 	sceneLoader_->SetVertexData(terrain_->GetvertexData());
 #ifdef DEMO
 	//受信用スレッド起動
