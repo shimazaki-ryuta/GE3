@@ -67,6 +67,7 @@ struct MeshData
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 	MaterialData material;
+	uint32_t indicesNum;
 };
 
 struct Index {

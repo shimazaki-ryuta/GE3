@@ -300,12 +300,12 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 1249;
+	const static uint32_t buffSize = 65536*12;
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
 		//受信
-		recvfrom(socket_, rBuff, buffSize -1, 0, (sockaddr*)&from, &sockaddr_in_size);
+		recvfrom(socket_, rBuff, buffSize , 0, (sockaddr*)&from, &sockaddr_in_size);
 
 		//end
 		if (strstr(rBuff,"end")) {
@@ -313,9 +313,7 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		//バイナリ実験
-		//float test[4];
-		memcpy(vData_,rBuff, sizeof(VertexData) * 24);
-		
+		ApplyVertexFromBinary(rBuff);
 		
 		/*sData = rBuff;
 		nlohmann::json jData;
@@ -412,3 +410,12 @@ void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData
 	}
 }
 
+void SceneLoader::ApplyVertexFromBinary(char* binData) {
+	
+	//頂点数取得
+	memcpy(&verticesNum_, binData, sizeof(verticesNum_));
+
+	//ヘッダー分のオフセット
+	const static size_t headerSize = 8;
+	memcpy(vData_, binData + headerSize, sizeof(VertexData) * verticesNum_);
+}

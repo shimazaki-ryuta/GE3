@@ -405,6 +405,7 @@ void GameScene::FromBlenderUpdate() {
 	sceneLoader_->ApplyTerrainTransform(terrain_);
 	sceneLoader_->ApplyRecevedData(objects_);
 	//sceneLoader_->ApplyTerrainVertices(terrain_);
+	terrain_->SetVerticesNum(sceneLoader_->GetVerticesNum());
 #endif // _DEBUG
 }
 

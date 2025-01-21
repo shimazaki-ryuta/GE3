@@ -25,10 +25,13 @@ public:
 	void ResetMeshData(TerrainData& data);
 	~Terrain() {};
 
-	//setter
+	//gettersetter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 
 	VertexData* GetvertexData() { return model_->GetVertexData(); };
+
+	//頂点数を設定する
+	void SetVerticesNum(size_t num);
 
 private:
 
@@ -37,5 +40,6 @@ private:
 	EulerTransform deltaTransform_;
 	std::unique_ptr<Material> material_;
 	std::string fileName = "";
+	size_t verticesNum_ = 0;
 };
 

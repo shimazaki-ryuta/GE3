@@ -41,6 +41,9 @@ public:
 	void ApplyTerrainTransform(std::unique_ptr<Terrain>& terrain);
 	//jsonファイルから頂点情報を読む
 	void ReadTerrainVerticesFromFile(std::unique_ptr<Terrain>& terrain,const std::string fileName);
+	//バイナリデータを頂点に
+	void ApplyVertexFromBinary(char* binData);
+
 
 	///debug
 
@@ -58,8 +61,9 @@ public:
 	
 	//変形したポリゴンのデータを作る
 	//void CreateTerrainData();
-
+	//Getter/Setter
 	void SetVertexData(VertexData* vData) { vData_ = vData; };
+	size_t GetVerticesNum() { return verticesNum_; };
 
 private:
 	//オブジェクト一個の解析
@@ -73,7 +77,8 @@ private:
 
 	std::thread receveJsonDataThread;
 	SOCKET socket_;
-	//バイナリテスト用
+	//バイナリ用
 	VertexData* vData_;
+	size_t verticesNum_=0;
 };
 

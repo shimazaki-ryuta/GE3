@@ -88,7 +88,7 @@ void Terrain::SetMeshData(TerrainData& data) {
 	data.vertexNum_ = -1;
 }
 
-static int num = 0;
+//static int num = 0;
 
 void Terrain::Update() {
 	static float st;
@@ -102,11 +102,7 @@ void Terrain::Update() {
 		//std::vector<VertexData>& vertices = model_->GetModelData().meshs.vertices;
 		//vertices.clear();
 	}
-	ImGui::DragInt("VertexNum",&num);
-	model_->GetModelData().meshs.indices.clear();
-	for (int i = 0; i < num;i++) {
-		model_->GetModelData().meshs.indices.push_back(uint32_t(i));
-	}
+	//ImGui::DragInt("VertexNum",&num);
 	ImGui::End();
 	
 	material_->paramater_.environmentCoefficient = st;
@@ -123,4 +119,11 @@ void Terrain::Draw(const ViewProjection& viewProjection) {
 	model_->SetMaterial(material_.get());
 	model_->TransferBuffer();
 	model_->Draw(worldtransform_, viewProjection);
+}
+
+void Terrain::SetVerticesNum(size_t num) {
+	if (verticesNum_ != num) {
+		verticesNum_ = num;
+		model_->GetModelData().meshs.indicesNum = uint32_t(num);
+	}
 }
