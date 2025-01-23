@@ -35,7 +35,7 @@ public:
 	void CreateTerrain(std::unique_ptr<MeshSyncObject>& terrain);
 	//トランスフォーム情報をモデルに適用する
 	void ApplyTerrainTransform(std::unique_ptr<MeshSyncObject>& terrain);
-	//バイナリデータを頂点に
+	//バイナリデータを頂点リソースに適用
 	void ApplyVertexFromBinary(char* binData);
 
 

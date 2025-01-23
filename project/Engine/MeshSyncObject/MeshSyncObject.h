@@ -9,7 +9,7 @@ struct MeshSyncHeader
 {
 	size_t verticesNum;//総頂点数
 	size_t verticesOffset;//頂点オフセット
-	//bool isLastData;//最後のデータか
+	size_t isLastData;//最後のデータか
 };
 
 
@@ -29,7 +29,7 @@ public:
 	void SetTransformData(TerrainData& data);
 
 	//頂点情報モデルにセット
-	void SetMeshData(TerrainData& data);
+	//void SetMeshData(TerrainData& data);
 
 	//モデルの頂点情報をクリアし頂点数を0にする
 	void ResetMeshData(TerrainData& data);

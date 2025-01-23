@@ -358,7 +358,7 @@ void SceneLoader::ApplyVertexFromBinary(char* binData) {
 	//頂点数取得
 	memcpy(&header, binData, sizeof(MeshSyncHeader));
 
-	if (/*header.isLastData || */ verticesNum_ < header.verticesNum) {
+	if (bool(header.isLastData) || verticesNum_ < header.verticesNum) {
 		verticesNum_ = header.verticesNum;
 	}
 
