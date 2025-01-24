@@ -58,6 +58,9 @@
     <Filter Include="Engine\MeshSyncObject">
       <UniqueIdentifier>{98049717-3356-42b7-b01b-98674ea36539}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application\Scene">
+      <UniqueIdentifier>{d5379bfb-b115-4625-ab84-3d34deaaf49e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Object3d.hlsli" />
@@ -260,9 +263,24 @@
       <Filter>Engine\2D</Filter>
     </ClCompile>
     <ClCompile Include="Application\Scene\GameScene.cpp">
-      <Filter>Application</Filter>
+      <Filter>Application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Application\Scene\SceneFactory.cpp">
+      <Filter>Application\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateRoot.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateFactory.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateAttack.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateDash.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateJump.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -475,12 +493,30 @@
       <Filter>Engine\3D</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\GameScene.h">
-      <Filter>Application</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\SceneFactory.h">
+      <Filter>Application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\BasePlayerState.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateFactory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateRoot.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateAttack.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateDash.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateJump.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -319,6 +319,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Character\BaseCharacter.cpp" />
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateAttack.cpp" />
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateDash.cpp" />
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateFactory.cpp" />
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateJump.cpp" />
+    <ClCompile Include="Application\Character\PlayerState\PlayerStateRoot.cpp" />
     <ClCompile Include="Application\GameObject\Bullet.cpp" />
     <ClCompile Include="Application\GameObject\Floor.cpp" />
     <ClCompile Include="Application\Camera\FollowCamera.cpp" />
@@ -404,6 +409,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Character\BaseCharacter.h" />
+    <ClInclude Include="Application\Character\PlayerState\BasePlayerState.h" />
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateAttack.h" />
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateDash.h" />
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateJump.h" />
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateRoot.h" />
+    <ClInclude Include="Application\Character\PlayerState\PlayerStateFactory.h" />
     <ClInclude Include="Application\GameObject\Bullet.h" />
     <ClInclude Include="Application\GameObject\Floor.h" />
     <ClInclude Include="Application\Camera\FollowCamera.h" />

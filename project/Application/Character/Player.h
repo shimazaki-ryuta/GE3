@@ -14,7 +14,7 @@
 #include "3D/Animation.h"
 #include "3D/Skeleton.h"
 #include "3D/Material.h"
-
+#include "PlayerState/PlayerStateFactory.h"
 //プレイヤーの制御、描画を行うクラス
 
 class Player : public BaseCharacter {
@@ -52,10 +52,8 @@ public:
 	/// 更新
 	/// </summary>
 	void Update() override;
-	void BehaviorRootUpdate();
-	void BehaviorAttackUpdate();
-	void BehaviorDashUpdate();
-	void BehaviorJumpUpdate();
+
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -68,8 +66,11 @@ public:
 	//リセット
 	void ReStart();
 
+	//射撃
+	void Shot();
+
 	inline void SetViewProjection(const ViewProjection* viewProjection) {viewProjection_ = viewProjection;	};
-	
+	const ViewProjection* GetViewProjection() { return viewProjection_; };
 	//グローバル変数適用
 	void ApplyGlobalVariables();
 
@@ -91,6 +92,20 @@ public:
 	void SetIsDead(bool is) { isDead_ = is; };
 	bool GetIsDead() { return isDead_; };
 	void SetBulletAnimation(Animation* animation) { bulletAnimation_ = animation; };
+	XINPUT_STATE* GetPreJoyState() { return &preJoyState_; };
+	void SetVelocity(const Vector3& velocity) { velocity_ = velocity; };
+	Vector3& GetVelocity() { return velocity_; };
+	void SetDirection(const Vector3& direction) { direction_ = direction; };
+	Vector3 GetDirection() { return direction_; };
+	void SetDirectionMatrix(const Matrix4x4& directionMatrix) { directionMatrix_ = directionMatrix; };
+	Matrix4x4 GetDirectionMatrix() { return directionMatrix_; };
+	bool GetIsJump();
+	//ステート変更
+	void ChangeState(const std::string& stateName);
+
+	//ターゲットの方を向く
+	void ToTarget();
+
 private:
 	const ViewProjection* viewProjection_ = nullptr;
 	WorldTransform worldTransformWepon_;
@@ -161,4 +176,6 @@ private:
 	std::unique_ptr<Skeleton> testSkeleton_;
 	SkinCluster cluster_;
 	std::unique_ptr<Material> material_;
+	std::unique_ptr<PlayerStateFactory> stateFactory_;
+	std::unique_ptr<BasePlayerState> state_;
 };

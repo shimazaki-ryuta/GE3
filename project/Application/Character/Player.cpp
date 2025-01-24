@@ -17,8 +17,7 @@
 #include "RandomEngine.h"
 #include "../Engine/TextureManager.h"
 #include "Collision.h"
-static int startFrame = 0;
-static int endFrame = 40;
+
 static int rigidityFrame = 30;
 static int attackFrame = 15;
 
@@ -27,10 +26,7 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	GlobalVariables* grovalVariables = GlobalVariables::GetInstance();
 	const char* groupName = "Player";
 	grovalVariables->CreateGroup(groupName);
-	//grovalVariables->AddItem(groupName, "Test3", Vector3{1.0f,2.0f,3.0f});
 
-
-	//assert(model);
 	BaseCharacter::Initialize(models);
 	worldTransform_.translation_.z = -60.0f;
 	obb_.center = worldTransform_.translation_;
@@ -66,15 +62,6 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	grovalVariables->AddItem(groupName, "JumpVelocity", kJumpVelocity);
 	grovalVariables->AddItem(groupName, "Gravity", kGravity);
 
-/*
-	weaponOBB_.center = worldTransformWepon_.translation_;
-	weaponOBB_.size = {1.0f,3.0f,1.0f};
-	weaponCollider_.SetOBB(weaponOBB_);
-	weaponCollider_.SetIsCollision(false);
-	CollisionManager::GetInstance()->PushCollider(&weaponCollider_);
-
-	obbModel_.reset(Model::CreateFromOBJ("cube"));
-	worldTtansformOBB_.Initialize();*/
 	comboNum_ = 0;
 
 	emitter.count = 1;
@@ -103,6 +90,11 @@ void Player::Initialize(const std::vector<HierarchicalAnimation>& models) {
 	material_->paramater_.disolveColor = Vector4{ 0.2f, 0.2f, 5.2f, 0.0f };
 	material_->outline_.color = { 0.0f,0.0f,1.0f,1.0f };
 	material_->ApplyParamater();
+
+
+	//ステート
+	stateFactory_ = std::make_unique<PlayerStateFactory>();
+	ChangeState("ROOT");
 }
 
 void Player::ReStart() {
@@ -184,65 +176,29 @@ void Player::BehaviorJumpInitialize() {
 }
 
 void Player::Update() {
+	Input::GetInstance()->GetJoystickState(0, joyState_);
 	ApplyGlobalVariables();
-	if (!isDead_) {
-
-		//弾削除
-		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
-			if (bullet->GetIsDead()) {
-				return true;
-			}
-			return false;
-			});
-
-		Input::GetInstance()->GetJoystickState(0, joyState_);
-
-		//ビヘイビアセット
-		if (behaviorRequest_) {
-			behavior_ = behaviorRequest_.value();
-			frameCount_ = 0;
-			switch (behavior_) {
-			case Player::Behavior::kRoot:
-			default:
-				BehaviorRootInitialize();
-				break;
-			case Player::Behavior::kAttack:
-				BehaviorAttackInitialize();
-				break;
-			case Player::Behavior::kDash:
-				BehaviorDashInitialize();
-				break;
-			case Player::Behavior::kJump:
-				BehaviorJumpInitialize();
-				break;
-			}
-			behaviorRequest_ = std::nullopt;
+	//弾削除
+	bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) {
+		if (bullet->GetIsDead()) {
+			return true;
 		}
-		
+		return false;
+		});
+	if (!isDead_) {		
+
+		//ステート更新
+		if (state_) {
+			state_->Update();
+		}
+
 		//親があったら落下を止める
 		if (worldTransform_.parent_) {
 			if (worldTransform_.translation_.y < 0.0f) {
 				worldTransform_.translation_.y = 0.0f;
 			}
-
 		}
 
-		//ビヘイビア実行
-		switch (behavior_) {
-		case Player::Behavior::kRoot:
-			BehaviorRootUpdate();
-			break;
-		case Player::Behavior::kAttack:
-			BehaviorAttackUpdate();
-			break;
-		case Player::Behavior::kDash:
-			BehaviorDashUpdate();
-			break;
-		case Player::Behavior::kJump:
-			BehaviorJumpUpdate();
-			break;
-		}
-		
 	}
 	else {
 
@@ -290,105 +246,18 @@ void Player::Update() {
 	preJoyState_ = joyState_;
 }
 
-void Player::BehaviorRootUpdate()
-{
-	// ゲームパッドの状態をえる
-	XINPUT_STATE joyState;
-	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-		return;
+void Player::ToTarget() {
+	//敵の方を向く
+	if (target_) {
+		Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
+		toTarget.y = 0;
+		directionMatrix_ = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 	}
-
-	//ステート変更
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) 
-	{
-		behaviorRequest_ = Behavior::kAttack;
-	}
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X))
-	{
-		behaviorRequest_ = Behavior::kDash;
-	}
-	if ((joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && !(preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) && 
-		worldTransform_.parent_)
-	{
-		behaviorRequest_ = Behavior::kJump;
-	}
-
-	//移動処理
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-
-		const float kCharacterSpeed = 0.3f;
-
-		//カメラ方向から移動向きを補正
-		Vector3 move = {
-		    float(joyState.Gamepad.sThumbLX) / SHRT_MAX, 0,
-		    float(joyState.Gamepad.sThumbLY) / SHRT_MAX};
-		move = Normalize(move) * kCharacterSpeed;
-		Matrix4x4 cameraRotateY = Inverse(viewProjection_->matView);
-		cameraRotateY.m[0][1] = 0;
-		cameraRotateY.m[1][0] = 0;
-		cameraRotateY.m[1][1] = 1;
-		cameraRotateY.m[1][2] = 0;
-		cameraRotateY.m[2][1] = 0;
-		cameraRotateY.m[3][0] = 0;
-		cameraRotateY.m[3][1] = 0;
-		cameraRotateY.m[3][2] = 0;
-		move = Transform(move, cameraRotateY);
-
-		//移動方向に向きを合わせる
-		if (joyState.Gamepad.sThumbLX != 0 || joyState.Gamepad.sThumbLY != 0) {
-			Matrix4x4 newDirection = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(move));
-			directionMatrix_ = newDirection;
-			direction_ = move;
-		}
-
-		//敵の方を向く
-		if (target_) {
-			Vector3 toTarget = target_->GetWorldPosition() - worldTransform_.GetWorldPosition();
-			toTarget.y = 0;
-			directionMatrix_=DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
-		}
-
-		//最終的な移動量を足す
-		worldTransform_.translation_ += move;
-
-		//移動時パーティクル発生
-		if (worldTransform_.parent_ && particle_ && Length(move) !=0.0f) {
-			Particle::ParticleData particleData;
-			for (uint32_t count = 0; count < emitter.count; count++) {
-				particleData.transform.scale = { 1.0f,1.0f,1.0f };
-				particleData.transform.rotate = { 0.0f,0.0f,0.0f };
-				particleData.transform.translate = worldTransform_.GetWorldPosition() + Vector3{ RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f), RandomEngine::GetRandom(-1.0f, 1.0f) };
-				particleData.velocity = { RandomEngine::GetRandom(-1.0f,1.0f),RandomEngine::GetRandom(-1.0f,1.0f), RandomEngine::GetRandom(-1.0f,1.0f) };
-				particleData.color = { 1.0f,1.0f,1.0f,1.0f };
-				particleData.lifeTime = RandomEngine::GetRandom(1.0f, 3.0f);
-				particleData.currentTime = 0;
-				particle_->MakeNewParticle(particleData);
-			}
-		}
-	}
-	if (!worldTransform_.parent_) {
-		velocity_ += kGravity;
-	}
-	worldTransform_.translation_ += velocity_;
-
-	//アニメーション
-	UpdateFloatingGimmick();
 }
 
-void Player::BehaviorAttackUpdate()
-{
-	static float weponRotateEnd = 3.14f;
 
-	static float frontLength = 5.0f;
-	
+void Player::Shot(){
 	const float kVelocityCefficent = 1.5f;
-
-	//待機状態に戻る
-	if (frameCount_ == endFrame) {
-		behaviorRequest_ = Behavior::kRoot;
-	}
-	
-	//敵に向けて射撃する
 	if (target_) {
 		Vector3 toTarget = target_->GetWorldPosition() - models_[kHead].worldTransform_.GetWorldPosition();
 		if (frameCount_ == 0) {
@@ -408,38 +277,8 @@ void Player::BehaviorAttackUpdate()
 		toTarget.y = 0;
 		directionMatrix_ = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(toTarget));
 	}
-
-	frameCount_++;
 }
 
-void Player::BehaviorDashUpdate() {
-	
-
-	Vector3 move = {0,0,dashSpeed_};
-	//回避方向を向く
-	Matrix4x4 rotate = worldTransform_.matWorld_;
-	rotate.m[3][0] = 0;
-	rotate.m[3][1] = 0;
-	rotate.m[3][2] = 0;
-	//敵の方を向く
-	if (target_) {
-		rotate = DirectionToDIrection(Normalize(Vector3{ 0.0f,0.0f,1.0f }), Normalize(direction_));
-	}
-	//移動方向補正
-	move = Transform(move, rotate);
-	worldTransform_.translation_ += move;
-
-	//待機状態に戻る
-	if (frameCount_ >= dashLength_) {
-		behaviorRequest_ = Behavior::kRoot;
-	}
-	frameCount_++;
-}
-
-void Player::BehaviorJumpUpdate() {
-	velocity_ = kJumpVelocity * directionMatrix_;
-	behaviorRequest_ = Behavior::kRoot;
-}
 
 void Player::Draw(const ViewProjection& viewProjection) {
 	//アニメーション適用
@@ -558,4 +397,18 @@ void Player::OnCollisionSphere(WorldTransform& parent, Sphere partner) {
 	worldTransform_.UpdateMatrix();
 	velocity_ = { 0,0,0 };
 	isFlooar_ = true;
+}
+
+bool Player::GetIsJump() {
+	bool isJump = false;
+	if (worldTransform_.parent_) {
+		isJump = true;
+	}
+	return isJump;
+};
+
+void Player::ChangeState(const std::string& stateName) {
+	state_.reset(stateFactory_->CreateState(stateName));
+	state_->SetPlayer(this);
+	state_->Initialize();
 }
