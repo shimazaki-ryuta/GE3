@@ -8,7 +8,7 @@
 #include "CommonFiles/DirectXCommon.h"
 #include "Scene/IScene.h"
 //#include "../GameScene.h"
-
+#include "../Application/Scene/SceneFactory.h"
 //ゲームループ管理クラス
 
 class GameManager
@@ -17,14 +17,14 @@ public:
 
 	GameManager() {};
 	~GameManager() {
-		delete dxCommon;
+		delete dxCommon_;
 #ifdef _DEBUG
 		//デバッグカメラの解放
-		debugController->Release();
+		debugController_->Release();
 
 #endif // _DEBUG
 		//ウィンドウ解放
-		CloseWindow(mainWindow->GetHwnd());
+		CloseWindow(mainWindow_->GetHwnd());
 
 		CoUninitialize();
 	};
@@ -37,9 +37,10 @@ public:
 
 private:
 	
-	Window* mainWindow = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	IScene* scene = nullptr;
-	ID3D12Debug1* debugController = nullptr;
+	Window* mainWindow_ = nullptr;
+	DirectXCommon* dxCommon_ = nullptr;
+	std::unique_ptr<IScene> scene_;
+	std::unique_ptr<SceneFactory> sceneFactory_;
+	ID3D12Debug1* debugController_ = nullptr;
 };
 

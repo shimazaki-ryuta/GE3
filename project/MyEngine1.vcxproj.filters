@@ -43,9 +43,6 @@
     <Filter Include="Engine\Scene">
       <UniqueIdentifier>{0aad628e-831d-441e-9803-81047d0413f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Terrain">
-      <UniqueIdentifier>{98049717-3356-42b7-b01b-98674ea36539}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Application\Camera">
       <UniqueIdentifier>{a7548859-f08e-4e18-a8e3-b953486e5171}</UniqueIdentifier>
     </Filter>
@@ -57,6 +54,9 @@
     </Filter>
     <Filter Include="Engine\Math">
       <UniqueIdentifier>{cc21af82-3c0c-41f2-bc85-d89c01223dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\MeshSyncObject">
+      <UniqueIdentifier>{98049717-3356-42b7-b01b-98674ea36539}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -194,7 +194,7 @@
       <Filter>Engine\3D</Filter>
     </ClCompile>
     <ClCompile Include="Engine\MeshSyncObject\MeshSyncObject.cpp">
-      <Filter>Engine\Terrain</Filter>
+      <Filter>Engine\MeshSyncObject</Filter>
     </ClCompile>
     <ClCompile Include="Engine\CommonFiles\Input.cpp">
       <Filter>Engine\CommonFiles</Filter>
@@ -259,8 +259,11 @@
     <ClCompile Include="Engine\2D\PostEffect.cpp">
       <Filter>Engine\2D</Filter>
     </ClCompile>
-    <ClCompile Include="Application\GameScene.cpp">
+    <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Scene\SceneFactory.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -454,7 +457,7 @@
       <Filter>Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Engine\MeshSyncObject\MeshSyncObject.h">
-      <Filter>Engine\Terrain</Filter>
+      <Filter>Engine\MeshSyncObject</Filter>
     </ClInclude>
     <ClInclude Include="Engine\2D\PostEffect.h">
       <Filter>Engine\2D</Filter>
@@ -471,8 +474,14 @@
     <ClInclude Include="Engine\3D\Skeleton.h">
       <Filter>Engine\3D</Filter>
     </ClInclude>
-    <ClInclude Include="Application\GameScene.h">
+    <ClInclude Include="Application\Scene\GameScene.h">
       <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\AbstractSceneFactory.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Scene\SceneFactory.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

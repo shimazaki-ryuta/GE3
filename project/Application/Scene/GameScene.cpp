@@ -41,13 +41,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	dxCommon_ = dxCommon;
 	input_ = Input::GetInstance();
 
-	debugCamera_.reset(new DebugCamera);
+	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize();
 
 	audioHandle_ = AudioManager::GetInstance()->LoadAudio("1.mp3");
 	
 
-	sceneLoader_.reset(new SceneLoader);
+	sceneLoader_ = std::make_unique<SceneLoader>();;
 	sceneLoader_->LoadFile("testScene");
 	modelList_.clear();
 	sceneLoader_->CreateModelList(modelList_);
@@ -69,7 +69,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	CreateLight();
 
 	//skybox
-	skyBox_.reset(new SkyBox);
+	skyBox_ = std::make_unique<SkyBox>();
 	skyBox_->Initialize(TextureManager::LoadTexture("skyBox.dds"));
 	skyBox_->SetColor({0.25f,0.25f,0.25f,1.0f});
 	worldTransformSkyBox_.Initialize();
@@ -80,7 +80,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	modelGround_ = new Model();
 	modelGround_->Create("Resources/human", "walk.gltf");
 
-	ground_.reset(new Ground);
+	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
 	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
 	terrain_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
@@ -126,12 +126,10 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	modelpl2->Create("Resources/Player", "player.gltf");
 	modelpl2->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerHead2_.reset(modelpl2);
-	//modelPlayerHead2_.reset(Model::CreateFromOBJ("float_Head"));
 	modelPlayerL_arm2_.reset(Model::CreateFromOBJ("float_L_arm"));
 	modelPlayerL_arm2_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
 	modelPlayerR_arm2_.reset(Model::CreateFromOBJ("float_R_arm"));
 	modelPlayerR_arm2_->SetPerspectivTextureHandle(skyBox_->GetTextureHandle());
-	// std::vector<Model*> modelPlayers_;
 	std::vector<HierarchicalAnimation> animationPlayer2;
 	animationPlayer2.push_back({ modelPlayerBody2_.get(), worldTransformPlayerBody });
 	animationPlayer2.push_back({ modelPlayerHead2_.get(), worldTransformPlayerHead });
@@ -141,30 +139,24 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	viewProjection_.Initialize();
 	viewProjection_.UpdateMatrix();
-	//debugCamera_ = new DebugCamera(1280, 720);
 	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png");
 	player_ = std::make_unique<Player>();
 	player_->Initialize(animationPlayer);
 	player_->InitializeFloatingGimmick();
 	player_->SetShadowTexture(toonShadowTextureHandle_);
 	player_->SetOutLineData(0.01f, { 0,0,1.0f,1.0f });
-	//player_->SetWepon(modelWepon_.get());
-
+	
 	player2_ = std::make_unique<Enemy>();
 	player2_->Initialize(animationPlayer2);
 	player2_->InitializeFloatingGimmick();
 	player2_->SetShadowTexture(toonShadowTextureHandle_);
 	player2_->SetOutLineData(0.01f, { 1.0f,0,0.0f,1.0f });
-	//player2_->SetWepon(modelWepon_.get());
 	Model* model = new Model;
 	model->Create("Resources/bullet", "bullet.gltf");
 	modelBullet_.reset(model);
-	bulletAnimation_.reset(new Animation);
+	bulletAnimation_ = std::make_unique<Animation>();
 	bulletAnimation_->Initialize();
 	bulletAnimation_->LoadAnimationFile("Resources/bullet", "bullet.gltf");
-	//bulletAnimation_->SetPlaySpeed(5.0f);
-	//modelBullet_.reset(Model::CreateFromOBJ("bullet"));
-	//modelBullet_->SetShiniess(40.0f);
 	modelBullet_->SetEnableLighting(0);
 	modelBullet_->SetGrowStrength(1.0f);
 	player_->SetModelBullet(modelBullet_.get());
@@ -172,18 +164,9 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 	player_->SetBulletAnimation(bulletAnimation_.get());
 	player2_->SetBulletAnimation(bulletAnimation_.get());
 	
-	// 地面
-	modelGround_ = new Model();
-	modelGround_->Create("Resources/human", "walk.gltf");
-	//modelGround_->SetGrowStrength(1.0f);
-
-	//modelPlayerHead_.reset(model);
-	ground_.reset(new Ground);
-	ground_->Initialize(modelGround_, Vector3(0.0f, 0.0f, 0.0f));
-	ground_->SetPerspectiveTextureHandle(skyBox_->GetTextureHandle());
-
+	
 	//床
-	floors_[0].reset(new Floor);
+	floors_[0] = std::make_unique<Floor>();
 	floors_[0]->Initialize();
 	floors_[0]->SetOffset({ 0.0f,0.0f,0.0f });
 	floors_[0]->SetSize({ 120.0f,0.0f,120.0f });
@@ -197,16 +180,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon) {
 
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
 
-	lockOn_.reset(new LockOn);
+	lockOn_ = std::make_unique<LockOn>();
 	lockOn_->Initialize();
-	//lockOn_->Update(player2_.get(), viewProjection_);
-
+	
 	particle.reset(Particle::Create(800));
 	particle->UseBillboard(true);
 	player_->SetParticle(particle.get());
 	player2_->SetParticle(particle.get());
 
-	ai_.reset(new PlayerAI);
+	ai_ = std::make_unique<PlayerAI>();
 	ai_->Initialize();
 	ai_->SetPlayer1(player_.get());
 	ai_->SetPlayer2(player2_.get());

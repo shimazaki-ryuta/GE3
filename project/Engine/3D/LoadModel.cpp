@@ -111,7 +111,6 @@ ModelData LoadModel::LoadObjFile(const std::string& directoryPath, const std::st
 				data.position = positions[elementIndices[0] - 1];
 				data.texcoord = texcoords[elementIndices[1] - 1];
 				data.normal = normals[elementIndices[2] - 1];
-				data.triangleCenter = {1.0f,1.0f,1.0f};
 				verticeslistes_.push_back(data);
 			}
 	
@@ -156,7 +155,6 @@ ModelData LoadModel::LoadModelFile(const std::string& directoryPath, const std::
 			vertex.texcoord = { texcoord.x,texcoord.y };
 			vertex.position.x *= -1.0f;
 			vertex.normal.x *= -1.0f;
-			vertex.triangleCenter = { 1.0f,1.0f,1.0f,1.0f };
 			//meshd.vertices.push_back(vertex);
 			meshd.vertices[vertexIndex] = vertex;
 			//meshs.push_back(mesh);

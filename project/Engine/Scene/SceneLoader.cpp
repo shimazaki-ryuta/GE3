@@ -26,8 +26,8 @@ void SceneLoader::LoadFile(const std::string fileName) {
 	std::string name = deserialized["name"].get<std::string>();
 	assert(name.compare("scene") == 0);
 
-	sceneData_.reset(new SceneData);
-	terrainData_.reset(new TerrainData);
+	sceneData_ = std::make_unique<SceneData>();
+	terrainData_ = std::make_unique<TerrainData>();
 	//全オブジェクト操作
 	for (nlohmann::json& object : deserialized["objects"]) {
 		PraceObject(object);
@@ -166,7 +166,7 @@ void SceneLoader::CreateModelList(std::map<std::string, std::unique_ptr<Model>>&
 void SceneLoader::CreateObjects(std::vector<std::unique_ptr<GameObject>>& list) {
 	for (GameObjectData& object : sceneData_->objects) {
 		std::unique_ptr<GameObject> instance;
-		instance.reset(new GameObject);
+		instance = std::make_unique<GameObject>();
 		instance->Initialize(object);
 		if (!object.children.empty()) {
 			for (GameObjectData& child : object.children) {
@@ -180,7 +180,7 @@ void SceneLoader::CreateObjects(std::vector<std::unique_ptr<GameObject>>& list) 
 
 void SceneLoader::CreateObject(std::unique_ptr<GameObject>& parent, GameObjectData& data) {
 	std::unique_ptr<GameObject> instance;
-	instance.reset(new GameObject);
+	instance = std::make_unique<GameObject>();
 	instance->Initialize(data);
 	if (!data.children.empty()) {
 		for (GameObjectData& child : data.children) {
@@ -192,8 +192,7 @@ void SceneLoader::CreateObject(std::unique_ptr<GameObject>& parent, GameObjectDa
 }
 
 void SceneLoader::CreateTerrain(std::unique_ptr<MeshSyncObject>& terrain) {
-	
-	terrain.reset(new MeshSyncObject);
+	terrain = std::make_unique<MeshSyncObject>();
 	terrain->Initialize(terrainData_->object);
 }
 
@@ -206,6 +205,12 @@ void SceneLoader::ApplyTerrainTransform(std::unique_ptr<MeshSyncObject>& terrain
 
 //debug
 void SceneLoader::StartReceveJson() {
+
+	WSAData wsaData;
+	WSAStartup(MAKEWORD(2, 0), &wsaData);
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	assert(SUCCEEDED(hr));
+
 	isRecevedData_ = false;
 	isRecevedTerrain_ = false;
 	//portSetUp
@@ -240,7 +245,7 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 65536*12;
+	const static uint32_t buffSize = 131072;
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
@@ -252,40 +257,13 @@ void SceneLoader::ReceveJsonData() {
 			break;
 		}
 
-		//バイナリ実験
+		//受信データをコピー
 		ApplyVertexFromBinary(rBuff);
 		
-		/*sData = rBuff;
-		nlohmann::json jData;
-		//json解凍
-		try {
-			jData = nlohmann::json::parse(sData);
-		}
-		catch (...) {
-			//Log(e.what());
-			//continue;
-			//break;
-		}
-		
-		//分岐
-		if (jData.contains("m")) {
-			//頂点データ
-			ReadTerrainVertices(jData);
-			isRecevedTerrain_ = true;
-		}
-		else {
-			sceneData_.reset(new SceneData);
-
-			//全オブジェクト走査
-			for (nlohmann::json& object : jData["objects"]) {
-				PraceObject(object);
-
-			}
-			isRecevedData_ = true;
-		}*/
 	}
 	closesocket(socket_);
 	isEnd = true;
+	WSACleanup();
 }
 
 void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& list) {
@@ -311,7 +289,7 @@ void SceneLoader::ApplyRecevedData(std::vector<std::unique_ptr<GameObject>>& lis
 	for (index; index < sceneData_->objects.size(); index++) {
 		//追加処理
 		std::unique_ptr<GameObject> instance;
-		instance.reset(new GameObject);
+		instance = std::make_unique<GameObject>();
 		instance->Initialize(sceneData_->objects[index]);
 		if (!sceneData_->objects[index].children.empty()) {
 			for (GameObjectData& child : sceneData_->objects[index].children) {
@@ -329,13 +307,6 @@ void SceneLoader::ScanChanged(std::unique_ptr<GameObject>& object,GameObjectData
 	object->SetParameter(datas);
 
 	size_t index = 0;
-	//子要素削除チェック
-	/*std::erase_if(*object->GetChildlen(), [&]() {
-		if (index++ < datas.children.size()) {
-			return false;
-		}
-		return true;
-	});*/
 
 	//子要素変更チェック
 	index = 0;

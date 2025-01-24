@@ -330,6 +330,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Character\Enemy.cpp" />
     <ClCompile Include="Application\Character\PlayerAI.cpp" />
     <ClCompile Include="Application\GameObject\Skydome.cpp" />
+    <ClCompile Include="Application\Scene\SceneFactory.cpp" />
     <ClCompile Include="Application\TimedCall.cpp" />
     <ClCompile Include="Engine\3D\Animation.cpp" />
     <ClCompile Include="Engine\Audio\AudioManager.cpp" />
@@ -398,7 +399,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Demo|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="Application\GameScene.cpp" />
+    <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -414,6 +415,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Character\Enemy.h" />
     <ClInclude Include="Application\Character\PlayerAI.h" />
     <ClInclude Include="Application\GameObject\Skydome.h" />
+    <ClInclude Include="Application\Scene\SceneFactory.h" />
     <ClInclude Include="Application\TimedCall.h" />
     <ClInclude Include="Engine\3D\Animation.h" />
     <ClInclude Include="Engine\Audio\AudioManager.h" />
@@ -453,6 +455,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\2D\PostEffect.h" />
     <ClInclude Include="Engine\CommonFiles\RandomEngine.h" />
     <ClInclude Include="Engine\Scene\IScene.h" />
+    <ClInclude Include="Engine\Scene\AbstractSceneFactory.h" />
     <ClInclude Include="Engine\Scene\SceneLoader.h" />
     <ClInclude Include="Engine\Scene\SceneStructs.h" />
     <ClInclude Include="Engine\CommonFiles\ShaderCompiler.h" />
@@ -471,7 +474,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="Application\GameScene.h" />
+    <ClInclude Include="Application\Scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

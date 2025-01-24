@@ -13,7 +13,7 @@ struct MeshSyncHeader
 };
 
 
-//MeshSync対応オブジェクトクラス
+//MeshSync対応オブジェクトクラス(モデルのラッパー)
 
 class MeshSyncObject
 {
@@ -37,7 +37,6 @@ public:
 
 	//gettersetter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
-
 	VertexData* GetvertexData() { return model_->GetVertexData(); };
 
 	//頂点数を設定する

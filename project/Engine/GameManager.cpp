@@ -2,7 +2,9 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-//#include "WindowProcedure.h"
+#include <Windows.h>
+#pragma comment(lib,"winmm.lib")
+
 #include <cstdint>
 #include <string>
 #include <format>
@@ -10,7 +12,6 @@
 #include <memory>
 #include"ConvertString.h"
 #include "2D/PostEffect.h"
-//static std::shared_ptr<D3DResourceLeakChacker> leakchecker;
 
 //Shader関係
 #include <dxcapi.h>
@@ -41,7 +42,6 @@
 #include "3D/LoadModel.h"
 #include "3D/Particle.h"
 
-#include "../Application/GameScene.h"
 
 const int32_t kClientWidth = 1280;
 const int32_t kClientHeight = 720;
@@ -49,65 +49,69 @@ const std::string kTitle = "";
 
 
 void GameManager::Initialize() {
-	mainWindow = new Window();
-	mainWindow->CreateGameWindow(kTitle, kClientWidth, kClientHeight);
+	//システムタイマーの分解能を上げる
+	timeBeginPeriod(1);
+
+	mainWindow_ = new Window();
+	mainWindow_->CreateGameWindow(kTitle, kClientWidth, kClientHeight);
 
 
 #ifdef _DEBUG
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_))))
 	{
-		debugController->EnableDebugLayer();
+		debugController_->EnableDebugLayer();
 		//debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif 
 
-	dxCommon = new DirectXCommon();
-	dxCommon->Initialize(mainWindow);
-	dxCommon->FixedFPS(true);
+	dxCommon_ = new DirectXCommon();
+	dxCommon_->Initialize(mainWindow_);
+	dxCommon_->FixedFPS(true);
 
 	//入力関数の初期化
-	Input::GetInstance()->Initialize(mainWindow->GetHwnd());
+	Input::GetInstance()->Initialize(mainWindow_->GetHwnd());
 
 	//TextureManagerの初期化
 	TextureManager* textureManager = TextureManager::GetInstance();
-	textureManager->Initialize(dxCommon->GetDevice());
-	textureManager->SetDirectXCommon(dxCommon);
-	textureManager->SetsrvDescriptorHeap(dxCommon->GetsrvDescriptorHeap());
-	dxCommon->CreateRenderTargetView();
-	dxCommon->InitializeImGui();
+	textureManager->Initialize(dxCommon_->GetDevice());
+	textureManager->SetDirectXCommon(dxCommon_);
+	textureManager->SetsrvDescriptorHeap(dxCommon_->GetsrvDescriptorHeap());
+	dxCommon_->CreateRenderTargetView();
+	dxCommon_->InitializeImGui();
 
 	//worldTransformの初期化
-	WorldTransform::SetDevice(dxCommon->GetDevice());
-	Animation::SetDevice(dxCommon->GetDevice());
+	WorldTransform::SetDevice(dxCommon_->GetDevice());
+	Animation::SetDevice(dxCommon_->GetDevice());
 
 
 	//Spriteの初期化
-	Sprite::StaticInitialize(dxCommon->GetDevice());
-	PostEffect::SetDevice(dxCommon->GetDevice());
-	//PostEffect::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
-	dxCommon->CreatePostEffectSprite();
+	Sprite::StaticInitialize(dxCommon_->GetDevice());
+	PostEffect::SetDevice(dxCommon_->GetDevice());
+	dxCommon_->CreatePostEffectSprite();
 	//Modelの初期化
-	LoadModel::SInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
-	Material::SetDevice(dxCommon->GetDevice());
-	Model::StaticInitialize(dxCommon->GetDevice());
-	Particle::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetsrvDescriptorHeap());
-	//Primitive3D::StaticInitialize(dxCommon->GetDevice(), mainWindow->GetClientWidth(), mainWindow->GetClientHeight());
-	SkyBox::StaticInitialize(dxCommon->GetDevice(), dxCommon->GetCommandList());
-	//DeltaTime::GetInstance();
+	LoadModel::SInitialize(dxCommon_->GetDevice(), dxCommon_->GetsrvDescriptorHeap());
+	Material::SetDevice(dxCommon_->GetDevice());
+	Model::StaticInitialize(dxCommon_->GetDevice());
+	Particle::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetsrvDescriptorHeap());
+	SkyBox::StaticInitialize(dxCommon_->GetDevice(), dxCommon_->GetCommandList());
+	
 
 	//音関係初期化
 	AudioManager::GetInstance()->Initialize();
 
-	const uint32_t descriptorSizeSRV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	dxCommon->SetDescriptorSizeSRV(descriptorSizeSRV);
-	const uint32_t descriptorSizeRTV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	dxCommon->SetDescriptorSizeRTV(descriptorSizeRTV);
-	const uint32_t descriptorSizeDSV = dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	dxCommon->SetDescriptorSizeDSV(descriptorSizeDSV);
+	const uint32_t descriptorSizeSRV = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	dxCommon_->SetDescriptorSizeSRV(descriptorSizeSRV);
+	const uint32_t descriptorSizeRTV = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	dxCommon_->SetDescriptorSizeRTV(descriptorSizeRTV);
+	const uint32_t descriptorSizeDSV = dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	dxCommon_->SetDescriptorSizeDSV(descriptorSizeDSV);
 
-	scene = new GameScene;
-	//gameScene.reset(new GameScene);
-	//gameScene->Initialize(dxCommon);
+	//シーンファクトリー
+	sceneFactory_ = std::make_unique<SceneFactory>();
+
+	//デフォルトシーンの読み込み
+	scene_.reset(sceneFactory_->CreateScene());
+	
 
 	//グローバル変数の読み込み
 	GlobalVariables::GetInstance()->LoadFiles();
@@ -117,7 +121,7 @@ void GameManager::Run() {
 	MSG msg{};
 	DeltaTime::GameLoopStart();
 
-	scene->Initialize(dxCommon);
+	scene_->Initialize(dxCommon_);
 
 	while (msg.message != WM_QUIT)
 	{
@@ -135,29 +139,28 @@ void GameManager::Run() {
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 			GlobalVariables::GetInstance()->Update();
-			scene->Update();
+			scene_->Update();
 
 			//描画
-			dxCommon->PreDraw();
+			dxCommon_->PreDraw();
 			
 
-			scene->Draw3D();
+			scene_->Draw3D();
 
-			dxCommon->End3DSorceDraw();
+			dxCommon_->End3DSorceDraw();
 			
-			Sprite::PreDraw(dxCommon->GetCommandList());
-			scene->Draw2D();
+			Sprite::PreDraw(dxCommon_->GetCommandList());
+			scene_->Draw2D();
 			Sprite::PostDraw();
 			
-			dxCommon->PostDraw();
+			dxCommon_->PostDraw();
 		}
 	}
-	dxCommon->DeletePostEffect();
+	dxCommon_->DeletePostEffect();
 	Log(ConvertString(std::format(L"WSTRING:{}\n", msg.message)));
 
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	delete scene;
 }
