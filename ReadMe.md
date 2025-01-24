@@ -2,7 +2,7 @@
 
 [![ReleaseBuild](https://github.com/shimazaki-ryuta/GE3/actions/workflows/ReleaseBuild.yml/badge.svg)](https://github.com/shimazaki-ryuta/GE3/actions/workflows/ReleaseBuild.yml)
 
-# 工夫した機能
+# MeshSync機能
 ## オブジェクト配置およびメッシュの同期機能。
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/meshsync.png)
 * [該当コード](project/Engine/Scene/SceneLoader.cpp)
@@ -31,8 +31,8 @@
 ---
 
 ### Blender操作手順
-1. [level_editor.py](blenderaddon/level_editor.py)をblenderのscripts/addons内に追加
-2. 編集->プリファレンス->レベルエディタを有効
+1. [mesh_sync_to_engine.py](blenderaddon/mesh_sync_to_engine.py)をblenderのscripts/addons内に追加
+2. 編集->プリファレンス->メッシュシンクを有効化
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/blender_preference.png)
 3. meshsyncさせたいオブジェクトのオブジェクト名を<span style="color: orange; ">field</span>に変更
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/blender_name.png)
