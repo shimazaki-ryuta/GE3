@@ -4,7 +4,7 @@
 
 # MeshSync機能
 ## オブジェクト配置およびメッシュの同期機能。
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/meshsync.png)
+![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](picture/title.png)
 * [該当コード](project/Engine/Scene/SceneLoader.cpp)
 ### アプリ側実行手順
 1. - Resource/Model内に必要なモデルを追加(obj&mtl,gltf)
