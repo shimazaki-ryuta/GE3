@@ -123,38 +123,32 @@ void GameManager::Run() {
 
 	scene_->Initialize(dxCommon_);
 
-	while (msg.message != WM_QUIT)
+	while (mainWindow_->ProcessMessage())
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else
-		{
-			//更新処理開始
-			Input::GetInstance()->KeyboardUpdate();
-			DeltaTime::FrameStart();
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-			GlobalVariables::GetInstance()->Update();
-			scene_->Update();
+		
+		//更新処理開始
+		Input::GetInstance()->KeyboardUpdate();
+		DeltaTime::FrameStart();
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		GlobalVariables::GetInstance()->Update();
+		scene_->Update();
 
-			//描画
-			dxCommon_->PreDraw();
+		//描画
+		dxCommon_->PreDraw();
 			
 
-			scene_->Draw3D();
+		scene_->Draw3D();
 
-			dxCommon_->End3DSorceDraw();
+		dxCommon_->End3DSorceDraw();
 			
-			Sprite::PreDraw(dxCommon_->GetCommandList());
-			scene_->Draw2D();
-			Sprite::PostDraw();
+		Sprite::PreDraw(dxCommon_->GetCommandList());
+		scene_->Draw2D();
+		Sprite::PostDraw();
 			
-			dxCommon_->PostDraw();
-		}
+		dxCommon_->PostDraw();
+		
 	}
 	dxCommon_->DeletePostEffect();
 	Log(ConvertString(std::format(L"WSTRING:{}\n", msg.message)));
