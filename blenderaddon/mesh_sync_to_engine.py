@@ -39,9 +39,9 @@ class send_Mesh:
     verticesOffset = 0#頂点オフセット
     isLastData = 0 #最後のデータか
     mainData = list() #データ本体
-
     oldData = list()#古いデータ
 
+    normalType = True
     #activeObject = bmesh()
 
     #格納されたデータを送信する
@@ -84,6 +84,11 @@ class send_Mesh:
         #アクティブオブジェクト取得
         me = object.data
 
+        #法線
+        self.normalType = False
+        if "normal_type" in object:
+            if object["normal_type"]:
+                self.normalType = True
         #有効なbmeshとして登録
         self.activeObject = bmesh.new()
         self.activeObject.from_mesh(me)
@@ -93,16 +98,21 @@ class send_Mesh:
     #頂点データを格納する
     def straged_vertex(self):
     
+        #編集モードの変更を即座に反映
+        #self.activeObject.update_from_editmode()
+
         activeMesh = self.activeObject
 
         #有効化されたuvを一個取ってくる
         uvLayer = activeMesh.loops.layers.uv.active
         
+        faceNum = 0#面数
 
         id=0#累計数
         verticesCount=0#位置データ内数
         self.verticesOffset = 0
         for face in activeMesh.faces :
+            faceNum = faceNum+1
             #三角面の時
             if( len(face.loops) == 3):
                 for loop in face.loops :
@@ -125,9 +135,14 @@ class send_Mesh:
                     self.mainData += struct.pack('<f',-uv.y)
 
                     #法線
-                    self.mainData += struct.pack('<f',face.normal.x)
-                    self.mainData += struct.pack('<f',face.normal.z)
-                    self.mainData += struct.pack('<f',face.normal.y)
+                    if self.normalType:
+                        self.mainData += struct.pack('<f',face.normal.x)
+                        self.mainData += struct.pack('<f',face.normal.z)
+                        self.mainData += struct.pack('<f',face.normal.y)
+                    else :
+                        self.mainData += struct.pack('<f',vertex.normal.x)
+                        self.mainData += struct.pack('<f',vertex.normal.z)
+                        self.mainData += struct.pack('<f',vertex.normal.y)
 
                     id = id + 1
                     verticesCount = verticesCount + 1
@@ -165,10 +180,10 @@ class send_Mesh:
                         id = id + 1
                         verticesCount = verticesCount + 1
             #送信処理
-            if(verticesCount > self.verticesMax or id == len(activeMesh.faces)):
+            if(verticesCount > self.verticesMax or faceNum == len(activeMesh.faces)):
                 #最後のデータか?
                 self.isLastData = 0
-                if(id == len(activeMesh.faces)):
+                if(faceNum== len(activeMesh.faces)):
                    self.isLastData = 1
 
                 #頂点数を更新
@@ -378,9 +393,29 @@ class MYADDON_OT_add_filename(bpy.types.Operator):
     bl_description = "['file_name']カスタムプロパティを追加します"
     bl_options = {"REGISTER","UNDO"}
 
+class OBJECT_PT_normal_type(bpy.types.Panel):
+    """オブジェクトの法線タイプパネル"""
+    bl_idname = "OBJECT_PT_normal_type"
+    bl_label = "NormalType"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "object"
+    
+    def draw(self,context):
+        if "normal_type" in context.object:
+            self.layout.prop(context.object,'["normal_type"]',text=self.bl_label)
+        else:
+            self.layout.operator(MYADDON_OT_add_normaltype.bl_idname)
+
+class MYADDON_OT_add_normaltype(bpy.types.Operator):
+    bl_idname = "myaddon.myaddon_ot_add_normaltype"
+    bl_label = "NormalType 追加"
+    bl_description = "['normal_type']カスタムプロパティを追加します"
+    bl_options = {"REGISTER","UNDO"}
+
     def execute(self,context):
 
-        context.object["file_name"] = ""
+        context.object["normal_type"] = True
 
         return {"FINISHED"}
 
@@ -391,6 +426,8 @@ classes = (
     TOPBAR_MT_my_menu,
     MYADDON_OT_add_filename,
     OBJECT_PT_file_name,
+    MYADDON_OT_add_normaltype,
+    OBJECT_PT_normal_type,
 )
 
 isSend = 1

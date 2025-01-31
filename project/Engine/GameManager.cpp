@@ -123,7 +123,7 @@ void GameManager::Run() {
 
 	scene_->Initialize(dxCommon_);
 
-	while (mainWindow_->ProcessMessage())
+	while (!mainWindow_->ProcessMessage())
 	{
 		
 		//更新処理開始
