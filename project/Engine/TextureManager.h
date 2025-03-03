@@ -8,6 +8,7 @@
 #include <string>
 #include <wrl.h>
 
+using namespace MyEngine;
 //テクスチャ管理クラス
 
 class TextureManager

@@ -1,6 +1,7 @@
 #include "WorldTransform.h"
 #include"MatrixFunction.h"
 #include "CommonFiles/DirectXCommon.h"
+using namespace MyEngine;
 ID3D12Device* WorldTransform::sDevice = nullptr;
 void WorldTransform::SetDevice(ID3D12Device* device)
 {

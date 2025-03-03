@@ -2,6 +2,7 @@
 #include "ShaderCompiler.h"
 #include "TextureManager.h"
 #include "MatrixFunction.h"
+using namespace MyEngine;
 //std::shared_ptr<D3DResourceLeakChacker>Sprite::leakchecker;
 ID3D12Device* Sprite::sDevice = nullptr;
 UINT Sprite::sDescriptorHandleIncrementSize;

@@ -16,7 +16,7 @@ void MeshSyncObject::Initialize(const GameObjectData& data) {
 	
 	material_.reset(new Material);
 	material_->Initialize();
-	material_->paramater_.enableLighting = 1;
+	material_->paramater_.enableLighting = 2;
 	material_->paramater_.disolveThreshold = 0.0f;
 	material_->paramater_.disolveColor = Vector4{ 1.0f, 1.0f, 1.0f, 0.0f };
 	material_->ApplyParamater();
@@ -54,7 +54,7 @@ void MeshSyncObject::Update() {
 	static float st;
 	ImGui::Begin("meshSync");
 	ImGui::DragInt("shadeType", &(material_->paramater_.shadingType), 1, 0, 1);
-	ImGui::DragFloat("Shiness", &(material_->paramater_.shininess), 0.1f, 0.0f, 100.0f);
+	ImGui::DragFloat("SpecularPow", &(material_->paramater_.shininess), 0.01f, 0.0f, 2.0f);
 	ImGui::DragFloat("EnvironmentSpecuraScale", &st, 0.01f, 0.0f, 2.0f);
 	ImGui::DragFloat("Disolve", &(material_->paramater_.disolveThreshold), 0.001f, 0.0f, 1.0f);
 	ImGui::ColorEdit3("DisolveColor", &(material_->paramater_.disolveColor.x));

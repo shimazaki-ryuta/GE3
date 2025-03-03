@@ -3,6 +3,8 @@
 #include "Scene/SceneLoader.h"
 #include "GameObject/GameObject.h"
 
+
+using namespace MyEngine;
 //シーン基底クラス
 
 class IScene

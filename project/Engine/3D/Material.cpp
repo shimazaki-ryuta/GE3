@@ -1,5 +1,5 @@
 #include "Material.h"
-
+using namespace MyEngine;
 ID3D12Device* Material::sDevice = nullptr;
 
 void Material::SetDevice(ID3D12Device* device) {
@@ -13,7 +13,7 @@ void Material::Initialize() {
 	materialData_->color = Vector4{ 1.0f, 1.0f, 1.0f, 1.0f };
 	materialData_->enableLighting = 0;
 	materialData_->uvTransform = MakeIdentity4x4();
-	materialData_->shininess = 100.0f;
+	materialData_->shininess = 0.1f;
 	materialData_->growStrength = 0;
 	materialData_->environmentCoefficient = 0;
 	materialData_->shadingType = 0;

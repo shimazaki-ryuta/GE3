@@ -52,7 +52,7 @@ void GameManager::Initialize() {
 	//システムタイマーの分解能を上げる
 	timeBeginPeriod(1);
 
-	mainWindow_ = new Window();
+	mainWindow_ = std::make_unique<Window>();
 	mainWindow_->CreateGameWindow(kTitle, kClientWidth, kClientHeight);
 
 
@@ -60,12 +60,11 @@ void GameManager::Initialize() {
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_))))
 	{
 		debugController_->EnableDebugLayer();
-		//debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif 
 
-	dxCommon_ = new DirectXCommon();
-	dxCommon_->Initialize(mainWindow_);
+	dxCommon_ = std::make_unique<DirectXCommon>();
+	dxCommon_->Initialize(mainWindow_.get());
 	dxCommon_->FixedFPS(true);
 
 	//入力関数の初期化
@@ -74,7 +73,7 @@ void GameManager::Initialize() {
 	//TextureManagerの初期化
 	TextureManager* textureManager = TextureManager::GetInstance();
 	textureManager->Initialize(dxCommon_->GetDevice());
-	textureManager->SetDirectXCommon(dxCommon_);
+	textureManager->SetDirectXCommon(dxCommon_.get());
 	textureManager->SetsrvDescriptorHeap(dxCommon_->GetsrvDescriptorHeap());
 	dxCommon_->CreateRenderTargetView();
 	dxCommon_->InitializeImGui();
@@ -121,7 +120,7 @@ void GameManager::Run() {
 	MSG msg{};
 	DeltaTime::GameLoopStart();
 
-	scene_->Initialize(dxCommon_);
+	scene_->Initialize(dxCommon_.get());
 
 	while (!mainWindow_->ProcessMessage())
 	{

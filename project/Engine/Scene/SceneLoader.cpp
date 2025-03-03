@@ -253,7 +253,7 @@ void SceneLoader::ReceveJsonData() {
 		recvfrom(socket_, rBuff, buffSize , 0, (sockaddr*)&from, &sockaddr_in_size);
 
 		//end
-		if (strstr(rBuff,"end")) {
+		if (strstr(rBuff, "end")) {
 			break;
 		}
 

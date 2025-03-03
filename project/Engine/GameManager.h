@@ -17,7 +17,7 @@ public:
 
 	GameManager() {};
 	~GameManager() {
-		delete dxCommon_;
+		//delete dxCommon_;
 #ifdef _DEBUG
 		//デバッグカメラの解放
 		debugController_->Release();
@@ -37,8 +37,8 @@ public:
 
 private:
 	
-	Window* mainWindow_ = nullptr;
-	DirectXCommon* dxCommon_ = nullptr;
+	std::unique_ptr<Window> mainWindow_ = nullptr;
+	std::unique_ptr<DirectXCommon> dxCommon_ = nullptr;
 	std::unique_ptr<IScene> scene_;
 	std::unique_ptr<SceneFactory> sceneFactory_;
 	ID3D12Debug1* debugController_ = nullptr;

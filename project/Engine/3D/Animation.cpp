@@ -9,6 +9,7 @@
 #include <cassert>
 
 #include "CommonFiles/DirectXCommon.h"
+using namespace MyEngine;
 ID3D12Device* Animation::sDevice = nullptr;
 void  Animation::SetDevice(ID3D12Device* device)
 {

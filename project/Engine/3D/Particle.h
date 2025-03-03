@@ -15,8 +15,8 @@
 #include <memory>
 #include <list>
 
+using namespace MyEngine;
 //平面パーティクルクラス
-
 class Particle
 {
 public:

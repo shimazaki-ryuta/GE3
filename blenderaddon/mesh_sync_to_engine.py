@@ -15,7 +15,7 @@ import struct
 
 serv_address = ('127.0.0.1', 50001)
 # ソケットを作成する
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock = socket
 
 bl_info = {
     "name": "メッシュシンク",
@@ -39,10 +39,10 @@ class send_Mesh:
     verticesOffset = 0#頂点オフセット
     isLastData = 0 #最後のデータか
     mainData = list() #データ本体
-    oldData = list()#古いデータ
+    oldData = None#古いデータ
 
     normalType = True
-    #activeObject = bmesh()
+    activeObject = None
 
     #格納されたデータを送信する
     def send(self):
@@ -193,19 +193,70 @@ class send_Mesh:
                 self.verticesOffset = self.verticesNum
                 verticesCount = 0
                 
+    def straged_Material(self):
+        activeMesh = self.activeObject
+
+        #有効化されたuvを一個取ってくる
+        material = activeMesh.materials
+        message += struct.pack('<c','M')
+        #diffuse
+        #message += struct.pack('<f',material.diffuse_color[0])
+        #message += struct.pack('<f',material.diffuse_color[1])
+        #message += struct.pack('<f',material.diffuse_color[2])
+
+        #specular
+        #message += struct.pack('<f',material.specular_color[0])
+        #message += struct.pack('<f',material.specular_color[1])
+        #message += struct.pack('<f',material.specular_color[2])
+
+        oridinalPath = material.texture_paint_images.filepath
+        path = ""
+        index =oridinalPath.find() 
+        while  index != -1:
+            path = oridinalPath[index:len(oridinalPath)]
+            index =path.find()
+
+                        
+
+
+        sock.sendto(message, serv_address)
+
+    
     #メッシュシンク適用オブジェクトを探して取得する
     def serch_object(self):
+
+        scene = bpy.context.scene
 
         #シーン内の全オブジェクト走査してパック
         #シーン内の全オブジェクトについて
         id = 0
-        for object in bpy.context.scene.objects:
+        for object in scene.objects:
             #親オブジェクトがあるものはスキップ 
             if object.parent:
                 continue
             #シーン直下のオブジェクトをルートノードとし再帰関数で走査
             self.parse_scene_recursive_json(object,0,id)
             id+=1
+
+    def set_object(self):
+
+        #object = bpy.context.object.data
+
+        #編集モードの変更を即座に反映
+        object.update_from_editmode()
+        #アクティブオブジェクト取得
+        me = object.data
+
+        #bm = bmesh.from_edit_mesh(me)
+
+        #法線
+        self.normalType = False
+        if "normal_type" in object:
+            if object["normal_type"]:
+                self.normalType = True
+        #有効なbmeshとして登録
+        self.activeObject = bmesh.new()
+        self.activeObject.from_mesh(me)
 
     #データ変更チェック
     def send_changing_data(self):
@@ -357,6 +408,43 @@ class MYADDON_OT_export_meshsyncobject(bpy.types.Operator,bpy_extras.io_utils.Ex
             file.write(json_text)
 
 
+isSend = 1
+isSendFileld = 1
+
+        
+#スレッドまとめ
+threads = []
+
+#機能有効か
+class MYADDON_OT_execute(bpy.types.Operator):
+    bl_idname = "myadddon.myaddon_ot_execute"
+    bl_label = "MeshSync開始"
+    bl_description = "MeshSync開始します"
+    #出力するファイルの拡張子
+    filename_ext = ".json"
+    #送信用ループ処理
+    def mesh_sync_loop(self):
+        sMesh = send_Mesh()
+        #無効化されるまでずっと
+        while isSend==1:
+            sMesh.serch_object()
+            #sMesh.set_object()
+            #if sMesh.send_changing_data():
+            sMesh.straged_vertex()
+
+
+    def execute(self,context):
+        print("有効化します")
+        #print(bpy.context.scene.objects)
+
+        #スレッド開始
+        thread = threading.Thread(target=self.mesh_sync_loop)
+        threads.append(thread)
+        thread.start()
+
+        return {'FINISHED'}
+    
+
 class TOPBAR_MT_my_menu(bpy.types.Menu):
     #Blenderがクラスを識別するための固有の文字列
     bl_idname = "TOPBAR_MT_my_menu"
@@ -368,6 +456,7 @@ class TOPBAR_MT_my_menu(bpy.types.Menu):
     #サブメニューの描画
     def draw(self,context):
         self.layout.operator(MYADDON_OT_export_meshsyncobject.bl_idname, text=MYADDON_OT_export_meshsyncobject.bl_label)
+        self.layout.operator(MYADDON_OT_execute.bl_idname, text=MYADDON_OT_execute.bl_label)
     
     #既存メニューにサブメニューを追加
     def submenu(self,context):
@@ -423,27 +512,13 @@ class MYADDON_OT_add_normaltype(bpy.types.Operator):
 #Blenderに登録するクラスリスト
 classes = (
     MYADDON_OT_export_meshsyncobject,
+    MYADDON_OT_execute,
     TOPBAR_MT_my_menu,
     MYADDON_OT_add_filename,
     OBJECT_PT_file_name,
     MYADDON_OT_add_normaltype,
     OBJECT_PT_normal_type,
 )
-
-isSend = 1
-isSendFileld = 1
-
-#送信用ループ処理
-def mesh_sync_loop():
-    sMesh = send_Mesh()
-    #無効化されるまでずっと
-    while isSend==1:
-        sMesh.serch_object()
-        #if sMesh.send_changing_data():
-        sMesh.straged_vertex()
-        
-#スレッドまとめ
-threads = []
 
 #アドオン有効化時コールバックS
 def register():
@@ -460,10 +535,14 @@ def register():
     global isSend
     isSend = 1
 
-    #スレッド開始
-    thread = threading.Thread(target=mesh_sync_loop)
-    threads.append(thread)
-    thread.start()
+    global serv_address
+    serv_address = ('127.0.0.1', 50001)
+    global sock
+    # ソケットを作成する
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+    
     #asyncio.run(send(jdata,sjson))
 
 #アドオン無効化時コールバック
@@ -482,6 +561,8 @@ def unregister():
     isSend = 0
     for t in threads:
         t.join()
+    sock.close()
 
 if __name__ == "__main__":
     register()
+    

@@ -878,8 +878,7 @@ void Model::CreateTerrain(const  std::string& directoryPath, const std::string& 
 
 	vertexNum = modelData_.vertexNum;
 	textureHandle_ = modelData_.meshs.material.textureHandle;
-	toonShadowTextureHandle_ = textureHandle_;
-	perspectivTextureHandle_ = textureHandle_;
+	toonShadowTextureHandle_ = TextureManager::LoadTexture("toonShadow1.png"); perspectivTextureHandle_ = textureHandle_;
 	disolveMaskTextureHandle_ = TextureManager::LoadTexture("noise0.png");
 
 	//仮最大数
