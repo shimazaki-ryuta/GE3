@@ -245,7 +245,7 @@ void SceneLoader::ReceveJsonData() {
 	static bool isEnd = false;
 	static int sockaddr_in_size = sizeof(struct sockaddr_in);
 	sockaddr_in from;
-	const static uint32_t buffSize = 131072;
+	const static uint32_t buffSize = 32768;
 	static char rBuff[buffSize];
 	std::string sData;
 	while (!isEnd) {
@@ -258,7 +258,9 @@ void SceneLoader::ReceveJsonData() {
 		}
 
 		//受信データをコピー
-		ApplyVertexFromBinary(rBuff);
+		//ApplyVertexFromBinary(rBuff);
+		//ApplyMaterial(rBuff);
+		AppyTextureName(rBuff);
 		
 	}
 	closesocket(socket_);
@@ -336,4 +338,22 @@ void SceneLoader::ApplyVertexFromBinary(char* binData) {
 	//ヘッダー分のオフセット
 	const static size_t headerSize = sizeof(MeshSyncHeader);
 	memcpy(vData_ + header.verticesOffset, binData + headerSize, sizeof(VertexData) * (header.verticesNum - header.verticesOffset));
+}
+
+void SceneLoader::ApplyMaterial(char* binData) {
+	struct RecvMaterial
+	{
+		Vector4 diffuseColor;
+		float specularPow;
+		float metaric;
+	};
+	RecvMaterial m;
+	memcpy(&m,binData,sizeof(RecvMaterial));
+	mData_->color = m.diffuseColor;
+	mData_->shininess = m.specularPow;
+	mData_->environmentCoefficient = m.metaric;
+}
+
+void SceneLoader::AppyTextureName(char* binData) {
+	*textureName_ = binData;
 }

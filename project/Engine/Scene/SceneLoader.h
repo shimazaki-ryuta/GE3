@@ -38,6 +38,11 @@ public:
 	//バイナリデータを頂点リソースに適用
 	void ApplyVertexFromBinary(char* binData);
 
+	//マテリアル情報を格納
+	void ApplyMaterial(char* binData);
+
+	//テクスチャ情報(仮)
+	void AppyTextureName(char* binData);
 
 	///debug
 
@@ -58,7 +63,8 @@ public:
 	//Getter/Setter
 	void SetVertexData(VertexData* vData) { vData_ = vData; };
 	size_t GetVerticesNum() { return verticesNum_; };
-
+	void SetMaterialData(MaterialParamater* mData) { mData_ = mData; };
+	void SetTexture(std::string* name) { textureName_ = name; };
 private:
 	//オブジェクト一個の解析
 	void PraceObject(nlohmann::json& object,GameObjectData* parent=nullptr);
@@ -74,5 +80,7 @@ private:
 	//バイナリ用
 	VertexData* vData_;
 	size_t verticesNum_=0;
+	MaterialParamater* mData_;
+	std::string* textureName_;
 };
 

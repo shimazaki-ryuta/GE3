@@ -38,7 +38,8 @@ public:
 	//gettersetter
 	void SetPerspectiveTextureHandle(uint32_t handle) { model_->SetPerspectivTextureHandle(handle); };
 	VertexData* GetvertexData() { return model_->GetVertexData(); };
-
+	MaterialParamater* GetMaterial() { return &material_->paramater_; };
+	std::string* GetTextureName() { return &newTexture_; };
 	//頂点数を設定する
 	void SetVerticesNum(size_t num);
 
@@ -50,5 +51,8 @@ private:
 	std::unique_ptr<Material> material_;
 	std::string fileName = "";
 	size_t verticesNum_ = 0;
+	std::string texture_;
+	std::string newTexture_;
+	uint32_t textureHandle_;
 };
 
